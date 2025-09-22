@@ -1,26 +1,338 @@
 <!DOCTYPE html>
 <html lang="ko">
-	<head>
-		<meta charset="UTF-8">
-		<meta http-equiv="X-UA-Compatible" content="IE=edge">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<title>밥밥밥</title>
-	</head>
-	<body>
-		<main style="margin: 0 auto; width: 1000px; height: 100vh; text-align: center;">
-			<table>
-				<tr>
-					<td style="font-size:30px;">돈토</td>
-					<td style="font-size:30px;">윤스</td>
-				</tr>
-				<tr>
-					<td><iframe src="https://pf.kakao.com/_xilxcBn/posts" style="width:500px;height:750px;" scrolling="no">돈토</iframe></td>
-					<td><iframe src="https://pf.kakao.com/_aKxdLs/posts" style="width:500px;height:750px;" scrolling="no">윤스</iframe></td>
-				</tr>
-				<tr>
-					<td colspan="2" style="font-size:30px; text-align:right; ">밥밥밥 ver 1.0</td>
-				</tr>
-			</table>
-		</main>
-	</body>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>밥밥밥</title>
+    <style>
+        body {
+            font-family: Pretendard, Arial, sans-serif;
+            text-align: center;
+            margin: 5px; /* 외부 여백 추가 */
+            padding: 0;
+            height: calc(100vh - 100px); /* 창 높이에 외부 여백만큼 뺌 */
+            box-sizing: border-box;
+        }
+
+        /* 전체 테이블 스타일 */
+        table {
+            width: 100%;
+            table-layout: fixed;
+            border-collapse: collapse;
+            height: 100%; /* 테이블 높이 전체 화면에 맞춤 */
+        }
+
+        /* 테이블 데이터 셀 스타일 */
+        td {
+            width: 33%;
+            vertical-align: top;
+            padding: 10px;
+        }
+
+        /* iframe 스타일 - 가로 100%, 세로 동적으로 설정 */
+        iframe {
+            width: 100%;
+            height: 100%; /* 부모 높이에 맞게 동적 설정 */
+            border: none;
+        }
+
+		/* 룰렛 컨테이너 스타일 */
+		#roulette-container {
+			position: relative;
+			width: calc(90% - 80px);
+			height: calc(90% - 80px); /* 부모 요소에 맞춰서 룰렛 크기 조정 */
+			margin: 0 auto;
+			box-sizing: border-box;
+		}
+		
+		#roulette-table {
+		}
+
+        /* 캔버스 스타일 */
+        canvas {
+            display: block;
+            margin: 0 auto;
+        }
+
+        /* 룰렛 화살표 스타일 */
+        .pointer {
+            position: absolute;
+            top: -20px; /* 화살표 위치를 중심에 맞춤 */
+            left: 50%;
+            transform: translateX(-50%);
+            width: 10px;
+            height: 40px;
+            background-color: black;
+        }
+
+        /* 입력 필드 스타일 */
+        input {
+            margin: 10px;
+            padding: 5px;
+        }
+
+        /* 숫자 입력 필드 스타일 */
+        input[type="number"] {
+            width: 80%;
+            max-width: 100px;
+            box-sizing: border-box;
+        }
+
+        /* 버튼 스타일 */
+        button {
+            padding: 5px 10px;
+            background-color: #478968;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        /* 버튼 호버 스타일 */
+        button:hover {
+            background-color: #356c54;
+        }
+
+        /* 메뉴 리스트 테이블 스타일 */
+        #menuList {
+            margin-top: 20px;
+            width: 100%;
+            border-collapse: collapse;
+            max-height: 200px; /* 최대 높이를 제한 */
+            overflow-y: auto; /* 스크롤 허용 */
+            display: block; /* 테이블 스크롤을 위한 블록화 */
+        }
+
+        /* 테이블 헤더 및 데이터 셀 스타일 */
+        th, td {
+            padding: 5px;
+            border: 1px solid #ddd;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        /* 동적 행 높이 */
+        .dynamic-row {
+            height: calc(100% - 60px); /* 남은 공간을 계산해 동적 높이 설정 */
+            overflow-y: auto; /* 2행 스크롤 추가 */
+        }
+    </style>
+</head>
+<body>
+    <h1>밥밥밥</h1>
+    <table>
+        <tr>
+            <td style="font-size:30px; text-align:center;">돈토</td>
+            <td style="font-size:30px; text-align:center;">윤스</td>
+            <td style="font-size:30px; text-align:center;">룰렛</td>
+        </tr>
+        <tr class="dynamic-row">
+            <!-- 각 셀의 내용을 iframe 및 룰렛으로 설정 -->
+            <td><iframe id="iframe-donto" src="http://pf.kakao.com/_xilxcBn" scrolling="no">돈토</iframe></td>
+            <td><iframe id="iframe-yuns" src="https://pf.kakao.com/_aKxdLs" scrolling="no">윤스</iframe></td>
+            <td>
+				<div id="roulette-table">
+					<div id="roulette-container">
+						<canvas id="roulette"></canvas>
+						<div class="pointer"></div>
+					</div>
+					<div style="margin-top: 20px;">
+						<input type="text" id="menuAdd" placeholder="메뉴 추가">
+						<button onclick="add()">추가</button>
+						<button onclick="rotate()">돌리기</button>
+						<button onclick="stopRotate()">멈추기</button>
+					</div>
+					<table id="menuList">
+						<thead>
+							<tr>
+								<th>메뉴</th>
+								<th>비중</th>
+								<th>삭제</th>
+							</tr>
+						</thead>
+						<tbody>
+						</tbody>
+					</table>
+				</div>
+            </td>
+        </tr>
+        <tr>
+            <td colspan="3" style="font-size:30px; text-align:right;">밥밥밥 ver 2.1</td>
+        </tr>
+    </table>
+
+<script>
+    const $c = document.querySelector("#roulette");
+    const ctx = $c.getContext(`2d`);
+    const menuAdd = document.querySelector('#menuAdd');
+    const menuList = document.querySelector('#menuList tbody');
+
+    const product = [{ name: "돈토", weight: 50 }, { name: "윤스", weight: 50 }];
+    const colors = [];
+    let rotateInterval = null;
+    let stopRequested = false;
+    let angle = 0;
+    let currentSpeed = 0;
+
+    const generatePastelColor = () => {
+        const r = Math.floor((Math.random() * 127) + 127);
+        const g = Math.floor((Math.random() * 127) + 127);
+        const b = Math.floor((Math.random() * 127) + 127);
+        return `rgb(${r}, ${g}, ${b})`;
+    };
+
+    const updateMenuList = () => {
+        menuList.innerHTML = '';
+        product.forEach((item, index) => {
+            const row = document.createElement('tr');
+
+            const nameCell = document.createElement('td');
+            nameCell.textContent = item.name;
+
+            const weightCell = document.createElement('td');
+            const weightInput = document.createElement('input');
+            weightInput.type = 'number';
+            weightInput.value = item.weight;
+            weightInput.addEventListener('change', () => {
+                const newWeight = parseFloat(weightInput.value);
+                if (isNaN(newWeight) || newWeight <= 0) {
+                    alert('비율은 숫자로 입력해야 합니다.');
+                    weightInput.value = item.weight;
+                    return;
+                }
+                item.weight = newWeight;
+                newMake();
+            });
+            weightCell.appendChild(weightInput);
+
+            const actionCell = document.createElement('td');
+            const deleteButton = document.createElement('button');
+            deleteButton.textContent = '삭제';
+            deleteButton.addEventListener('click', () => {
+                product.splice(index, 1);
+                updateMenuList();
+                newMake();
+            });
+            actionCell.appendChild(deleteButton);
+
+            row.appendChild(nameCell);
+            row.appendChild(weightCell);
+            row.appendChild(actionCell);
+            menuList.appendChild(row);
+        });
+    };
+
+    const newMake = () => {
+        const [cw, ch] = [$c.width / 2, $c.height / 2];
+        const totalWeight = product.reduce((sum, item) => sum + item.weight, 0);
+        let startAngle = 0;
+
+        if (colors.length === 0) {
+            for (let i = 0; i < product.length; i++) {
+                colors.push(generatePastelColor());
+            }
+        }
+
+        ctx.clearRect(0, 0, $c.width, $c.height);
+
+        product.forEach((item, i) => {
+            const arc = (item.weight / totalWeight) * 2 * Math.PI;
+            ctx.beginPath();
+            ctx.fillStyle = colors[i % colors.length];
+            ctx.moveTo(cw, ch);
+            ctx.arc(cw, ch, cw, startAngle, startAngle + arc);
+            ctx.fill();
+            ctx.closePath();
+            startAngle += arc;
+        });
+
+        ctx.fillStyle = "#000";
+        ctx.font = "18px Pretendard";
+        ctx.textAlign = "center";
+
+        startAngle = 0;
+        product.forEach((item) => {
+            const angle = startAngle + (item.weight / totalWeight) * Math.PI;
+            ctx.save();
+            ctx.translate(
+                cw + Math.cos(angle) * (cw - 50),
+                ch + Math.sin(angle) * (ch - 50)
+            );
+            ctx.rotate(angle + Math.PI / 2);
+            ctx.fillText(item.name, 0, 0);
+            ctx.restore();
+            startAngle += (item.weight / totalWeight) * 2 * Math.PI;
+        });
+    };
+
+    const spin = () => {
+        if (stopRequested && currentSpeed > 0) {
+            currentSpeed -= 0.1;
+        }
+
+        if (currentSpeed <= 0) {
+            clearInterval(rotateInterval);
+            rotateInterval = null;
+            return;
+        }
+
+        angle += currentSpeed;
+        ctx.save();
+        ctx.translate($c.width / 2, $c.height / 2);
+        ctx.rotate((angle * Math.PI) / 180);
+        ctx.translate(-$c.width / 2, -$c.height / 2);
+        newMake();
+        ctx.restore();
+    };
+
+    const rotate = () => {
+        if (product.length <= 1) {
+            alert('메뉴는 최소 2개 이상이어야 합니다.');
+            return;
+        }
+        stopRequested = false;
+        currentSpeed = 15;
+        rotateInterval = setInterval(spin, 10);
+        setTimeout(() => stopRotate(), 4000);
+    };
+
+    const stopRotate = () => {
+        stopRequested = true;
+    };
+
+    const add = () => {
+        if (menuAdd.value.trim()) {
+            product.push({ name: menuAdd.value.trim(), weight: 50 });
+            colors.length = 0;
+            for (let i = 0; i < product.length; i++) {
+                colors.push(generatePastelColor());
+            }
+            menuAdd.value = '';
+            updateMenuList();
+            newMake();
+        } else {
+            alert("메뉴를 입력한 후 버튼을 클릭 해 주세요");
+        }
+    };
+
+    const resizeCanvas = () => {
+        const containerWidth = document.getElementById('roulette-container').offsetWidth;
+        const containerHeight = document.querySelector('.dynamic-row').offsetHeight;
+        $c.width = containerWidth - 60; // padding 고려
+        $c.height = Math.min(containerHeight - 60, containerWidth - 60);
+
+        newMake();
+    };
+
+    menuAdd.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+            add();
+        }
+    });
+
+    window.addEventListener('resize', resizeCanvas);
+
+    updateMenuList();
+    resizeCanvas();
+</script>
+</body>
 </html>
