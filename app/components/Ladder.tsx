@@ -142,10 +142,16 @@ const Ladder = () => {
     setPlayers([]);
     setResults([]);
     setNames([]);
-    setPlayerInput("");
     setGameState("initial");
-  };
 
+    const canvas = canvasRef.current;
+    if (canvas) {
+      const ctx = canvas.getContext("2d");
+      if (ctx) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+    }
+  };
   const animatePath = useCallback(
     (path: PathPoint[]) => {
       let i = 0;
@@ -344,16 +350,18 @@ const Ladder = () => {
         </Box>
       )}
 
-      <canvas
-        ref={canvasRef}
-        style={{
-          marginTop: theme.spacing(2),
-          backgroundColor: theme.palette.background.paper,
-          borderRadius: theme.shape.borderRadius,
-          width: "100%",
-          display: "block",
-        }}
-      ></canvas>
+      {gameState !== "initial" && (
+        <canvas
+          ref={canvasRef}
+          style={{
+            marginTop: theme.spacing(2),
+            backgroundColor: theme.palette.background.paper,
+            borderRadius: theme.shape.borderRadius,
+            width: "100%",
+            display: "block",
+          }}
+        ></canvas>
+      )}
     </Box>
   );
 };
