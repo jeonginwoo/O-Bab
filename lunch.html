@@ -127,67 +127,82 @@
         </tr>
         <tr class="dynamic-row">
             <!-- 각 셀의 내용을 iframe 및 룰렛으로 설정 -->
-            <td><iframe id="iframe-donto" src="http://pf.kakao.com/_xilxcBn" scrolling="no">돈토</iframe></td>
-            <td><iframe id="iframe-yuns" src="https://pf.kakao.com/_aKxdLs" scrolling="no">윤스</iframe></td>
+            <td><iframe id="iframe-donto" src="http://pf.kakao.com/_xilxcBn/posts" scrolling="no">돈토</iframe></td>
+            <td><iframe id="iframe-yuns" src="https://pf.kakao.com/_aKxdLs/posts" scrolling="no">윤스</iframe></td>
             <td>
-				<div id="roulette-table">
-					<div id="roulette-container">
-						<canvas id="roulette"></canvas>
-						<div class="pointer"></div>
-					</div>
-					<div style="margin-top: 20px;">
-						<input type="text" id="menuAdd" placeholder="메뉴 추가">
-						<button onclick="add()">추가</button>
-						<button onclick="rotate()">돌리기</button>
-						<button onclick="stopRotate()">멈추기</button>
-					</div>
-					<table id="menuList">
-						<thead>
-							<tr>
-								<th>메뉴</th>
-								<th>비중</th>
-								<th>삭제</th>
-							</tr>
-						</thead>
-						<tbody>
-						</tbody>
-					</table>
-				</div>
+                <div id="game-selection">
+                    <button onclick="showGame('roulette')">룰렛</button>
+                    <button onclick="showGame('ladder')">사다리타기</button>
+                </div>
+
+                <div id="game-roulette">
+                    <div id="roulette-container">
+                        <canvas id="roulette"></canvas>
+                        <div class="pointer"></div>
+                    </div>
+                    <div style="margin-top: 20px;">
+                        <input type="text" id="menuAdd" placeholder="메뉴 추가">
+                        <button onclick="add()">추가</button>
+                        <button onclick="rotate()">돌리기</button>
+                        <button onclick="stopRotate()">멈추기</button>
+                    </div>
+                    <table id="menuList">
+                        <thead>
+                            <tr>
+                                <th>메뉴</th>
+                                <th>비중</th>
+                                <th>삭제</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="game-ladder" style="display: none;">
+                    <div>
+                        <input type="text" id="ladder-players" placeholder="이름 (쉼표로 구분)">
+                        <button id="start-ladder-btn" onclick="startLadderGame()">사다리 시작</button>
+                        <button id="retry-ladder-btn" onclick="retryLadder()" style="display:none;">다시하기</button>
+                        <button id="trace-ladder-btn" onclick="traceAllPaths()" style="display:none;">결과 확인</button>
+                    </div>
+                    <div id="ladder-controls" style="display:none;">
+                        <label for="ladder-height">사다리 길이: </label>
+                        <input type="range" id="ladder-height" min="200" max="600" value="300">
+                        <span id="ladder-height-value">300</span>
+                    </div>
+                    <canvas id="ladder-canvas"></canvas>
+                </div>
             </td>
         </tr>
         <tr>
-            <td colspan="3" style="font-size:30px; text-align:right;">밥밥밥 ver 2.1</td>
+            <td colspan="3" style="font-size:30px; text-align:right;">밥밥밥 ver 2.2</td>
         </tr>
     </table>
-
 <script>
+    // Roulette game code...
     const $c = document.querySelector("#roulette");
     const ctx = $c.getContext(`2d`);
     const menuAdd = document.querySelector('#menuAdd');
     const menuList = document.querySelector('#menuList tbody');
-
     const product = [{ name: "돈토", weight: 50 }, { name: "윤스", weight: 50 }];
     const colors = [];
     let rotateInterval = null;
     let stopRequested = false;
     let angle = 0;
     let currentSpeed = 0;
-
     const generatePastelColor = () => {
         const r = Math.floor((Math.random() * 127) + 127);
         const g = Math.floor((Math.random() * 127) + 127);
         const b = Math.floor((Math.random() * 127) + 127);
         return `rgb(${r}, ${g}, ${b})`;
     };
-
     const updateMenuList = () => {
         menuList.innerHTML = '';
         product.forEach((item, index) => {
             const row = document.createElement('tr');
-
             const nameCell = document.createElement('td');
             nameCell.textContent = item.name;
-
             const weightCell = document.createElement('td');
             const weightInput = document.createElement('input');
             weightInput.type = 'number';
@@ -203,7 +218,6 @@
                 newMake();
             });
             weightCell.appendChild(weightInput);
-
             const actionCell = document.createElement('td');
             const deleteButton = document.createElement('button');
             deleteButton.textContent = '삭제';
@@ -213,27 +227,22 @@
                 newMake();
             });
             actionCell.appendChild(deleteButton);
-
             row.appendChild(nameCell);
             row.appendChild(weightCell);
             row.appendChild(actionCell);
             menuList.appendChild(row);
         });
     };
-
     const newMake = () => {
         const [cw, ch] = [$c.width / 2, $c.height / 2];
         const totalWeight = product.reduce((sum, item) => sum + item.weight, 0);
         let startAngle = 0;
-
         if (colors.length === 0) {
             for (let i = 0; i < product.length; i++) {
                 colors.push(generatePastelColor());
             }
         }
-
         ctx.clearRect(0, 0, $c.width, $c.height);
-
         product.forEach((item, i) => {
             const arc = (item.weight / totalWeight) * 2 * Math.PI;
             ctx.beginPath();
@@ -244,11 +253,9 @@
             ctx.closePath();
             startAngle += arc;
         });
-
         ctx.fillStyle = "#000";
         ctx.font = "18px Pretendard";
         ctx.textAlign = "center";
-
         startAngle = 0;
         product.forEach((item) => {
             const angle = startAngle + (item.weight / totalWeight) * Math.PI;
@@ -263,18 +270,15 @@
             startAngle += (item.weight / totalWeight) * 2 * Math.PI;
         });
     };
-
     const spin = () => {
         if (stopRequested && currentSpeed > 0) {
             currentSpeed -= 0.1;
         }
-
         if (currentSpeed <= 0) {
             clearInterval(rotateInterval);
             rotateInterval = null;
             return;
         }
-
         angle += currentSpeed;
         ctx.save();
         ctx.translate($c.width / 2, $c.height / 2);
@@ -283,7 +287,6 @@
         newMake();
         ctx.restore();
     };
-
     const rotate = () => {
         if (product.length <= 1) {
             alert('메뉴는 최소 2개 이상이어야 합니다.');
@@ -294,11 +297,9 @@
         rotateInterval = setInterval(spin, 10);
         setTimeout(() => stopRotate(), 4000);
     };
-
     const stopRotate = () => {
         stopRequested = true;
     };
-
     const add = () => {
         if (menuAdd.value.trim()) {
             product.push({ name: menuAdd.value.trim(), weight: 50 });
@@ -313,26 +314,248 @@
             alert("메뉴를 입력한 후 버튼을 클릭 해 주세요");
         }
     };
-
     const resizeCanvas = () => {
         const containerWidth = document.getElementById('roulette-container').offsetWidth;
         const containerHeight = document.querySelector('.dynamic-row').offsetHeight;
         $c.width = containerWidth - 60; // padding 고려
         $c.height = Math.min(containerHeight - 60, containerWidth - 60);
-
         newMake();
     };
-
     menuAdd.addEventListener('keydown', (event) => {
         if (event.key === 'Enter') {
             add();
         }
     });
-
     window.addEventListener('resize', resizeCanvas);
-
     updateMenuList();
     resizeCanvas();
+
+    function showGame(gameId) {
+        document.getElementById('game-roulette').style.display = 'none';
+        document.getElementById('game-ladder').style.display = 'none';
+        
+        if (gameId === 'ladder') {
+            resetLadderGame();
+        }
+
+        document.getElementById('game-' + gameId).style.display = 'block';
+    }
+
+    // Ladder game code
+    const ladderCanvas = document.getElementById('ladder-canvas');
+    const ladderCtx = ladderCanvas.getContext('2d');
+    let ladderData = [];
+    let names = []; // Will hold start points: '커피', '꽝'
+    let results = []; // Will hold destinations: Player names
+    let numPlayers = 0;
+
+    document.getElementById('ladder-height').addEventListener('input', function() {
+        document.getElementById('ladder-height-value').textContent = this.value;
+        rebuildLadder();
+    });
+
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+    }
+
+    function randomizeStartAndEnd() {
+        // Shuffle player names at the bottom
+        shuffleArray(results);
+        
+        // Generate start points randomly
+        names = new Array(numPlayers).fill('꽝');
+        const coffeeIndex = Math.floor(Math.random() * numPlayers);
+        names[coffeeIndex] = '커피';
+    }
+
+    function startLadderGame() {
+        const playersInput = document.getElementById('ladder-players').value;
+        const players = playersInput.split(',').map(s => s.trim()).filter(Boolean);
+        numPlayers = players.length;
+
+        if (numPlayers < 2) {
+            alert('이름을 2명 이상 입력해주세요.');
+            return;
+        }
+
+        results = players;
+        randomizeStartAndEnd();
+        
+        document.getElementById('start-ladder-btn').style.display = 'none';
+        document.getElementById('retry-ladder-btn').style.display = 'inline-block';
+        document.getElementById('trace-ladder-btn').style.display = 'inline-block';
+        document.getElementById('ladder-controls').style.display = 'block';
+
+        drawLadder();
+    }
+    
+    function resetLadderGame() {
+        ladderCtx.clearRect(0, 0, ladderCanvas.width, ladderCanvas.height);
+        document.getElementById('ladder-players').value = '';
+        document.getElementById('start-ladder-btn').style.display = 'inline-block';
+        document.getElementById('retry-ladder-btn').style.display = 'none';
+        document.getElementById('trace-ladder-btn').style.display = 'none';
+        document.getElementById('ladder-controls').style.display = 'none';
+        ladderData = [];
+        names = [];
+        results = [];
+        numPlayers = 0;
+    }
+
+    function retryLadder() {
+        randomizeStartAndEnd();
+        drawLadder();
+        document.getElementById('trace-ladder-btn').style.display = 'inline-block';
+    }
+
+    function drawLadder() {
+        const width = 500;
+        const height = parseInt(document.getElementById('ladder-height').value);
+        ladderCanvas.width = width;
+        ladderCanvas.height = height;
+        const step = width / (numPlayers + 1);
+        const minRungGap = 30; // Minimum vertical gap between rungs
+        const rungCount = Math.floor((height - 70) / 50); // Adjust rung count based on height
+        const segmentHeight = (height - 70) / rungCount;
+        ladderData = [];
+
+        ladderCtx.clearRect(0, 0, width, height);
+        ladderCtx.lineWidth = 2;
+        ladderCtx.font = '14px Pretendard';
+        ladderCtx.textAlign = 'center';
+
+        for (let i = 0; i < numPlayers; i++) {
+            const x = step * (i + 1);
+            // Draw start points at the top
+            ladderCtx.fillText(names[i], x, 20);
+            ladderCtx.beginPath();
+            ladderCtx.moveTo(x, 30);
+            ladderCtx.lineTo(x, height - 30);
+            ladderCtx.stroke();
+            // Draw player names at the bottom
+            ladderCtx.fillText(results[i], x, height - 10);
+        }
+
+        for (let i = 0; i < numPlayers - 1; i++) {
+            const rungs = [];
+            for (let j = 0; j < rungCount; j++) {
+                const x1 = step * (i + 1);
+                const x2 = step * (i + 2);
+                let y;
+                let attempts = 0;
+                do {
+                    // Place rung in its own segment
+                    y = 40 + (segmentHeight * j) + (Math.random() * segmentHeight * 0.8) + (segmentHeight * 0.1);
+                    attempts++;
+                } while (
+                    (rungs.some(r => Math.abs(r.y - y) < minRungGap) ||
+                    (i > 0 && ladderData[i-1].some(r => Math.abs(r.y - y) < minRungGap))) &&
+                    attempts < 50
+                );
+                
+                rungs.push({y, x1, x2});
+                ladderCtx.beginPath();
+                ladderCtx.moveTo(x1, y);
+                ladderCtx.lineTo(x2, y);
+                ladderCtx.stroke();
+            }
+            ladderData.push(rungs.sort((a,b) => a.y - b.y));
+        }
+    }
+
+    function traceAllPaths() {
+        document.getElementById('trace-ladder-btn').style.display = 'none';
+        document.getElementById('retry-ladder-btn').style.display = 'none';
+        const coffeeIndex = names.indexOf('커피');
+
+        if (coffeeIndex !== -1) {
+            const { path, finalLane } = tracePath(coffeeIndex);
+            animatePath(path, coffeeIndex);
+        }
+    }
+
+    function tracePath(playerIndex) {
+        const path = [];
+        const width = ladderCanvas.width;
+        const height = ladderCanvas.height;
+        const step = width / (numPlayers + 1);
+        let currentX = step * (playerIndex + 1);
+        let currentY = 30;
+        let currentLane = playerIndex;
+
+        path.push({x: currentX, y: currentY});
+
+        while(currentY < height - 30) {
+            let nextRung = null;
+
+            // Find the next available rung to the right
+            if (currentLane < numPlayers - 1) {
+                for (const rung of ladderData[currentLane]) {
+                    if (rung.y > currentY) {
+                        nextRung = { ...rung, direction: 'right' };
+                        break;
+                    }
+                }
+            }
+
+            // Find the next available rung to the left and check if it's closer
+            if (currentLane > 0) {
+                for (const rung of ladderData[currentLane - 1]) {
+                    if (rung.y > currentY) {
+                        if (!nextRung || rung.y < nextRung.y) {
+                            nextRung = { ...rung, direction: 'left' };
+                        }
+                        break;
+                    }
+                }
+            }
+
+            if (nextRung) {
+                path.push({ x: currentX, y: nextRung.y });
+                currentY = nextRung.y;
+
+                if (nextRung.direction === 'right') {
+                    currentX = nextRung.x2;
+                    currentLane++;
+                } else {
+                    currentX = nextRung.x1;
+                    currentLane--;
+                }
+                path.push({ x: currentX, y: currentY });
+            } else {
+                // No more rungs for this path, go straight to the bottom
+                currentY = height - 30;
+                path.push({ x: currentX, y: currentY });
+            }
+        }
+        return { path, finalLane: currentLane };
+    }
+
+    function animatePath(path, index) {
+        let i = 0;
+        const pathColor = 'red';
+        function draw() {
+            if (i < path.length - 1) {
+                ladderCtx.save();
+                ladderCtx.beginPath();
+                ladderCtx.moveTo(path[i].x, path[i].y);
+                ladderCtx.lineTo(path[i+1].x, path[i+1].y);
+                ladderCtx.strokeStyle = pathColor;
+                ladderCtx.lineWidth = 3;
+                ladderCtx.stroke();
+                ladderCtx.restore();
+                i++;
+                setTimeout(draw, 250);
+            } else {
+                // Animation complete, re-enable retry button
+                document.getElementById('retry-ladder-btn').style.display = 'inline-block';
+            }
+        }
+        draw();
+    }
 </script>
 </body>
 </html>
