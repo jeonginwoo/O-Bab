@@ -59,7 +59,7 @@ const Roulette = () => {
             startAngle += arc;
         });
 
-        ctx.fillStyle = theme.palette.primary.main; // Use theme color for text
+        ctx.fillStyle = theme.palette.primary.main;
         ctx.font = "16px Roboto";
         ctx.textAlign = "center";
         startAngle = 0;
@@ -195,7 +195,7 @@ const Roulette = () => {
                 <TextField
                     sx={{
                         flexGrow: 1,
-                        minWidth: 0, // Added minWidth: 0 to allow it to shrink
+                        minWidth: 0,
                         '& .MuiInputBase-root': { color: theme.palette.text.primary },
                         '& .MuiOutlinedInput-notchedOutline': { borderColor: theme.palette.text.secondary },
                         '& .MuiInputLabel-root': { color: theme.palette.text.secondary },
