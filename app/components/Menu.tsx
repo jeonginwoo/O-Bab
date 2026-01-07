@@ -1,12 +1,20 @@
 "use client";
 
-import axios from 'axios';
-import React, { useState, useEffect } from 'react';
-import { 
-  Card, CardContent, Typography, CircularProgress, Alert, Box, 
-  ImageList, ImageListItem, Modal, IconButton
-} from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
+import axios from "axios";
+import React, { useState, useEffect } from "react";
+import {
+  Card,
+  CardContent,
+  Typography,
+  CircularProgress,
+  Alert,
+  Box,
+  ImageList,
+  ImageListItem,
+  Modal,
+  IconButton,
+} from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
 
 interface Media {
   type: string;
@@ -25,12 +33,12 @@ interface ApiResponse {
   items: any[];
 }
 
-function Menu({ title, apiUrl }: { title: string; apiUrl:string }) {
+function Menu({ title, apiUrl }: { title: string; apiUrl: string }) {
   const [menu, setMenu] = useState<MenuItem | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [openModal, setOpenModal] = useState(false);
-  const [selectedImage, setSelectedImage] = useState('');
+  const [selectedImage, setSelectedImage] = useState("");
 
   useEffect(() => {
     async function fetchData() {
@@ -40,14 +48,16 @@ function Menu({ title, apiUrl }: { title: string; apiUrl:string }) {
         const proxyUrl = `/api/proxy?url=${encodeURIComponent(apiUrl)}`;
         const response = await axios.get(proxyUrl);
         const data: ApiResponse = response.data;
-        const menuItem = data.items.find(item => !item.pinned);
+        const menuItem = data.items.find((item) => !item.pinned);
         if (menuItem) {
           setMenu(menuItem);
         } else {
-          setError('No available menu found.');
+          setError("No available menu found.");
         }
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'An unknown error occurred.');
+        setError(
+          err instanceof Error ? err.message : "An unknown error occurred."
+        );
         console.error(err);
       } finally {
         setLoading(false);
@@ -63,13 +73,13 @@ function Menu({ title, apiUrl }: { title: string; apiUrl:string }) {
 
   const handleCloseModal = () => {
     setOpenModal(false);
-    setSelectedImage('');
+    setSelectedImage("");
   };
 
   const renderImages = () => {
     if (!menu || !menu.media || menu.media.length === 0) return null;
 
-    const imageMedia = menu.media.filter(m => m.type === 'image');
+    const imageMedia = menu.media.filter((m) => m.type === "image");
     if (imageMedia.length === 0) return null;
 
     let menuImages: Media[] = [];
@@ -84,7 +94,6 @@ function Menu({ title, apiUrl }: { title: string; apiUrl:string }) {
         foodImages = imageMedia.slice(0, imageMedia.length - 1);
       }
     } else {
-     
       foodImages = imageMedia;
     }
 
@@ -95,7 +104,12 @@ function Menu({ title, apiUrl }: { title: string; apiUrl:string }) {
             <img
               src={media.url}
               alt={`${menu.title} menu image ${index + 1}`}
-              style={{ width: '100%', height: 'auto', borderRadius: 4, cursor: 'pointer' }}
+              style={{
+                width: "100%",
+                height: "auto",
+                borderRadius: 4,
+                cursor: "pointer",
+              }}
               onClick={() => handleImageClick(media.url)}
             />
           </Box>
@@ -108,7 +122,12 @@ function Menu({ title, apiUrl }: { title: string; apiUrl:string }) {
                   src={media.url}
                   alt={`${menu.title} food image ${index + 1}`}
                   loading="lazy"
-                  style={{ width: '100%', height: 'auto', borderRadius: 4, cursor: 'pointer' }}
+                  style={{
+                    width: "100%",
+                    height: "auto",
+                    borderRadius: 4,
+                    cursor: "pointer",
+                  }}
                   onClick={() => handleImageClick(media.url)}
                 />
               </ImageListItem>
@@ -120,25 +139,44 @@ function Menu({ title, apiUrl }: { title: string; apiUrl:string }) {
   };
 
   return (
-    <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+    <Card sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
       <CardContent sx={{ flexGrow: 1 }}>
-        <Typography variant="h5" component="div" color="secondary" align="center" gutterBottom>
+        <Typography
+          variant="h5"
+          component="div"
+          color="secondary"
+          align="center"
+          gutterBottom
+        >
           {title}
         </Typography>
         {loading && (
-          <Box sx={{ display: 'flex', justifyContent: 'center', my: 2 }}>
+          <Box sx={{ display: "flex", justifyContent: "center", my: 2 }}>
             <CircularProgress color="secondary" />
           </Box>
         )}
-        {error && <Alert severity="error" sx={{ my: 2 }}>메뉴를 불러오는데 실패했습니다: {error}</Alert>}
+        {error && (
+          <Alert severity="error" sx={{ my: 2 }}>
+            메뉴를 불러오는데 실패했습니다: {error}
+          </Alert>
+        )}
         {menu && (
           <Box>
-            <Typography variant="h6" component="h3" color="text.primary" sx={{ fontWeight: 'bold', mt: 2 }}>
+            <Typography
+              variant="h6"
+              component="h3"
+              color="text.primary"
+              sx={{ fontWeight: "bold", mt: 2 }}
+            >
               {menu.title}
             </Typography>
             {renderImages()}
             {menu.contents && menu.contents.length > 0 && (
-              <Typography variant="body2" color="text.primary" sx={{ mt: 1, whiteSpace: 'pre-wrap' }}>
+              <Typography
+                variant="body2"
+                color="text.primary"
+                sx={{ mt: 1, whiteSpace: "pre-wrap" }}
+              >
                 {menu.contents[0].v}
               </Typography>
             )}
@@ -153,40 +191,46 @@ function Menu({ title, apiUrl }: { title: string; apiUrl:string }) {
         aria-labelledby="image-modal-title"
         aria-describedby="image-modal-description"
       >
-        <Box sx={{
-          position: 'absolute',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          bgcolor: 'background.paper',
-          boxShadow: 24,
-          p: 1,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}>
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            bgcolor: "background.paper",
+            boxShadow: 24,
+            p: 1,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            justifyContent: "center",
+          }}
+        >
           <IconButton
             aria-label="close"
             onClick={handleCloseModal}
             sx={{
-              position: 'absolute',
+              position: "absolute",
               right: 14,
               top: 14,
               color: (theme) => theme.palette.grey[500],
-              backgroundColor: 'rgba(0, 0, 0, 0.5)',
-              '&:hover': {
-                backgroundColor: 'rgba(0, 0, 0, 0.7)',
-              }
+              backgroundColor: "rgba(0, 0, 0, 0.5)",
+              "&:hover": {
+                backgroundColor: "rgba(0, 0, 0, 0.7)",
+              },
             }}
           >
             <CloseIcon />
           </IconButton>
           {selectedImage && (
-            <img 
-              src={selectedImage} 
-              alt="Expanded menu item" 
-              style={{ maxWidth: '80vw', maxHeight: '80vw', objectFit: 'contain' }}
+            <img
+              src={selectedImage}
+              alt="Expanded menu item"
+              style={{
+                maxWidth: "80vw",
+                maxHeight: "80vw",
+                objectFit: "contain",
+              }}
             />
           )}
         </Box>
