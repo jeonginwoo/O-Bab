@@ -227,8 +227,8 @@ function Menu({ title, apiUrl }: { title: string; apiUrl: string }) {
               src={selectedImage}
               alt="Expanded menu item"
               style={{
-                maxWidth: "80vw",
-                maxHeight: "80vw",
+                maxWidth: "90vw",
+                maxHeight: "90vh",
                 objectFit: "contain",
               }}
             />
