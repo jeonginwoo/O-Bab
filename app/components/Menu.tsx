@@ -99,21 +99,75 @@ function Menu({ title, apiUrl }: { title: string; apiUrl: string }) {
 
     return (
       <Box sx={{ mt: 2 }}>
-        {menuImages.map((media, index) => (
-          <Box key={index} sx={{ mb: 2 }}>
-            <img
-              src={media.url}
-              alt={`${menu.title} menu image ${index + 1}`}
-              style={{
-                width: "100%",
-                height: "auto",
-                borderRadius: 4,
-                cursor: "pointer",
+        {title === "돈토" && menuImages.length === 2 ? (
+          <Box
+            sx={{
+              display: "flex",
+              width: "100%",
+              borderRadius: 1,
+              overflow: "hidden",
+              mb: 2,
+              cursor: "pointer",
+            }}
+            onClick={() => handleImageClick("combined_donto_view")}
+          >
+            <Box
+              sx={{
+                width: "calc(50% - 0.5px)",
+                overflow: "hidden",
+                position: "relative",
               }}
-              onClick={() => handleImageClick(media.url)}
+            >
+              <img
+                src={menuImages[0].url}
+                alt={`${menu.title} menu image 1`}
+                style={{
+                  width: "160%",
+                  height: "auto",
+                  display: "block",
+                  marginLeft: "-30%",
+                }}
+              />
+            </Box>
+            <Box
+              sx={{ width: "1px", borderLeft: "1px dashed", borderLeftColor: "text.secondary", flexShrink: 0 }}
             />
+            <Box
+              sx={{
+                width: "calc(50% - 0.5px)",
+                overflow: "hidden",
+                position: "relative",
+              }}
+            >
+              <img
+                src={menuImages[1].url}
+                alt={`${menu.title} menu image 2`}
+                style={{
+                  width: "160%",
+                  height: "auto",
+                  display: "block",
+                  marginLeft: "-30%",
+                }}
+              />
+            </Box>
           </Box>
-        ))}
+        ) : (
+          menuImages.map((media, index) => (
+            <Box key={index} sx={{ mb: 2 }}>
+              <img
+                src={media.url}
+                alt={`${menu.title} menu image ${index + 1}`}
+                style={{
+                  width: "100%",
+                  height: "auto",
+                  borderRadius: 4,
+                  cursor: "pointer",
+                }}
+                onClick={() => handleImageClick(media.url)}
+              />
+            </Box>
+          ))
+        )}
         {foodImages.length > 0 && (
           <ImageList sx={{ mt: 2 }} cols={3} gap={8}>
             {foodImages.map((media, index) => (
@@ -210,6 +264,7 @@ function Menu({ title, apiUrl }: { title: string; apiUrl: string }) {
             aria-label="close"
             onClick={handleCloseModal}
             sx={{
+              zIndex: 1,
               position: "absolute",
               right: 14,
               top: 14,
@@ -222,16 +277,74 @@ function Menu({ title, apiUrl }: { title: string; apiUrl: string }) {
           >
             <CloseIcon />
           </IconButton>
-          {selectedImage && (
-            <img
-              src={selectedImage}
-              alt="Expanded menu item"
-              style={{
-                maxWidth: "90vw",
-                maxHeight: "90vh",
-                objectFit: "contain",
-              }}
-            />
+          {selectedImage === "combined_donto_view" && menu ? (
+            (() => {
+              const imageMedia = menu.media.filter((m) => m.type === "image");
+              const menuImages = imageMedia.slice(0, 2);
+              if (menuImages.length < 2) return null;
+
+              return (
+                <Box
+                  sx={{
+                    display: "flex",
+                    maxWidth: "90vw",
+                    maxHeight: "90vh",
+                  }}
+                >
+                  <Box
+                    sx={{
+                      width: "calc(50% - 1px)",
+                      overflow: "hidden",
+                      position: "relative",
+                    }}
+                  >
+                    <img
+                      src={menuImages[0].url}
+                      alt={`${menu.title} menu image 1`}
+                      style={{
+                        width: "160%",
+                        height: "auto",
+                        display: "block",
+                        marginLeft: "-30%",
+                      }}
+                    />
+                  </Box>
+                  <Box
+                    sx={{ width: "2px", borderLeft: "2px dashed", borderLeftColor: "text.secondary", flexShrink: 0 }}
+                  />
+                  <Box
+                    sx={{
+                      width: "calc(50% - 1px)",
+                      overflow: "hidden",
+                      position: "relative",
+                    }}
+                  >
+                    <img
+                      src={menuImages[1].url}
+                      alt={`${menu.title} menu image 2`}
+                      style={{
+                        width: "160%",
+                        height: "auto",
+                        display: "block",
+                        marginLeft: "-30%",
+                      }}
+                    />
+                  </Box>
+                </Box>
+              );
+            })()
+          ) : (
+            selectedImage && (
+              <img
+                src={selectedImage}
+                alt="Expanded menu item"
+                style={{
+                  maxWidth: "90vw",
+                  maxHeight: "90vh",
+                  objectFit: "contain",
+                }}
+              />
+            )
           )}
         </Box>
       </Modal>
