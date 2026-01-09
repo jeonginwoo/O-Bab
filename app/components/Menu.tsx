@@ -15,6 +15,7 @@ import {
   IconButton,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import DontoMenuView from "./DontoMenuView";
 
 interface Media {
   type: string;
@@ -287,6 +288,7 @@ function Menu({ title, apiUrl }: { title: string; apiUrl: string }) {
                 <Box
                   sx={{
                     display: "flex",
+                    width: "100vw",
                     maxWidth: "90vw",
                     maxHeight: "90vh",
                   }}
