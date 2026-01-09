@@ -100,58 +100,13 @@ function Menu({ title, apiUrl }: { title: string; apiUrl: string }) {
 
     return (
       <Box sx={{ mt: 2 }}>
-        {title === "돈토" && menuImages.length === 2 ? (
-          <Box
-            sx={{
-              display: "flex",
-              width: "100%",
-              borderRadius: 1,
-              overflow: "hidden",
-              mb: 2,
-              cursor: "pointer",
-            }}
+        {title === "돈토" && menu && menuImages.length >= 2 ? (
+          <DontoMenuView
+            menuImages={menuImages}
+            menuTitle={menu.title}
+            view="preview"
             onClick={() => handleImageClick("combined_donto_view")}
-          >
-            <Box
-              sx={{
-                width: "calc(50% - 0.5px)",
-                overflow: "hidden",
-                position: "relative",
-              }}
-            >
-              <img
-                src={menuImages[0].url}
-                alt={`${menu.title} menu image 1`}
-                style={{
-                  width: "160%",
-                  height: "auto",
-                  display: "block",
-                  marginLeft: "-30%",
-                }}
-              />
-            </Box>
-            <Box
-              sx={{ width: "1px", borderLeft: "1px dashed", borderLeftColor: "text.secondary", flexShrink: 0 }}
-            />
-            <Box
-              sx={{
-                width: "calc(50% - 0.5px)",
-                overflow: "hidden",
-                position: "relative",
-              }}
-            >
-              <img
-                src={menuImages[1].url}
-                alt={`${menu.title} menu image 2`}
-                style={{
-                  width: "160%",
-                  height: "auto",
-                  display: "block",
-                  marginLeft: "-30%",
-                }}
-              />
-            </Box>
-          </Box>
+          />
         ) : (
           menuImages.map((media, index) => (
             <Box key={index} sx={{ mb: 2 }}>
@@ -282,57 +237,12 @@ function Menu({ title, apiUrl }: { title: string; apiUrl: string }) {
             (() => {
               const imageMedia = menu.media.filter((m) => m.type === "image");
               const menuImages = imageMedia.slice(0, 2);
-              if (menuImages.length < 2) return null;
-
               return (
-                <Box
-                  sx={{
-                    display: "flex",
-                    width: "100vw",
-                    maxWidth: "90vw",
-                    maxHeight: "90vh",
-                  }}
-                >
-                  <Box
-                    sx={{
-                      width: "calc(50% - 1px)",
-                      overflow: "hidden",
-                      position: "relative",
-                    }}
-                  >
-                    <img
-                      src={menuImages[0].url}
-                      alt={`${menu.title} menu image 1`}
-                      style={{
-                        width: "160%",
-                        height: "auto",
-                        display: "block",
-                        marginLeft: "-30%",
-                      }}
-                    />
-                  </Box>
-                  <Box
-                    sx={{ width: "2px", borderLeft: "2px dashed", borderLeftColor: "text.secondary", flexShrink: 0 }}
-                  />
-                  <Box
-                    sx={{
-                      width: "calc(50% - 1px)",
-                      overflow: "hidden",
-                      position: "relative",
-                    }}
-                  >
-                    <img
-                      src={menuImages[1].url}
-                      alt={`${menu.title} menu image 2`}
-                      style={{
-                        width: "160%",
-                        height: "auto",
-                        display: "block",
-                        marginLeft: "-30%",
-                      }}
-                    />
-                  </Box>
-                </Box>
+                <DontoMenuView
+                  menuImages={menuImages}
+                  menuTitle={menu.title}
+                  view="modal"
+                />
               );
             })()
           ) : (
