@@ -30,7 +30,7 @@ const DontoMenuView: React.FC<DontoMenuViewProps> = ({
 
     const calculateSize = () => {
       // 1. 기준 컨테이너 크기 설정 (화면의 90%)
-      const containerWidth = window.innerWidth * 0.9;
+      const containerWidth = window.innerWidth * 0.8;
       const containerHeight = window.innerHeight * 0.9;
 
       if (containerWidth === 0 || containerHeight === 0) return;

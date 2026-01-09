@@ -1,7 +1,7 @@
 "use client";
 
 import axios from "axios";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Card,
   CardContent,
@@ -15,6 +15,8 @@ import {
   IconButton,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
+import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import DontoMenuView from "./DontoMenuView";
 
 interface Media {
@@ -39,7 +41,7 @@ function Menu({ title, apiUrl }: { title: string; apiUrl: string }) {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [openModal, setOpenModal] = useState(false);
-  const [selectedImage, setSelectedImage] = useState("");
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   useEffect(() => {
     async function fetchData() {
@@ -67,14 +69,70 @@ function Menu({ title, apiUrl }: { title: string; apiUrl: string }) {
     fetchData();
   }, [apiUrl]);
 
+  const allImages: string[] = React.useMemo(() => {
+    if (!menu) return [];
+    const imageMedia = menu.media.filter((m) => m.type === "image");
+    if (imageMedia.length === 0) return [];
+
+    if (title === "돈토") {
+      const foodImages = imageMedia.slice(2);
+      const foodImagesSrc = foodImages.map((m) => m.url);
+      return ["combined_donto_view", ...foodImagesSrc];
+    } else if (title === "윤스") {
+      if (imageMedia.length > 0) {
+        const menuImages = [imageMedia[imageMedia.length - 1]];
+        const foodImages = imageMedia.slice(0, imageMedia.length - 1);
+        const menuImagesSrc = menuImages.map((m) => m.url);
+        const foodImagesSrc = foodImages.map((m) => m.url);
+        return [...menuImagesSrc, ...foodImagesSrc];
+      } else {
+        return [];
+      }
+    } else {
+      return imageMedia.map((m) => m.url);
+    }
+  }, [menu, title]);
+
+  const handleNextImage = useCallback(() => {
+    if (allImages.length === 0) return;
+    setCurrentImageIndex((prevIndex) => (prevIndex + 1) % allImages.length);
+  }, [allImages.length]);
+
+  const handlePrevImage = useCallback(() => {
+    if (allImages.length === 0) return;
+    setCurrentImageIndex(
+      (prevIndex) => (prevIndex - 1 + allImages.length) % allImages.length
+    );
+  }, [allImages.length]);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (openModal) {
+        if (event.key === "ArrowLeft") {
+          handlePrevImage();
+        } else if (event.key === "ArrowRight") {
+          handleNextImage();
+        }
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [openModal, handlePrevImage, handleNextImage]);
+
   const handleImageClick = (imageUrl: string) => {
-    setSelectedImage(imageUrl);
-    setOpenModal(true);
+    const index = allImages.indexOf(imageUrl);
+    if (index !== -1) {
+      setCurrentImageIndex(index);
+      setOpenModal(true);
+    }
   };
 
   const handleCloseModal = () => {
     setOpenModal(false);
-    setSelectedImage("");
   };
 
   const renderImages = () => {
@@ -207,56 +265,92 @@ function Menu({ title, apiUrl }: { title: string; apiUrl: string }) {
             top: "50%",
             left: "50%",
             transform: "translate(-50%, -50%)",
-            bgcolor: "background.paper",
-            boxShadow: 24,
-            p: 1,
             display: "flex",
-            flexDirection: "column",
             alignItems: "center",
             justifyContent: "center",
+            outline: "none",
+            gap: 1,
           }}
         >
-          <IconButton
-            aria-label="close"
-            onClick={handleCloseModal}
+          {allImages.length > 1 && (
+            <IconButton
+              onClick={handlePrevImage}
+              sx={{
+                bgcolor: "rgba(0,0,0,0.5)",
+                "&:hover": { bgcolor: "rgba(0,0,0,0.7)" },
+              }}
+            >
+              <ArrowBackIosNewIcon sx={{ color: "white" }} />
+            </IconButton>
+          )}
+          <Box
             sx={{
-              zIndex: 1,
-              position: "absolute",
-              right: 14,
-              top: 14,
-              color: (theme) => theme.palette.grey[500],
-              backgroundColor: "rgba(0, 0, 0, 0.5)",
-              "&:hover": {
-                backgroundColor: "rgba(0, 0, 0, 0.7)",
-              },
+              position: "relative",
+              bgcolor: "background.paper",
+              boxShadow: 24,
+              p: 1,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
             }}
           >
-            <CloseIcon />
-          </IconButton>
-          {selectedImage === "combined_donto_view" && menu ? (
-            (() => {
-              const imageMedia = menu.media.filter((m) => m.type === "image");
-              const menuImages = imageMedia.slice(0, 2);
-              return (
-                <DontoMenuView
-                  menuImages={menuImages}
-                  menuTitle={menu.title}
-                  view="modal"
-                />
-              );
-            })()
-          ) : (
-            selectedImage && (
-              <img
-                src={selectedImage}
-                alt="Expanded menu item"
-                style={{
-                  maxWidth: "90vw",
-                  maxHeight: "90vh",
-                  objectFit: "contain",
-                }}
-              />
-            )
+            <IconButton
+              aria-label="close"
+              onClick={handleCloseModal}
+              sx={{
+                zIndex: 1,
+                position: "absolute",
+                right: 14,
+                top: 14,
+                color: (theme) => theme.palette.grey[500],
+                backgroundColor: "rgba(0, 0, 0, 0.5)",
+                "&:hover": {
+                  backgroundColor: "rgba(0, 0, 0, 0.7)",
+                },
+              }}
+            >
+              <CloseIcon />
+            </IconButton>
+            {(() => {
+              const selectedImage = allImages[currentImageIndex];
+              if (selectedImage === "combined_donto_view" && menu) {
+                const imageMedia = menu.media.filter(
+                  (m) => m.type === "image"
+                );
+                const menuImages = imageMedia.slice(0, 2);
+                return (
+                  <DontoMenuView
+                    menuImages={menuImages}
+                    menuTitle={menu.title}
+                    view="modal"
+                  />
+                );
+              } else if (selectedImage) {
+                return (
+                  <img
+                    src={selectedImage}
+                    alt="Expanded menu item"
+                    style={{
+                      maxWidth: "80vw",
+                      maxHeight: "90vh",
+                      objectFit: "contain",
+                    }}
+                  />
+                );
+              }
+              return null;
+            })()}
+          </Box>
+          {allImages.length > 1 && (
+            <IconButton
+              onClick={handleNextImage}
+              sx={{
+                bgcolor: "rgba(0,0,0,0.5)",
+                "&:hover": { bgcolor: "rgba(0,0,0,0.7)" },
+              }}
+            >
+              <ArrowForwardIosIcon sx={{ color: "white" }} />
+            </IconButton>
           )}
         </Box>
       </Modal>
