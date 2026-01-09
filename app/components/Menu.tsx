@@ -269,20 +269,8 @@ function Menu({ title, apiUrl }: { title: string; apiUrl: string }) {
             alignItems: "center",
             justifyContent: "center",
             outline: "none",
-            gap: 1,
           }}
         >
-          {allImages.length > 1 && (
-            <IconButton
-              onClick={handlePrevImage}
-              sx={{
-                bgcolor: "rgba(0,0,0,0.5)",
-                "&:hover": { bgcolor: "rgba(0,0,0,0.7)" },
-              }}
-            >
-              <ArrowBackIosNewIcon sx={{ color: "white" }} />
-            </IconButton>
-          )}
           <Box
             sx={{
               position: "relative",
@@ -294,6 +282,23 @@ function Menu({ title, apiUrl }: { title: string; apiUrl: string }) {
               justifyContent: "center",
             }}
           >
+            {allImages.length > 1 && (
+              <IconButton
+                onClick={handlePrevImage}
+                sx={{
+                  position: "absolute",
+                  left: 0,
+                  top: "50%",
+                  transform: "translate(-50%, -50%)",
+                  bgcolor: "rgba(0,0,0,0.5)",
+                  "&:hover": { bgcolor: "rgba(0,0,0,0.7)" },
+                  zIndex: 2,
+                  color: "white",
+                }}
+              >
+                <ArrowBackIosNewIcon />
+              </IconButton>
+            )}
             <IconButton
               aria-label="close"
               onClick={handleCloseModal}
@@ -309,7 +314,7 @@ function Menu({ title, apiUrl }: { title: string; apiUrl: string }) {
                 },
               }}
             >
-              <CloseIcon />
+              <CloseIcon sx={{ color: "white" }} />
             </IconButton>
             {(() => {
               const selectedImage = allImages[currentImageIndex];
@@ -340,18 +345,24 @@ function Menu({ title, apiUrl }: { title: string; apiUrl: string }) {
               }
               return null;
             })()}
+            {allImages.length > 1 && (
+              <IconButton
+                onClick={handleNextImage}
+                sx={{
+                  position: "absolute",
+                  right: 0,
+                  top: "50%",
+                  transform: "translate(50%, -50%)",
+                  bgcolor: "rgba(0,0,0,0.5)",
+                  "&:hover": { bgcolor: "rgba(0,0,0,0.7)" },
+                  zIndex: 2,
+                  color: "white",
+                }}
+              >
+                <ArrowForwardIosIcon />
+              </IconButton>
+            )}
           </Box>
-          {allImages.length > 1 && (
-            <IconButton
-              onClick={handleNextImage}
-              sx={{
-                bgcolor: "rgba(0,0,0,0.5)",
-                "&:hover": { bgcolor: "rgba(0,0,0,0.7)" },
-              }}
-            >
-              <ArrowForwardIosIcon sx={{ color: "white" }} />
-            </IconButton>
-          )}
         </Box>
       </Modal>
     </Card>
