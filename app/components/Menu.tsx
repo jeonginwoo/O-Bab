@@ -15,9 +15,13 @@ import {
   IconButton,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import ArrowBackIosNewIcon from "@mui/icons-material/ArrowBackIosNew";
-import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos";
 import DontoMenuView from "./DontoMenuView";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation, Pagination, Keyboard } from "swiper/modules";
+
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
 
 interface Media {
   type: string;
@@ -37,12 +41,12 @@ interface ApiResponse {
   items: any[];
 }
 
-function Menu({ title, apiUrl }: { title: string; apiUrl: string }) {
+function Menu({ title, apiUrl }: { title:string; apiUrl: string }) {
   const [menu, setMenu] = useState<MenuItem | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [openModal, setOpenModal] = useState(false);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [initialSlide, setInitialSlide] = useState(0);
 
   useEffect(() => {
     async function fetchData() {
@@ -94,40 +98,10 @@ function Menu({ title, apiUrl }: { title: string; apiUrl: string }) {
     }
   }, [menu, title]);
 
-  const handleNextImage = useCallback(() => {
-    if (allImages.length === 0) return;
-    setCurrentImageIndex((prevIndex) => (prevIndex + 1) % allImages.length);
-  }, [allImages.length]);
-
-  const handlePrevImage = useCallback(() => {
-    if (allImages.length === 0) return;
-    setCurrentImageIndex(
-      (prevIndex) => (prevIndex - 1 + allImages.length) % allImages.length
-    );
-  }, [allImages.length]);
-
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (openModal) {
-        if (event.key === "ArrowLeft") {
-          handlePrevImage();
-        } else if (event.key === "ArrowRight") {
-          handleNextImage();
-        }
-      }
-    };
-
-    window.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [openModal, handlePrevImage, handleNextImage]);
-
   const handleImageClick = (imageUrl: string) => {
     const index = allImages.indexOf(imageUrl);
     if (index !== -1) {
-      setCurrentImageIndex(index);
+      setInitialSlide(index);
       setOpenModal(true);
     }
   };
@@ -139,10 +113,10 @@ function Menu({ title, apiUrl }: { title: string; apiUrl: string }) {
   const formatDate = (timestamp: number) => {
     const date = new Date(timestamp);
     const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
-    const hours = String(date.getHours()).padStart(2, '0');
-    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
     return `${year}.${month}.${day} ${hours}:${minutes}`;
   };
 
@@ -281,104 +255,74 @@ function Menu({ title, apiUrl }: { title: string; apiUrl: string }) {
             top: "50%",
             left: "50%",
             transform: "translate(-50%, -50%)",
+            width: "auto",
+            maxWidth: "95vw",
+            maxHeight: "95vh",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             outline: "none",
           }}
         >
-          <Box
+          <IconButton
+            aria-label="close"
+            onClick={handleCloseModal}
             sx={{
-              position: "relative",
-              bgcolor: "background.paper",
-              boxShadow: 24,
-              p: 1,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
+              position: "absolute",
+              top: 8,
+              right: 8,
+              zIndex: 1301, 
+              color: 'white',
+              backgroundColor: 'rgba(0,0,0,0.5)',
+              '&:hover': {
+                backgroundColor: 'rgba(0,0,0,0.7)'
+              }
             }}
           >
-            {allImages.length > 1 && (
-              <IconButton
-                onClick={handlePrevImage}
-                sx={{
-                  position: "absolute",
-                  left: 0,
-                  top: "50%",
-                  transform: "translate(-50%, -50%)",
-                  bgcolor: "rgba(0,0,0,0.5)",
-                  "&:hover": { bgcolor: "rgba(0,0,0,0.7)" },
-                  zIndex: 2,
-                  color: "white",
-                }}
-              >
-                <ArrowBackIosNewIcon />
-              </IconButton>
-            )}
-            <IconButton
-              aria-label="close"
-              onClick={handleCloseModal}
-              sx={{
-                zIndex: 1,
-                position: "absolute",
-                right: 14,
-                top: 14,
-                color: (theme) => theme.palette.grey[500],
-                backgroundColor: "rgba(0, 0, 0, 0.5)",
-                "&:hover": {
-                  backgroundColor: "rgba(0, 0, 0, 0.7)",
-                },
-              }}
-            >
-              <CloseIcon sx={{ color: "white" }} />
-            </IconButton>
-            {(() => {
-              const selectedImage = allImages[currentImageIndex];
-              if (selectedImage === "combined_donto_view" && menu) {
-                const imageMedia = menu.media.filter(
-                  (m) => m.type === "image"
-                );
-                const menuImages = imageMedia.slice(0, 2);
-                return (
-                  <DontoMenuView
-                    menuImages={menuImages}
-                    menuTitle={menu.title}
-                    view="modal"
-                  />
-                );
-              } else if (selectedImage) {
-                return (
-                  <img
-                    src={selectedImage}
-                    alt="Expanded menu item"
-                    style={{
-                      maxWidth: "80vw",
-                      maxHeight: "90vh",
-                      objectFit: "contain",
-                    }}
-                  />
-                );
-              }
-              return null;
-            })()}
-            {allImages.length > 1 && (
-              <IconButton
-                onClick={handleNextImage}
-                sx={{
-                  position: "absolute",
-                  right: 0,
-                  top: "50%",
-                  transform: "translate(50%, -50%)",
-                  bgcolor: "rgba(0,0,0,0.5)",
-                  "&:hover": { bgcolor: "rgba(0,0,0,0.7)" },
-                  zIndex: 2,
-                  color: "white",
-                }}
-              >
-                <ArrowForwardIosIcon />
-              </IconButton>
-            )}
-          </Box>
+            <CloseIcon />
+          </IconButton>
+          <Swiper
+            modules={[Navigation, Pagination, Keyboard]}
+            spaceBetween={50}
+            slidesPerView={1}
+            navigation
+            pagination={{ clickable: true }}
+            keyboard={{ enabled: true }}
+            initialSlide={initialSlide}
+            style={{
+              '--swiper-navigation-color': '#fff',
+              '--swiper-pagination-color': '#fff',
+            } as React.CSSProperties}
+          >
+            {allImages.map((imageUrl, index) => (
+              <SwiperSlide key={index}>
+                <Box sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  height: '95vh',
+                }}>
+                  {imageUrl === "combined_donto_view" && menu ? (
+                    <DontoMenuView
+                      menuImages={menu.media.filter(m => m.type === 'image').slice(0, 2)}
+                      menuTitle={menu.title}
+                      view="modal"
+                    />
+                  ) : (
+                    <img
+                      src={imageUrl}
+                      alt={`Expanded view ${index + 1}`}
+                      style={{
+                        maxWidth: "90vw",
+                        maxHeight: "90vh",
+                        objectFit: "contain",
+                      }}
+                    />
+                  )}
+                </Box>
+              </SwiperSlide>
+            ))}
+          </Swiper>
         </Box>
       </Modal>
     </Card>
