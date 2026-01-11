@@ -47,6 +47,26 @@ function Menu({ title, apiUrl }: { title:string; apiUrl: string }) {
   const [loading, setLoading] = useState<boolean>(true);
   const [openModal, setOpenModal] = useState(false);
   const [initialSlide, setInitialSlide] = useState(0);
+  const [modalImageStyle, setModalImageStyle] = useState({});
+
+  useEffect(() => {
+    if (!openModal) return;
+
+    const calculateImageStyle = () => {
+      setModalImageStyle({
+        maxWidth: "90vw",
+        maxHeight: `${window.innerHeight * 0.9}px`,
+        objectFit: "contain",
+      });
+    };
+
+    calculateImageStyle();
+    window.addEventListener("resize", calculateImageStyle);
+
+    return () => {
+      window.removeEventListener("resize", calculateImageStyle);
+    };
+  }, [openModal]);
 
   useEffect(() => {
     async function fetchData() {
@@ -313,11 +333,7 @@ function Menu({ title, apiUrl }: { title:string; apiUrl: string }) {
                     <img
                       src={imageUrl}
                       alt={`Expanded view ${index + 1}`}
-                      style={{
-                        maxWidth: "90vw",
-                        maxHeight: "90vh",
-                        objectFit: "contain",
-                      }}
+                      style={modalImageStyle}
                     />
                   )}
                 </Box>
