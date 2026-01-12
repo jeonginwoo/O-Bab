@@ -47,7 +47,15 @@ export default function Home() {
               color="secondary"
               sx={{ flexGrow: 1, textAlign: "center" }}
             >
-              점심 뭐 먹지?
+              <Box sx={{
+                display: "inline",
+                fontWeight: "bold",
+                fontSize: "1.2em",
+                background: "linear-gradient(45deg, #FFFFFF, #64FFDA)",
+                WebkitBackgroundClip: "text",
+                backgroundClip: "text",
+                color: "transparent",
+              }}>5</Box>🍚❔
             </Typography>
           </Toolbar>
         </AppBar>
