@@ -4,6 +4,7 @@ import { Analytics } from "@vercel/analytics/next"
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import GameContainer from "./components/game/GameContainer";
 import Menu from "./components/menu/Menu";
+import Image from "next/image";
 import {
   Box,
   AppBar,
@@ -40,23 +41,17 @@ export default function Home() {
             borderBottom: `1px solid ${theme.palette.secondary.main}`,
           }}
         >
-          <Toolbar>
-            <Typography
-              variant="h4"
-              component="h1"
-              color="secondary"
-              sx={{ flexGrow: 1, textAlign: "center" }}
-            >
-              <Box sx={{
-                display: "inline",
-                fontWeight: "bold",
-                fontSize: "1.2em",
-                background: "linear-gradient(45deg, #FFFFFF, #64FFDA)",
-                WebkitBackgroundClip: "text",
-                backgroundClip: "text",
-                color: "transparent",
-              }}>5</Box>🍚❔
-            </Typography>
+          <Toolbar sx={{ justifyContent: "center" }}>
+            <Box sx={{ py: 1, display: "flex", alignItems: "center" }}>
+              <Image
+                src="/logo.png"
+                alt="5뭐?"
+                width={160}
+                height={73}
+                priority
+                style={{ height: "auto" }}
+              />
+            </Box>
           </Toolbar>
         </AppBar>
 
@@ -95,7 +90,7 @@ export default function Home() {
               color="text.secondary"
               sx={{ flexGrow: 1, textAlign: "center" }}
             >
-              밥밥밥 ver 3.2.3
+              밥밥밥 ver 3.2.4
             </Typography>
           </Toolbar>
         </AppBar>
