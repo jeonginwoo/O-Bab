@@ -311,7 +311,7 @@ const Ladder = () => {
               color="secondary"
               sx={{
                 backgroundColor: theme.palette.secondary.main,
-                color: theme.palette.primary.main,
+                color: theme.palette.background.default,
                 "&:hover": { backgroundColor: theme.palette.secondary.dark },
               }}
             >
@@ -339,7 +339,7 @@ const Ladder = () => {
               disabled={gameState === "tracing"}
               sx={{
                 backgroundColor: theme.palette.secondary.main,
-                color: theme.palette.primary.main,
+                color: theme.palette.background.default,
                 "&:hover": { backgroundColor: theme.palette.secondary.dark },
               }}
             >
