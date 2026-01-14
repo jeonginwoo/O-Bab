@@ -90,7 +90,7 @@ export default function Home() {
               color="text.secondary"
               sx={{ flexGrow: 1, textAlign: "center" }}
             >
-              밥밥밥 ver 3.2.4
+              밥밥밥 ver 3.2.5
             </Typography>
           </Toolbar>
         </AppBar>

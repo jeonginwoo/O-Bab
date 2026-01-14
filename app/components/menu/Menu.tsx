@@ -36,6 +36,7 @@ interface MenuItem {
   contents: Content[];
   media: Media[];
   created_at?: number;
+  updated_at?: number;
 }
 interface ApiResponse {
   items: any[];
@@ -243,9 +244,17 @@ function Menu({ title, apiUrl }: { title:string; apiUrl: string }) {
             >
               {menu.title}
             </Typography>
-            {menu.created_at && (
-              <Typography variant="caption" color="text.secondary" sx={{ mt: 0.5 }}>
-                {formatDate(menu.created_at)}
+            {(menu.updated_at || menu.created_at) && (
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ mt: 0.5 }}
+              >
+                {formatDate(menu.updated_at || menu.created_at!)}
+                {menu.updated_at &&
+                  menu.created_at &&
+                  menu.updated_at !== menu.created_at &&
+                  " (수정됨)"}
               </Typography>
             )}
             {renderImages()}
