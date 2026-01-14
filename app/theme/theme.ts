@@ -32,6 +32,30 @@ export const themeOptions: Record<string, ThemeOptions> = {
     },
     typography,
   },
+  ocean: {
+    palette: {
+      mode: "dark",
+      primary: {
+        main: "#0077be",
+      },
+      secondary: {
+        main: "#00e5ff",
+      },
+      background: {
+        default: "#001e3c",
+        paper: "#0a2744",
+      },
+      text: {
+        primary: "#e3f2fd",
+        secondary: "#90caf9",
+      },
+    },
+    typography: {
+      ...typography,
+      h1: { color: "#00e5ff" },
+      h2: { color: "#00e5ff" },
+    },
+  },
   light: {
     palette: {
       mode: "light",
@@ -74,54 +98,6 @@ export const themeOptions: Record<string, ThemeOptions> = {
       ...typography,
       h1: { color: "#2e7d32" },
       h2: { color: "#2e7d32" },
-    },
-  },
-  ocean: {
-    palette: {
-      mode: "dark",
-      primary: {
-        main: "#0077be",
-      },
-      secondary: {
-        main: "#00e5ff",
-      },
-      background: {
-        default: "#001e3c",
-        paper: "#0a2744",
-      },
-      text: {
-        primary: "#e3f2fd",
-        secondary: "#90caf9",
-      },
-    },
-    typography: {
-      ...typography,
-      h1: { color: "#00e5ff" },
-      h2: { color: "#00e5ff" },
-    },
-  },
-  sunset: {
-    palette: {
-      mode: "dark",
-      primary: {
-        main: "#ff5722",
-      },
-      secondary: {
-        main: "#d500f9",
-      },
-      background: {
-        default: "#210a0a",
-        paper: "#331010",
-      },
-      text: {
-        primary: "#fff3e0",
-        secondary: "#ffccbc",
-      },
-    },
-    typography: {
-      ...typography,
-      h1: { color: "#ff5722" },
-      h2: { color: "#ff5722" },
     },
   },
   coffee: {

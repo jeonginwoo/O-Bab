@@ -127,7 +127,7 @@ export default function Home() {
                                 width: currentTheme === key ? 28 : 24,
                                 height: currentTheme === key ? 28 : 24,
                                 borderRadius: "50%",
-                                background: `linear-gradient(90deg, ${primary} 50%, ${secondary} 50%)`,
+                                background: `linear-gradient(90deg, ${background} 50%, ${secondary} 50%)`,
                                 border: `2px solid ${background}`,
                                 boxShadow: 3,
                               }}
@@ -178,7 +178,7 @@ export default function Home() {
               color="text.secondary"
               sx={{ flexGrow: 1, textAlign: "center" }}
             >
-              밥밥밥 ver 3.3.1
+              밥밥밥 ver 3.4.0
             </Typography>
           </Toolbar>
         </AppBar>

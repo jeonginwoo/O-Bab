@@ -294,7 +294,7 @@ const Ladder = () => {
             onClick={handleStart}
             sx={{
               backgroundColor: theme.palette.secondary.main,
-              color: theme.palette.primary.main,
+              color: theme.palette.background.default,
               "&:hover": { backgroundColor: theme.palette.secondary.dark },
             }}
           >

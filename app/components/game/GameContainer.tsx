@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Roulette from "./Roulette";
 import Ladder from "./Ladder";
+import RandomFood from "./RandomFood";
 import { Box, Typography, Tabs, Tab } from "@mui/material";
 
 const GameContainer = () => {
@@ -34,11 +35,13 @@ const GameContainer = () => {
         >
           <Tab label="룰렛" />
           <Tab label="사다리타기" />
+          <Tab label="음식 추천" />
         </Tabs>
       </Box>
       <Box sx={{ flexGrow: 1 }}>
         {activeGame === 0 && <Roulette />}
         {activeGame === 1 && <Ladder />}
+        {activeGame === 2 && <RandomFood />}
       </Box>
     </Box>
   );

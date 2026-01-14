@@ -253,7 +253,7 @@ const Roulette = () => {
           onClick={handleAdd}
           sx={{
             backgroundColor: theme.palette.secondary.main,
-            color: theme.palette.primary.main,
+            color: theme.palette.background.default,
             "&:hover": { backgroundColor: theme.palette.secondary.dark },
             padding: "8px 12px",
           }}
@@ -265,7 +265,7 @@ const Roulette = () => {
           onClick={handleRotate}
           sx={{
             backgroundColor: theme.palette.secondary.main,
-            color: theme.palette.primary.main,
+            color: theme.palette.background.default,
             "&:hover": { backgroundColor: theme.palette.secondary.dark },
             padding: "8px 12px",
           }}
