@@ -98,7 +98,8 @@ const DontoMenuView: React.FC<DontoMenuViewProps> = ({
           sx={{
             width: "1px",
             borderLeft: "1px dashed",
-            borderLeftColor: "text.secondary",
+            borderLeftColor: "#8892B0",
+            backgroundColor: "#012346",
             flexShrink: 0,
           }}
         />
@@ -159,7 +160,8 @@ const DontoMenuView: React.FC<DontoMenuViewProps> = ({
           sx={{
             width: "2px",
             borderLeft: "2px dashed",
-            borderLeftColor: "text.secondary",
+            borderLeftColor: "#8892B0",
+            backgroundColor: "#012346",
             flexShrink: 0,
           }}
         />
