@@ -2,13 +2,12 @@
 import * as React from "react";
 import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
-import theme from "./theme";
+import { createCustomTheme, themeOptions } from "./theme";
+import { ThemeContext } from "./ThemeContext";
 
 import createCache from "@emotion/cache";
 import { CacheProvider } from "@emotion/react";
 import { useServerInsertedHTML } from "next/navigation";
-
-const primaryCache = createCache({ key: "mui", prepend: true });
 
 export default function ThemeRegistry({
   children,
@@ -18,6 +17,21 @@ export default function ThemeRegistry({
   const [emotionCache] = React.useState(
     createCache({ key: "css", prepend: true })
   );
+  const [currentTheme, setCurrentTheme] = React.useState("dark");
+
+  React.useEffect(() => {
+    const savedTheme = localStorage.getItem("theme");
+    if (savedTheme && themeOptions[savedTheme]) {
+      setCurrentTheme(savedTheme);
+    }
+  }, []);
+
+  const handleSetTheme = (name: string) => {
+    setCurrentTheme(name);
+    localStorage.setItem("theme", name);
+  };
+
+  const theme = React.useMemo(() => createCustomTheme(currentTheme), [currentTheme]);
 
   useServerInsertedHTML(() => {
     const serialized =
@@ -33,10 +47,12 @@ export default function ThemeRegistry({
 
   return (
     <CacheProvider value={emotionCache}>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        {children}
-      </ThemeProvider>
+      <ThemeContext.Provider value={{ currentTheme, setTheme: handleSetTheme }}>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          {children}
+        </ThemeProvider>
+      </ThemeContext.Provider>
     </CacheProvider>
   );
 }
