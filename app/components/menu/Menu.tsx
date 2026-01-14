@@ -220,6 +220,7 @@ function Menu({ title, apiUrl }: { title:string; apiUrl: string }) {
           component="div"
           color="secondary"
           align="center"
+          fontWeight={"bold"}
           gutterBottom
         >
           {title}

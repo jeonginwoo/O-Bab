@@ -19,6 +19,7 @@ const GameContainer = () => {
         component="h2"
         color="secondary"
         align="center"
+        fontWeight={"bold"}
         gutterBottom
       >
         게임
