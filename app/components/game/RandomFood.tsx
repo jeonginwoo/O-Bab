@@ -55,9 +55,17 @@ const RandomFood = () => {
                     sx={{ 
                         fontWeight: 'bold', 
                         color: theme.palette.secondary.main,
-                        textShadow: showCelebration ? `0 0 20px ${theme.palette.secondary.light}` : 'none',
+                        transition: 'transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+                        ...(showCelebration && {
+                            animation: 'shimmer 1.5s infinite alternate ease-in-out',
+                            '@keyframes shimmer': {
+                                '0%': { textShadow: `0 0 10px ${theme.palette.secondary.main}` },
+                                '50%': { textShadow: `0 0 30px ${theme.palette.secondary.main}` },
+                                '100%': { textShadow: `0 0 10px ${theme.palette.secondary.main}` },
+                            },
+                        }),
+                        textShadow: showCelebration ? undefined : 'none',
                         transform: showCelebration ? 'scale(1.2)' : 'scale(1)',
-                        transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
                     }}
                 >
                     {selectedFood || "오늘 뭐 먹지?"}
