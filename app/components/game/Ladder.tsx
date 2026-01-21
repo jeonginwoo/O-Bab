@@ -261,7 +261,7 @@ const Ladder = () => {
   }, [gameState, drawLadder]);
 
   return (
-    <Box sx={{ p: 2 }}>
+    <Box sx={{ p: 2, maxWidth: 600, mx: "auto" }}>
       {gameState === "initial" && (
         <Box sx={{ display: "flex", gap: 1, justifyContent: "center" }}>
           <TextField

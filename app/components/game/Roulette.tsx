@@ -198,10 +198,11 @@ const Roulette = () => {
     draw();
   }, [product]);
 
-  return (
-    <Box sx={{ p: 2 }}>
-      <Box
-        sx={{ position: "relative", width: "100%", maxWidth: 300, mx: "auto" }}
+    return (
+      <Box sx={{ p: 2, maxWidth: 600, mx: "auto" }}>
+        <Box
+          sx={{
+            position: "relative", width: "100%", maxWidth: 300, mx: "auto" }}
       >
         <canvas
           ref={canvasRef}

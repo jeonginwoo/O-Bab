@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Naver Map API Minimum Function Test</title>
+    <script type="text/javascript" 
+            src="https://oapi.map.naver.com/openapi/v3/maps.js?ncpClientId=nugw3g1yw7">
+    </script>
+</head>
+<body>
+    <h1>Naver 지도 API 로드 테스트</h1>
+    <p>이 페이지가 정상적으로 보이면, 잠시 후 지도 API가 로드됩니다.</p>
+    <p>개발자 도구(F12) 콘솔 탭에서 '네이버 지도 Open API 인증이 실패하였습니다' 오류가 여전히 보이는지 확인해주세요.</p>
+    
+    <div id="map" style="width:100%;height:400px;"></div>
+
+    <script>
+        setTimeout(() => {
+            try {
+                if (window.naver && window.naver.maps) {
+                    var map = new naver.maps.Map('map', {
+                        center: new naver.maps.LatLng(37.3595704, 127.105399),
+                        zoom: 10
+                    });
+                    alert("테스트 성공: 지도 API가 올바르게 로드되었습니다!");
+                    console.log("TEST PAGE SUCCESS: Naver Maps API loaded successfully.");
+                } else {
+                    // The auth error message is usually printed directly by Naver's script,
+                    // so we don't need a specific alert for failure here.
+                    console.error("TEST PAGE FAILED: window.naver object not found.");
+                }
+            } catch (e) {
+                console.error("TEST PAGE FAILED WITH ERROR:", e);
+            }
+        }, 1500); // Wait 1.5 seconds for the script to load and execute
+    </script>
+</body>
+</html>

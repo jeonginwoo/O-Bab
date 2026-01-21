@@ -152,13 +152,13 @@ export default function Home() {
               gap: theme.spacing(3),
             }}
           >
-            <Box sx={{ flex: "1 1 300px" }}>
+            <Box sx={{ flex: "1 1 400px" }}>
               <Menu title="돈토" apiUrl={dontoUrl} />
             </Box>
-            <Box sx={{ flex: "1 1 300px" }}>
+            <Box sx={{ flex: "1 1 400px" }}>
               <Menu title="윤스" apiUrl={yunsUrl} />
             </Box>
-            <Box sx={{ flex: "1 1 300px" }}>
+            <Box sx={{ flex: "1 1 400px" }}>
               <Card sx={{ height: "100%" }}>
                 <CardContent sx={{ height: "100%" }}>
                   <GameContainer />
@@ -178,7 +178,7 @@ export default function Home() {
               color="text.secondary"
               sx={{ flexGrow: 1, textAlign: "center" }}
             >
-              밥밥밥 ver 3.4.3
+              밥밥밥 ver 3.5.0
             </Typography>
           </Toolbar>
         </AppBar>

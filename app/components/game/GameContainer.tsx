@@ -4,6 +4,7 @@ import { useState } from "react";
 import Roulette from "./Roulette";
 import Ladder from "./Ladder";
 import RandomFood from "./RandomFood";
+import RestaurantMap from "./RestaurantMap";
 import { Box, Typography, Tabs, Tab } from "@mui/material";
 
 const GameContainer = () => {
@@ -15,33 +16,25 @@ const GameContainer = () => {
 
   return (
     <Box sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
-      <Typography
-        variant="h5"
-        component="h2"
-        color="secondary"
-        align="center"
-        fontWeight={"bold"}
-        gutterBottom
-      >
-        게임
-      </Typography>
       <Box sx={{ borderBottom: 1, borderColor: "divider", mb: 2 }}>
         <Tabs
           value={activeGame}
           onChange={handleChange}
-          centered
+          variant="fullWidth"
           textColor="secondary"
           indicatorColor="secondary"
         >
           <Tab label="룰렛" />
           <Tab label="사다리타기" />
           <Tab label="음식 추천" />
+          <Tab label="맛집" />
         </Tabs>
       </Box>
       <Box sx={{ flexGrow: 1 }}>
         {activeGame === 0 && <Roulette />}
         {activeGame === 1 && <Ladder />}
         {activeGame === 2 && <RandomFood />}
+        {activeGame === 3 && <RestaurantMap />}
       </Box>
     </Box>
   );
