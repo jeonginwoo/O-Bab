@@ -26,6 +26,9 @@ const sampleRestaurants: Restaurant[] = [
   { id: 6, name: '여장군 가산점', address: '서울 금천구 가산디지털1로 142 더스카이밸리 2층 220호', menu: '육류,고기요리' },
   { id: 7, name: '오리오리 가산디지털단지점', address: '서울 금천구 가산디지털1로 186 제이플라츠 지하1층 B130호', menu: '오리요리' },
   { id: 8, name: '민락양꼬치👍', address: '경기 의정부시 오목로225번길 16-4 1층', menu: '양꼬치' },
+  { id: 9, name: '더낙원램양꼬치', address: '서울 관악구 남부순환로151길 78 1층', menu: '양꼬치' },
+  { id: 10, name: '먹거리곱창', address: '서울 성북구 정릉로21길 71 1층', menu: '곱창,막창,양' },
+  { id: 11, name: '천막집', address: '서울 성북구 보문로30길 31 1층 천막집', menu: '요리주점' },
 ];
 
 
@@ -83,17 +86,32 @@ const RestaurantMap = () => {
         const point = new naver.maps.LatLng(parseFloat(coords.y), parseFloat(coords.x));
 
         const marker = new naver.maps.Marker({ position: point, map: mapInstance, title: restaurant.name });
-        const naverMapSearchUrl = `https://map.naver.com/v5/search/${encodeURIComponent(restaurant.name)}`;
+        const naverMapSearchUrl = `https://map.naver.com/v5/search/${encodeURIComponent(restaurant.address + " " + restaurant.name)}`;
+        
+        const contentEl = document.createElement("div");
+        contentEl.style.cssText = "padding: 10px; min-width: 200px; line-height: 1.5; color: #000; position: relative;";
+        
+        contentEl.innerHTML = `
+          <h4 style="margin: 0 0 5px 0; padding-right: 20px;">
+            <a href="${naverMapSearchUrl}" target="_blank" rel="noopener noreferrer" style="color: #03a9f4; text-decoration: none;">${restaurant.name}</a>
+          </h4>
+          <p style="margin: 0; color: #333;">${restaurant.address}</p>
+          <p style="margin: 0; color: #977162;">${restaurant.menu}</p>
+        `;
+
+        const closeBtn = document.createElement("button");
+        closeBtn.innerHTML = "&#x2715;";
+        closeBtn.style.cssText = "position: absolute; top: 0px; right: 0px; border: none; background: transparent; cursor: pointer; font-size: 18px; color: #888; padding: 5px; line-height: 1;";
+        closeBtn.type = "button";
+        contentEl.appendChild(closeBtn);
+
         const infoWindow = new naver.maps.InfoWindow({
-          content: `
-            <div style="padding: 10px; min-width: 200px; line-height: 1.5; color: #000;">
-              <h4 style="margin: 0 0 5px 0;">
-                <a href="${naverMapSearchUrl}" target="_blank" rel="noopener noreferrer" style="color: #03a9f4; text-decoration: none;">${restaurant.name}</a>
-              </h4>
-              <p style="margin: 0; color: #333;">${restaurant.address}</p>
-              <p style="margin: 0; color: #977162;">${restaurant.menu}</p>
-            </div>
-          `,
+          content: contentEl,
+        });
+
+        closeBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            infoWindow.close();
         });
 
         markersRef.current.push({ restaurantId: restaurant.id, marker, infoWindow });
