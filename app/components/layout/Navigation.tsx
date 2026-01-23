@@ -15,8 +15,12 @@ import {
   Grow,
   Button,
   useTheme,
+  Menu,
+  MenuItem,
+  Typography,
 } from "@mui/material";
 import PaletteIcon from "@mui/icons-material/Palette";
+import MenuIcon from "@mui/icons-material/Menu";
 import { useThemeContext } from "../../theme/ThemeContext";
 import { themeOptions } from "../../theme/theme";
 
@@ -25,6 +29,7 @@ export default function Navigation() {
   const pathname = usePathname();
   const { currentTheme, setTheme } = useThemeContext();
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
+  const [mobileAnchorEl, setMobileAnchorEl] = useState<HTMLElement | null>(null);
 
   const handlePaletteClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
@@ -34,7 +39,16 @@ export default function Navigation() {
     setAnchorEl(null);
   };
 
+  const handleMobileMenuOpen = (event: React.MouseEvent<HTMLElement>) => {
+    setMobileAnchorEl(event.currentTarget);
+  };
+
+  const handleMobileMenuClose = () => {
+    setMobileAnchorEl(null);
+  };
+
   const open = Boolean(anchorEl);
+  const isMobileMenuOpen = Boolean(mobileAnchorEl);
   const id = open ? "theme-popover" : undefined;
 
   const navItems = [
@@ -65,8 +79,8 @@ export default function Navigation() {
               />
            </Link>
 
-           {/* Navigation Links */}
-           <Stack direction="row" spacing={1}>
+           {/* Navigation Links (Desktop) */}
+           <Stack direction="row" spacing={1} sx={{ display: { xs: 'none', md: 'flex' } }}>
              {navItems.map((item) => (
                <Button
                  key={item.path}
@@ -81,6 +95,43 @@ export default function Navigation() {
                </Button>
              ))}
            </Stack>
+
+           {/* Navigation Menu (Mobile) */}
+           <Box sx={{ display: { xs: 'flex', md: 'none' } }}>
+             <IconButton
+               size="large"
+               onClick={handleMobileMenuOpen}
+               color="inherit"
+               sx={{ color: theme.palette.text.primary }}
+             >
+               <MenuIcon />
+             </IconButton>
+             <Menu
+               anchorEl={mobileAnchorEl}
+               open={isMobileMenuOpen}
+               onClose={handleMobileMenuClose}
+               sx={{ display: { xs: 'block', md: 'none' } }}
+             >
+               {navItems.map((item) => (
+                 <MenuItem 
+                   key={item.path} 
+                   onClick={handleMobileMenuClose}
+                   component={Link}
+                   href={item.path}
+                 >
+                   <Typography 
+                     textAlign="center"
+                     sx={{ 
+                       fontWeight: pathname === item.path ? "bold" : "normal",
+                       color: pathname === item.path ? theme.palette.secondary.main : theme.palette.text.primary 
+                     }}
+                   >
+                     {item.label}
+                   </Typography>
+                 </MenuItem>
+               ))}
+             </Menu>
+           </Box>
         </Box>
 
         <Box>

@@ -276,39 +276,41 @@ const Roulette = () => {
       </Box>
       <TableContainer
         component={Paper}
-        sx={{ mt: 3, backgroundColor: theme.palette.background.paper }}
+        elevation={0}
+        sx={{ mt: 3, backgroundColor: "transparent" }}
       >
         <Table size="small">
           <TableHead>
             <TableRow>
               <TableCell
                 sx={{
-                  borderColor: theme.palette.text.secondary,
-                  color: theme.palette.secondary.main,
+                  borderBottom: `1px solid ${theme.palette.divider}`,
+                  color: theme.palette.text.secondary,
                   textAlign: "center",
                   width: "25%",
+                  backgroundColor: theme.palette.action.hover,
                 }}
               >
                 메뉴
               </TableCell>
               <TableCell
                 sx={{
-                  borderColor: theme.palette.text.secondary,
-                  color: theme.palette.secondary.main,
+                  borderBottom: `1px solid ${theme.palette.divider}`,
+                  color: theme.palette.text.secondary,
                   textAlign: "center",
+                  backgroundColor: theme.palette.action.hover,
                 }}
               >
                 비중
               </TableCell>
               <TableCell
                 sx={{
-                  borderColor: theme.palette.text.secondary,
-                  color: theme.palette.secondary.main,
+                  borderBottom: `1px solid ${theme.palette.divider}`,
+                  color: theme.palette.text.secondary,
                   textAlign: "center",
+                  backgroundColor: theme.palette.action.hover,
                 }}
-              >
-                삭제
-              </TableCell>
+              />
             </TableRow>
           </TableHead>
           <TableBody>
@@ -316,7 +318,7 @@ const Roulette = () => {
               <TableRow key={index}>
                 <TableCell
                   sx={{
-                    borderColor: theme.palette.text.secondary,
+                    borderBottom: `1px solid ${theme.palette.divider}`,
                     color: theme.palette.text.primary,
                     textAlign: "center",
                     width: "25%",
@@ -326,7 +328,7 @@ const Roulette = () => {
                 </TableCell>
                 <TableCell
                   sx={{
-                    borderColor: theme.palette.text.secondary,
+                    borderBottom: `1px solid ${theme.palette.divider}`,
                     color: theme.palette.text.primary,
                     textAlign: "center",
                   }}
@@ -357,7 +359,7 @@ const Roulette = () => {
                 </TableCell>
                 <TableCell
                   sx={{
-                    borderColor: theme.palette.text.secondary,
+                    borderBottom: `1px solid ${theme.palette.divider}`,
                     color: theme.palette.text.primary,
                     textAlign: "center",
                   }}

@@ -8,10 +8,12 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
   return (
     <div style={{ height: "100vh", display: "flex", flexDirection: "column" }}>
       <Navigation />
-      <Box component="main" sx={{ flexGrow: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
-        {children}
+      <Box component="main" sx={{ flexGrow: 1, display: "flex", flexDirection: "column", overflow: "auto" }}>
+        <Box sx={{ flexGrow: 1 }}>
+          {children}
+        </Box>
+        <Footer />
       </Box>
-      <Footer />
     </div>
   );
 }

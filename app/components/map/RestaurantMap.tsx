@@ -1,7 +1,10 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from 'react';
-import { Box, Typography, CircularProgress, Alert, Chip, Button } from '@mui/material';
+import { Box, Typography, CircularProgress, Alert, Chip, Button, Menu, MenuItem, IconButton, Tooltip } from '@mui/material';
+import MenuIcon from '@mui/icons-material/Menu';
+import ViewListIcon from '@mui/icons-material/ViewList';
+import ViewModuleIcon from '@mui/icons-material/ViewModule';
 import { useNaverMap } from '../../hooks/useNaverMap';
 
 interface Restaurant {
@@ -31,14 +34,72 @@ const sampleRestaurants: Restaurant[] = [
   { id: 11, name: '천막집', address: '서울 성북구 보문로30길 31 1층 천막집', menu: '요리주점' },
 ];
 
-
+const RestaurantChip = ({ 
+  restaurant, 
+  isSelected, 
+  onClick 
+}: { 
+  restaurant: Restaurant; 
+  isSelected: boolean; 
+  onClick: () => void; 
+}) => (
+  <Chip
+    label={
+      <span>
+        {restaurant.name}{" "}
+        <span style={{ fontSize: "0.85em", opacity: 0.6 }}>
+          ({restaurant.menu})
+        </span>
+      </span>
+    }
+    onClick={onClick}
+    color={isSelected ? "secondary" : "default"}
+    variant={isSelected ? "filled" : "outlined"}
+    clickable
+  />
+);
 
 const RestaurantMap = () => {
   const { isLoaded, error } = useNaverMap();
   const mapRef = useRef<HTMLDivElement | null>(null);
+  const chipsContainerRef = useRef<HTMLDivElement>(null);
+  const [selectedRestaurant, setSelectedRestaurant] = useState<Restaurant | null>(null);
+  const [isMenuMode, setIsMenuMode] = useState(false);
+  const [isUserMenuMode, setIsUserMenuMode] = useState(false); // User preference
+  const [mobileAnchorEl, setMobileAnchorEl] = useState<null | HTMLElement>(null);
+  
+  // Changed type to HTMLElement to support Chip
+  const isMobileMenuOpen = Boolean(mobileAnchorEl);
   const [map, setMap] = useState<naver.maps.Map | null>(null);
   const markersRef = useRef<RestaurantMarker[]>([]);
   const initialMapCenterRef = useRef<naver.maps.LatLng | null>(null);
+
+  const toggleViewMode = () => {
+    setIsUserMenuMode((prev) => !prev);
+  }
+
+  useEffect(() => {
+    // Initial auto-detection: if content is large, switch to menu mode by default.
+    // We use a one-time observer to detect initial overflow.
+    const observer = new ResizeObserver(() => {
+        if (chipsContainerRef.current) {
+             const height = chipsContainerRef.current.offsetHeight;
+             // If height > 110 (approx 2 lines), auto-enable menu mode initially
+             if (height > 110) {
+                 setIsUserMenuMode(true);
+                 observer.disconnect(); // Only auto-switch once on load
+             }
+        }
+    });
+
+    if (chipsContainerRef.current) {
+      observer.observe(chipsContainerRef.current);
+    }
+
+    return () => {
+      observer.disconnect();
+    };
+  }, []);
 
   // Initialize map and markers
   useEffect(() => {
@@ -93,7 +154,7 @@ const RestaurantMap = () => {
         
         contentEl.innerHTML = `
           <h4 style="margin: 0 0 5px 0; padding-right: 20px;">
-            <a href="${naverMapSearchUrl}" target="_blank" rel="noopener noreferrer" style="color: #03a9f4; text-decoration: none;">${restaurant.name}</a>
+            <a href="${naverMapSearchUrl}" target="_blank" rel="noopener noreferrer" style="color: #03a9f4; text-decoration: underline;">${restaurant.name}</a>
           </h4>
           <p style="margin: 0; color: #333;">${restaurant.address}</p>
           <p style="margin: 0; color: #977162;">${restaurant.menu}</p>
@@ -119,12 +180,14 @@ const RestaurantMap = () => {
         naver.maps.Event.addListener(marker, 'click', () => {
           markersRef.current.forEach(m => m.infoWindow.close());
           infoWindow.open(mapInstance, marker);
+          setSelectedRestaurant(restaurant);
         });
       });
     });
   }, [isLoaded, map]);
   
   const handleListItemClick = (restaurant: Restaurant) => {
+    setSelectedRestaurant(restaurant);
     if (!map) return;
     const restaurantMarker = markersRef.current.find(m => m.restaurantId === restaurant.id);
     if (restaurantMarker) {
@@ -135,10 +198,24 @@ const RestaurantMap = () => {
   };
 
   const handleCenterMap = () => {
+    setSelectedRestaurant(null);
     if (map && initialMapCenterRef.current) {
       map.setCenter(initialMapCenterRef.current);
       map.setZoom(17); // Reset zoom to initial level if needed
     }
+  };
+
+  const handleMobileMenuClick = (event: React.MouseEvent<HTMLElement>) => {
+    setMobileAnchorEl(event.currentTarget);
+  };
+  
+  const handleMobileMenuClose = () => {
+    setMobileAnchorEl(null);
+  };
+
+  const handleMobileSelect = (r: Restaurant) => {
+    handleListItemClick(r);
+    handleMobileMenuClose();
   };
 
   if (error) return <Alert severity="error">지도를 불러오는데 실패했습니다: {error.message}</Alert>;
@@ -146,30 +223,115 @@ const RestaurantMap = () => {
   
   return (
     <Box sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
-      <Box sx={{ p: 2, display: 'flex', flexWrap: 'wrap', gap: 1, flexShrink: 0 }}>
-        <Chip
-          label="프로텐"
-          onClick={handleCenterMap}
-          clickable
-          color="primary"
-          variant="filled"
-        />
-        {sampleRestaurants.map((r) => (
+       {/* Removed separate toggle button bar */}
+      <Box sx={{ position: 'relative', width: '100%', flexShrink: 0 }}>
+        {/* Chips Container - Rendered when NOT in menu mode */}
+        {!isUserMenuMode && (
+        <div 
+          ref={chipsContainerRef}
+          style={{ 
+            padding: '16px', 
+            display: 'flex', 
+            flexWrap: 'wrap', 
+            gap: '8px',
+            width: '100%',
+            boxSizing: 'border-box',
+          }}
+        >
           <Chip
-            key={r.id}
-            label={
-              <span>
-                {r.name}{" "}
-                <span style={{ fontSize: "0.85em", opacity: 0.6 }}>
-                  ({r.menu})
-                </span>
-              </span>
-            }
-            onClick={() => handleListItemClick(r)}
+            label="프로텐"
+            onClick={handleCenterMap}
             clickable
+            color="primary"
+            variant="filled"
           />
-        ))}
+          <Tooltip title="간략히 보기">
+            <Chip
+               label={<ViewListIcon sx={{ display: 'block' }} />}
+               onClick={toggleViewMode}
+               clickable
+               variant="filled"
+               color="info"
+               sx={{ '& .MuiChip-label': { px: 1 } }}
+            />
+          </Tooltip>
+          {sampleRestaurants.map((r) => (
+            <RestaurantChip
+              key={r.id}
+              restaurant={r}
+              isSelected={selectedRestaurant?.id === r.id}
+              onClick={() => handleListItemClick(r)}
+            />
+          ))}
+        </div>
+        )}
+
+        {/* Menu View - Visible only when in menu mode */}
+        {isUserMenuMode && (
+          <Box sx={{ p: 2, display: 'flex', alignItems: 'center', gap: 1, overflowX: "auto", whiteSpace: "nowrap", width: '100%' }}>
+            <Chip
+              label="프로텐"
+              onClick={handleCenterMap}
+              clickable
+              color="primary"
+              variant="filled"
+            />
+            <Tooltip title="펼쳐 보기">
+              <Chip
+                   label={<ViewModuleIcon sx={{ display: 'block' }} />}
+                   onClick={toggleViewMode}
+                   clickable
+                   variant="filled"
+                   color="info"
+                   sx={{ '& .MuiChip-label': { px: 1 } }}
+              />
+            </Tooltip>
+            <Chip
+                label="식당 선택" 
+                onClick={handleMobileMenuClick} 
+                icon={<MenuIcon />} 
+                clickable 
+                variant="outlined"
+            />
+            {selectedRestaurant && (
+               <Chip
+                label={
+                  <span>
+                    {selectedRestaurant.name}{" "}
+                    <span style={{ fontSize: "0.85em", opacity: 0.6 }}>
+                      ({selectedRestaurant.menu})
+                    </span>
+                  </span>
+                }
+                color="secondary"
+               />
+            )}
+            <Menu
+              anchorEl={mobileAnchorEl}
+              open={isMobileMenuOpen}
+              onClose={handleMobileMenuClose}
+              PaperProps={{
+                style: {
+                  maxHeight: "60vh",
+                  maxWidth: "90vw",
+                },
+              }}
+            >
+              <Box sx={{ p: 2, display: 'flex', flexWrap: 'wrap', gap: 1, maxWidth: 600, maxHeight: 600 }}>
+                {sampleRestaurants.map((r) => (
+                  <RestaurantChip
+                    key={r.id}
+                    restaurant={r}
+                    isSelected={selectedRestaurant?.id === r.id}
+                    onClick={() => handleMobileSelect(r)}
+                  />
+                ))}
+              </Box>
+            </Menu>
+          </Box>
+        )}
       </Box>
+
       <Box sx={{ flexGrow: 1, width: '100%', position: 'relative' }}>
         <div ref={mapRef} style={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0 }} />
       </Box>
