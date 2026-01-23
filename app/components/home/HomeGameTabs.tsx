@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import Roulette from "./Roulette";
-import RandomFood from "./RandomFood";
+import Roulette from "../roulette/Roulette";
+import RandomFood from "../food/RandomFood";
 import { Box, Typography, Tabs, Tab } from "@mui/material";
 
-const GameContainer = () => {
+const HomeGameTabs = () => {
   const [activeGame, setActiveGame] = useState<number>(0);
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
@@ -34,4 +34,4 @@ const GameContainer = () => {
   );
 };
 
-export default GameContainer;
+export default HomeGameTabs;

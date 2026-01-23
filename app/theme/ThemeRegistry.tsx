@@ -14,7 +14,7 @@ export default function ThemeRegistry({
 }: {
   children: React.ReactNode;
 }) {
-  const [emotionCache] = React.useState(
+  const [emotionCache] = React.useState(() =>
     createCache({ key: "css", prepend: true })
   );
   const [currentTheme, setCurrentTheme] = React.useState("dark");
@@ -26,12 +26,17 @@ export default function ThemeRegistry({
     }
   }, []);
 
-  const handleSetTheme = (name: string) => {
+  const handleSetTheme = React.useCallback((name: string) => {
     setCurrentTheme(name);
     localStorage.setItem("theme", name);
-  };
+  }, []);
 
   const theme = React.useMemo(() => createCustomTheme(currentTheme), [currentTheme]);
+
+  const themeContextValue = React.useMemo(
+    () => ({ currentTheme, setTheme: handleSetTheme }),
+    [currentTheme, handleSetTheme]
+  );
 
   useServerInsertedHTML(() => {
     const serialized =
@@ -47,7 +52,7 @@ export default function ThemeRegistry({
 
   return (
     <CacheProvider value={emotionCache}>
-      <ThemeContext.Provider value={{ currentTheme, setTheme: handleSetTheme }}>
+      <ThemeContext.Provider value={themeContextValue}>
         <ThemeProvider theme={theme}>
           <CssBaseline />
           {children}

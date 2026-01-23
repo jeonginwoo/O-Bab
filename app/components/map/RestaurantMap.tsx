@@ -18,13 +18,14 @@ interface RestaurantMarker {
 }
 
 const sampleRestaurants: Restaurant[] = [
-  { id: 1, name: '고기부자집', address: '서울 금천구 가산동 371-28', menu: '육류,고기요리' },
-  { id: 2, name: '가산 마포갈매기', address: '서울 금천구 가산동 50-3', menu: '육류,고기요리' },
-  { id: 3, name: '양원집 가산디지털단지점', address: '서울 금천구 가산동 371-28', menu: '양갈비' },
-  { id: 4, name: '여장군 가산점', address: '서울 금천구 가산동 371-57', menu: '육류,고기요리' },
-  { id: 5, name: '서울식당', address: '서울 금천구 가산동 371-28', menu: '한식' },
-  { id: 6, name: '양은이네 가산직영점', address: '서울 금천구 가산동 371-28', menu: '한식' },
-  { id: 7, name: '오리오리 가산디지털단지점', address: '서울 금천구 가산동 459-11', menu: '오리요리' },
+  { id: 1, name: '고기부자집', address: '서울 금천구 가산디지털1로 168 A동 B119호', menu: '육류,고기요리' },
+  { id: 2, name: '양원집 가산디지털단지점', address: '서울 금천구 가산디지털1로 168 우림라이온스밸리 A동 207호', menu: '양갈비' },
+  { id: 3, name: '서울식당', address: '서울 금천구 가산디지털1로 168 우림라이온스밸리1차 A동 2층', menu: '한식' },
+  { id: 4, name: '양은이네 가산직영점', address: '서울 금천구 가산디지털1로 168 우림라이온스밸리 A동 2층 205호', menu: '한식' },
+  { id: 5, name: '가산 마포갈매기', address: '서울 금천구 벚꽃로 298 대륭포스트타워 6차 B1층(지하) 104호', menu: '육류,고기요리' },
+  { id: 6, name: '여장군 가산점', address: '서울 금천구 가산디지털1로 142 더스카이밸리 2층 220호', menu: '육류,고기요리' },
+  { id: 7, name: '오리오리 가산디지털단지점', address: '서울 금천구 가산디지털1로 186 제이플라츠 지하1층 B130호', menu: '오리요리' },
+  { id: 8, name: '민락양꼬치👍', address: '경기 의정부시 오목로225번길 16-4 1층', menu: '양꼬치' },
 ];
 
 
@@ -85,11 +86,12 @@ const RestaurantMap = () => {
         const naverMapSearchUrl = `https://map.naver.com/v5/search/${encodeURIComponent(restaurant.name)}`;
         const infoWindow = new naver.maps.InfoWindow({
           content: `
-            <div style="padding: 10px; min-width: 200px; line-height: 1.5;">
+            <div style="padding: 10px; min-width: 200px; line-height: 1.5; color: #000;">
               <h4 style="margin: 0 0 5px 0;">
-                <a href="${naverMapSearchUrl}" target="_blank" rel="noopener noreferrer">${restaurant.name}</a>
+                <a href="${naverMapSearchUrl}" target="_blank" rel="noopener noreferrer" style="color: #03a9f4; text-decoration: none;">${restaurant.name}</a>
               </h4>
-              <p style="margin: 0;">${restaurant.menu}</p>
+              <p style="margin: 0; color: #333;">${restaurant.address}</p>
+              <p style="margin: 0; color: #977162;">${restaurant.menu}</p>
             </div>
           `,
         });
@@ -125,8 +127,8 @@ const RestaurantMap = () => {
   if (!isLoaded) return <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}><CircularProgress /><Typography sx={{ ml: 2 }}>지도 로딩 중...</Typography></Box>;
   
   return (
-    <Box sx={{ width: '100%', height: '100%' }}>
-      <Box sx={{ p: 1, display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+    <Box sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column' }}>
+      <Box sx={{ p: 2, display: 'flex', flexWrap: 'wrap', gap: 1, flexShrink: 0 }}>
         <Chip
           label="프로텐"
           onClick={handleCenterMap}
@@ -137,14 +139,21 @@ const RestaurantMap = () => {
         {sampleRestaurants.map((r) => (
           <Chip
             key={r.id}
-            label={r.name}
+            label={
+              <span>
+                {r.name}{" "}
+                <span style={{ fontSize: "0.85em", opacity: 0.6 }}>
+                  ({r.menu})
+                </span>
+              </span>
+            }
             onClick={() => handleListItemClick(r)}
             clickable
           />
         ))}
       </Box>
-      <Box sx={{ height: '500px', width: '100%' }}>
-        <div ref={mapRef} style={{ width: '100%', height: '100%' }} />
+      <Box sx={{ flexGrow: 1, width: '100%', position: 'relative' }}>
+        <div ref={mapRef} style={{ width: '100%', height: '100%', position: 'absolute', top: 0, left: 0 }} />
       </Box>
     </Box>
   );

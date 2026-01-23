@@ -24,12 +24,19 @@ export function useNaverMap() {
     };
 
     // If script is already loaded and ready
-    if (window.naver && window.naver.maps) {
+    if (window.naver && window.naver.maps && window.naver.maps.Service) {
       setIsLoaded(true);
       return;
     }
 
     let script = document.getElementById(SCRIPT_ID) as HTMLScriptElement | null;
+    
+    // If script exists but Service is not ready yet, we can attach listener or poll
+    if (script && window.naver && window.naver.maps && !window.naver.maps.Service) {
+      // It implies script is loaded but maybe submodules are async or initing?
+      // Or maybe the script tag exists but hasn't fired load?
+      // Simple strategy: attach listeners below regardless provided we check loaded state.
+    }
     
     if (!script) {
       script = document.createElement('script');
