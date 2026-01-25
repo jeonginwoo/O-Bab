@@ -11,9 +11,27 @@ export function useNaverMap() {
     let isMounted = true;
     const SCRIPT_ID = 'naver-maps-script';
 
+    const checkNaverMaps = () => {
+      if (window.naver && window.naver.maps && window.naver.maps.Service) {
+        setIsLoaded(true);
+        return true;
+      }
+      return false;
+    };
+
     const handleLoad = () => {
       if (isMounted) {
-        setIsLoaded(true);
+        if (!checkNaverMaps()) {
+          // If loaded but Service not ready, poll briefly
+          const intervalId = setInterval(() => {
+            if (checkNaverMaps()) {
+              clearInterval(intervalId);
+            }
+          }, 100);
+          
+          // Clear interval after timeout (e.g., 5 seconds)
+          setTimeout(() => clearInterval(intervalId), 5000);
+        }
       }
     };
 
@@ -23,19 +41,30 @@ export function useNaverMap() {
       }
     };
 
-    // If script is already loaded and ready
-    if (window.naver && window.naver.maps && window.naver.maps.Service) {
-      setIsLoaded(true);
+    // 1. Check if already loaded and ready
+    if (checkNaverMaps()) {
       return;
     }
 
     let script = document.getElementById(SCRIPT_ID) as HTMLScriptElement | null;
     
-    // If script exists but Service is not ready yet, we can attach listener or poll
-    if (script && window.naver && window.naver.maps && !window.naver.maps.Service) {
-      // It implies script is loaded but maybe submodules are async or initing?
-      // Or maybe the script tag exists but hasn't fired load?
-      // Simple strategy: attach listeners below regardless provided we check loaded state.
+    // 2. If script exists but not ready, poll for it (catches case where script is loading or loaded but Service missing)
+    if (script) {
+       const intervalId = setInterval(() => {
+         if (isMounted && checkNaverMaps()) {
+           clearInterval(intervalId);
+         }
+       }, 100);
+       // We don't set a timeout here because if script is loading, it might take time. 
+       // But we could add a reasonable timeout or rely on the script listeners below if we re-attach them.
+       // However, re-attaching load listener to an already loaded script does nothing.
+       // So polling is the robust way for "existing script".
+       
+       // Cleanup interval if unmount
+       return () => {
+         clearInterval(intervalId);
+         isMounted = false;
+       };
     }
     
     if (!script) {

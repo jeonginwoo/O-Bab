@@ -64,7 +64,6 @@ const RestaurantMap = () => {
   const mapRef = useRef<HTMLDivElement | null>(null);
   const chipsContainerRef = useRef<HTMLDivElement>(null);
   const [selectedRestaurant, setSelectedRestaurant] = useState<Restaurant | null>(null);
-  const [isMenuMode, setIsMenuMode] = useState(false);
   const [isUserMenuMode, setIsUserMenuMode] = useState(false); // User preference
   const [mobileAnchorEl, setMobileAnchorEl] = useState<null | HTMLElement>(null);
   
@@ -147,7 +146,7 @@ const RestaurantMap = () => {
         const point = new naver.maps.LatLng(parseFloat(coords.y), parseFloat(coords.x));
 
         const marker = new naver.maps.Marker({ position: point, map: mapInstance, title: restaurant.name });
-        const naverMapSearchUrl = `https://map.naver.com/v5/search/${encodeURIComponent(restaurant.address + " " + restaurant.name)}`;
+        const naverMapSearchUrl = `https://map.naver.com/v5/search/${encodeURIComponent(restaurant.address)}`;
         
         const contentEl = document.createElement("div");
         contentEl.style.cssText = "padding: 10px; min-width: 200px; line-height: 1.5; color: #000; position: relative;";
