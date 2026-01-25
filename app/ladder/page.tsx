@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import Ladder from "../components/ladder/Ladder";
+import Ladder from "./components/Ladder";
 import { Container, Card, CardContent, Box } from "@mui/material";
 
 export default function LadderPage() {

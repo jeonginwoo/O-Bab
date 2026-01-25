@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import RestaurantMap from "../components/map/RestaurantMap";
+import RestaurantMap from "./components/RestaurantMap";
 import { Container, Card, CardContent } from "@mui/material";
 
 export default function MapPage() {
