@@ -15,7 +15,7 @@ export default function Footer() {
           color="text.secondary"
           sx={{ flexGrow: 1, textAlign: "center" }}
         >
-          밥밥밥 ver 3.5.5
+          밥밥밥 ver 3.5.6
         </Typography>
       </Toolbar>
     </AppBar>

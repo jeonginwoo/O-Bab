@@ -18,6 +18,7 @@ interface RestaurantMarker {
   restaurantId: number;
   marker: naver.maps.Marker;
   infoWindow: naver.maps.InfoWindow;
+  originalPosition: naver.maps.LatLng;
 }
 
 const sampleRestaurants: Restaurant[] = [
@@ -145,7 +146,23 @@ const RestaurantMap = () => {
         const coords = response.v2.addresses[0];
         const point = new naver.maps.LatLng(parseFloat(coords.y), parseFloat(coords.x));
 
-        const marker = new naver.maps.Marker({ position: point, map: mapInstance, title: restaurant.name });
+        let finalPosition = point;
+        const sameLocMarkers = markersRef.current.filter(m => 
+            m.originalPosition.equals(point)
+        );
+
+        if (sameLocMarkers.length > 0) {
+            const spacing = 0.0002;
+            const offsetIdx = sameLocMarkers.length;
+            const theta = offsetIdx * 2.4; // Approx 137.5 degrees
+            const r = spacing * (1 + 0.1 * offsetIdx); 
+            
+            const lat = parseFloat(coords.y) + r * Math.sin(theta);
+            const lng = parseFloat(coords.x) + r * Math.cos(theta);
+            finalPosition = new naver.maps.LatLng(lat, lng);
+        }
+
+        const marker = new naver.maps.Marker({ position: finalPosition, map: mapInstance, title: restaurant.name });
         const naverMapSearchUrl = `https://map.naver.com/v5/search/${encodeURIComponent(restaurant.address)}`;
         
         const contentEl = document.createElement("div");
@@ -174,7 +191,7 @@ const RestaurantMap = () => {
             infoWindow.close();
         });
 
-        markersRef.current.push({ restaurantId: restaurant.id, marker, infoWindow });
+        markersRef.current.push({ restaurantId: restaurant.id, marker, infoWindow, originalPosition: point });
 
         naver.maps.Event.addListener(marker, 'click', () => {
           markersRef.current.forEach(m => m.infoWindow.close());
