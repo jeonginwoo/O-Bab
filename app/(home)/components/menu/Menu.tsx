@@ -23,6 +23,16 @@ import "swiper/css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 
+// 식당별 메뉴 이미지 설정
+const MENU_IMAGE_CONFIG: Record<string, {
+  position: 'first' | 'last';  // 이미지 목록에서 메뉴판 위치
+  count: number;               // 메뉴판 이미지 개수
+}> = {
+  돈토: { position: 'first', count: 2 },  // 처음 2개가 메뉴판
+  윤스: { position: 'first', count: 1 },   // 처음 1개가 메뉴판 (위치가 바뀔 수 있음)
+  // 윤스: { position: 'last', count: 1 },   // 마지막 1개가 메뉴판 (위치가 바뀔 수 있음)
+};
+
 interface Media {
   type: string;
   url: string;
@@ -100,21 +110,31 @@ function Menu({ title, apiUrl }: { title:string; apiUrl: string }) {
     const imageMedia = menu.media.filter((m) => m.type === "image");
     if (imageMedia.length === 0) return [];
 
-    if (title === "돈토") {
-      const foodImages = imageMedia.slice(2);
+    const config = MENU_IMAGE_CONFIG[title];
+
+    if (title === "돈토" && config) {
+      // 돈토는 특수 뷰를 먼저 보여주고 음식 이미지를 나중에
+      const foodImages = imageMedia.slice(config.count);
       const foodImagesSrc = foodImages.map((m) => m.url);
       return ["combined_donto_view", ...foodImagesSrc];
-    } else if (title === "윤스") {
-      if (imageMedia.length > 0) {
-        const menuImages = [imageMedia[imageMedia.length - 1]];
-        const foodImages = imageMedia.slice(0, imageMedia.length - 1);
-        const menuImagesSrc = menuImages.map((m) => m.url);
-        const foodImagesSrc = foodImages.map((m) => m.url);
-        return [...menuImagesSrc, ...foodImagesSrc];
+    } else if (config) {
+      // 다른 식당은 메뉴판 먼저, 음식 이미지 나중에
+      let menuImages: Media[];
+      let foodImages: Media[];
+      
+      if (config.position === 'first') {
+        menuImages = imageMedia.slice(0, config.count);
+        foodImages = imageMedia.slice(config.count);
       } else {
-        return [];
+        menuImages = imageMedia.slice(-config.count);
+        foodImages = imageMedia.slice(0, -config.count);
       }
+      
+      const menuImagesSrc = menuImages.map((m) => m.url);
+      const foodImagesSrc = foodImages.map((m) => m.url);
+      return [...menuImagesSrc, ...foodImagesSrc];
     } else {
+      // 설정이 없으면 모든 이미지를 순서대로
       return imageMedia.map((m) => m.url);
     }
   }, [menu, title]);
@@ -150,15 +170,21 @@ function Menu({ title, apiUrl }: { title:string; apiUrl: string }) {
     let menuImages: Media[] = [];
     let foodImages: Media[] = [];
 
-    if (title === "돈토") {
-      menuImages = imageMedia.slice(0, 2);
-      foodImages = imageMedia.slice(2);
-    } else if (title === "윤스") {
-      if (imageMedia.length > 0) {
-        menuImages = [imageMedia[imageMedia.length - 1]];
-        foodImages = imageMedia.slice(0, imageMedia.length - 1);
+    // 설정에서 메뉴 이미지 위치 가져오기
+    const config = MENU_IMAGE_CONFIG[title];
+    
+    if (config) {
+      if (config.position === 'first') {
+        // 처음부터 count개가 메뉴판
+        menuImages = imageMedia.slice(0, config.count);
+        foodImages = imageMedia.slice(config.count);
+      } else if (config.position === 'last') {
+        // 마지막 count개가 메뉴판
+        menuImages = imageMedia.slice(-config.count);
+        foodImages = imageMedia.slice(0, -config.count);
       }
     } else {
+      // 설정이 없으면 모두 음식 이미지로 처리
       foodImages = imageMedia;
     }
 
