@@ -145,14 +145,16 @@ export default function Navigation() {
               <QuestionAnswerIcon />
             </IconButton>
           </Tooltip>
-          <IconButton
-            color="inherit"
-            aria-describedby={id}
-            onClick={handlePaletteClick}
-            sx={{ color: theme.palette.text.primary }}
-          >
-            <PaletteIcon />
-          </IconButton>
+          <Tooltip title="테마 변경" placement="bottom">
+            <IconButton
+              color="inherit"
+              aria-describedby={id}
+              onClick={handlePaletteClick}
+              sx={{ color: theme.palette.text.primary }}
+            >
+              <PaletteIcon />
+            </IconButton>
+          </Tooltip>
           <Popover
             id={id}
             open={open}
@@ -166,15 +168,31 @@ export default function Navigation() {
               vertical: "top",
               horizontal: "center",
             }}
+            slotProps={{
+              root: {
+                style: {
+                  position: "absolute",
+                },
+              },
+            }}
             PaperProps={{
               sx: {
+                position: "absolute",
                 backgroundColor: "transparent",
                 boxShadow: "none",
                 overflow: "visible",
               },
             }}
           >
-            <Stack direction="column" spacing={1} sx={{ p: 1 }}>
+            <Stack 
+              direction="column" 
+              sx={{ 
+                p: 1, 
+                position: "relative",
+                height: Object.keys(themeOptions).length * 40,
+                width: 48,
+              }}
+            >
               {Object.entries(themeOptions).map(([key, option], index) => {
                 const primary = (option.palette?.primary as any)?.main;
                 const secondary = (option.palette?.secondary as any)?.main;
@@ -189,16 +207,29 @@ export default function Navigation() {
                     <Tooltip title={key} placement="left">
                       <IconButton
                         onClick={() => setTheme(key)}
-                        sx={{ p: 0.5 }}
+                        sx={{ 
+                          position: "absolute",
+                          top: index * 40,
+                          left: 4,
+                          width: 40,
+                          height: 40,
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                        }}
                       >
                         <Box
                           sx={{
                             width: currentTheme === key ? 28 : 24,
                             height: currentTheme === key ? 28 : 24,
+                            minWidth: currentTheme === key ? 28 : 24,
+                            minHeight: currentTheme === key ? 28 : 24,
                             borderRadius: "50%",
                             background: `linear-gradient(90deg, ${background} 50%, ${secondary} 50%)`,
                             border: `2px solid ${background}`,
                             boxShadow: 3,
+                            transition: "all 0.2s ease-in-out",
+                            flexShrink: 0,
                           }}
                         />
                       </IconButton>
