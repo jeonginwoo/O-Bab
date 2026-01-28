@@ -21,6 +21,7 @@ import {
 } from "@mui/material";
 import PaletteIcon from "@mui/icons-material/Palette";
 import MenuIcon from "@mui/icons-material/Menu";
+import QuestionAnswerIcon from "@mui/icons-material/QuestionAnswer";
 import { useThemeContext } from "../../theme/ThemeContext";
 import { themeOptions } from "../../theme/theme";
 
@@ -134,7 +135,16 @@ export default function Navigation() {
            </Box>
         </Box>
 
-        <Box>
+        <Box sx={{ display: 'flex', gap: 1 }}>
+          <Tooltip title="문의하기" placement="bottom">
+            <IconButton
+              color="inherit"
+              onClick={() => window.open("https://forms.gle/Hq8LCa7foUcZig8f7", "_blank", "noopener,noreferrer")}
+              sx={{ color: theme.palette.text.primary }}
+            >
+              <QuestionAnswerIcon />
+            </IconButton>
+          </Tooltip>
           <IconButton
             color="inherit"
             aria-describedby={id}
