@@ -148,6 +148,30 @@ export const themeOptions: Record<string, ThemeOptions> = {
       h2: { color: "#673ab7" },
     },
   },
+  oliveMeadow: {
+    palette: {
+      mode: "light",
+      primary: {
+        main: "#89986D",
+      },
+      secondary: {
+        main: "#C5D89D",
+      },
+      background: {
+        default: "#F6F0D7",
+        paper: "#ffffff",
+      },
+      text: {
+        primary: "#556047",
+        secondary: "#89986D",
+      },
+    },
+    typography: {
+      ...typography,
+      h1: { color: "#89986D" },
+      h2: { color: "#89986D" },
+    },
+  },
 };
 
 export const createCustomTheme = (themeName: string) => {
