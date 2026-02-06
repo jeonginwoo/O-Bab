@@ -46,7 +46,7 @@ const RandomFood = () => {
   };
 
   return (
-    <Box sx={{ p: 4, textAlign: "center", display: 'flex', flexDirection: 'column', alignItems: 'center', height: '100%', minHeight: '500px', position: 'relative', overflow: 'hidden' }}>
+    <Box sx={{ textAlign: "center", display: 'flex', flexDirection: 'column', alignItems: 'center', height: '100%', minHeight: '500px', position: 'relative', overflow: 'hidden' }}>
         <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <Zoom in={true}>
                 <Typography 

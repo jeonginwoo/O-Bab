@@ -5,15 +5,21 @@ import {
   Box,
   TextField,
   Button,
-  TableContainer,
-  Table,
-  TableHead,
-  TableBody,
-  TableRow,
-  TableCell,
   Paper,
   useTheme,
+  Card,
+  CardContent,
+  CardHeader,
+  IconButton,
+  List,
+  ListItem,
+  ListItemText,
+  Divider,
+  InputAdornment,
+  Typography,
 } from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
+import DeleteIcon from "@mui/icons-material/Delete";
 
 interface MenuItem {
   name: string;
@@ -27,6 +33,7 @@ const Roulette = () => {
     { name: "윤스", weight: 5 },
   ]);
   const [newMenu, setNewMenu] = useState("");
+  const [isSpinning, setIsSpinning] = useState(false);
   const colors = useRef<string[]>([]);
   const angle = useRef(0);
   const currentSpeed = useRef(0);
@@ -57,34 +64,69 @@ const Roulette = () => {
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
+    // Draw Wheel Background/Shadow
+    ctx.shadowColor = "rgba(0,0,0,0.2)";
+    ctx.shadowBlur = 10;
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 5;
+
+    ctx.beginPath();
+    ctx.arc(cw, ch, cw - 10, 0, 2 * Math.PI);
+    ctx.fillStyle = theme.palette.background.paper;
+    ctx.fill();
+    ctx.shadowColor = "transparent"; // Reset shadow
+
+    // Draw Segments
     product.forEach((item, i) => {
       const arc = (item.weight / totalWeight) * 2 * Math.PI;
       ctx.beginPath();
       ctx.fillStyle = colors.current[i];
       ctx.moveTo(cw, ch);
-      ctx.arc(cw, ch, cw, startAngle, startAngle + arc);
+      ctx.arc(cw, ch, cw - 15, startAngle, startAngle + arc); // Slightly smaller radius
       ctx.fill();
+      ctx.stroke(); // Add subtle stroke between segments
       ctx.closePath();
       startAngle += arc;
     });
 
-    ctx.fillStyle = theme.palette.primary.main;
-    ctx.font = "16px Roboto";
+    // Draw Text
+    ctx.fillStyle = "#FFFFFF"; // Fixed white text for better contrast on colored segments
+    ctx.font = "bold 16px Roboto"; // Bold text
     ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
     startAngle = 0;
 
     product.forEach((item) => {
       const itemAngle = startAngle + (item.weight / totalWeight) * Math.PI;
       ctx.save();
       ctx.translate(
-        cw + Math.cos(itemAngle) * (cw - 50),
-        ch + Math.sin(itemAngle) * (ch - 50)
+        cw + Math.cos(itemAngle) * (cw - 60),
+        ch + Math.sin(itemAngle) * (ch - 60)
       );
       ctx.rotate(itemAngle + Math.PI / 2);
+      
+      // Text Shadow for readability
+      ctx.shadowColor = "rgba(0,0,0,0.8)";
+      ctx.shadowBlur = 4;
       ctx.fillText(item.name, 0, 0);
       ctx.restore();
       startAngle += (item.weight / totalWeight) * 2 * Math.PI;
     });
+
+    // Draw Center Circle (Hub)
+    ctx.shadowColor = "rgba(0,0,0,0.2)";
+    ctx.shadowBlur = 5;
+    ctx.beginPath();
+    ctx.arc(cw, ch, 25, 0, 2 * Math.PI);
+    ctx.fillStyle = theme.palette.background.paper;
+    ctx.fill();
+    
+    // Center Dot
+    ctx.beginPath();
+    ctx.arc(cw, ch, 10, 0, 2 * Math.PI);
+    ctx.fillStyle = theme.palette.secondary.main;
+    ctx.fill();
+    ctx.shadowColor = "transparent"; // Reset for next frame
   };
 
   const spin = () => {
@@ -97,6 +139,7 @@ const Roulette = () => {
       if (rotateInterval.current) clearInterval(rotateInterval.current);
       rotateInterval.current = null;
       stopRequested.current = false;
+      setIsSpinning(false);
 
       const totalWeight = product.reduce((sum, item) => sum + item.weight, 0);
       const finalAngle = angle.current % 360;
@@ -139,6 +182,7 @@ const Roulette = () => {
     }
     if (rotateInterval.current) return;
 
+    setIsSpinning(true);
     currentSpeed.current = Math.random() * 10 + 15;
     angle.current = 0;
     stopRequested.current = false;
@@ -146,7 +190,7 @@ const Roulette = () => {
 
     setTimeout(() => {
       stopRequested.current = true;
-    }, Math.random() * 2000 + 2000);
+    }, Math.random() * 1000 + 1000);
   };
 
   const handleAdd = () => {
@@ -192,11 +236,11 @@ const Roulette = () => {
     resizeCanvas();
     window.addEventListener("resize", resizeCanvas);
     return () => window.removeEventListener("resize", resizeCanvas);
-  }, [product]);
+  }, [product, theme]);
 
   useEffect(() => {
     draw();
-  }, [product]);
+  }, [product, theme]);
 
     return (
       <Box sx={{ p: 2, maxWidth: 600, mx: "auto" }}>
@@ -216,168 +260,184 @@ const Roulette = () => {
         <Box
           sx={{
             position: "absolute",
-            top: -10,
+            top: -2,
             left: "50%",
             transform: "translateX(-50%)",
-            width: 0,
-            height: 0,
-            borderLeft: "10px solid transparent",
-            borderRight: "10px solid transparent",
-            borderTop: `20px solid ${theme.palette.secondary.main}`,
-          }}
-        />
-      </Box>
-      <Box sx={{ mt: 3, display: "flex", gap: 1, justifyContent: "center" }}>
-        <TextField
-          fullWidth
-          label="메뉴 추가"
-          variant="outlined"
-          value={newMenu}
-          onChange={(e) => setNewMenu(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && handleAdd()}
-          size="small"
-          color="secondary"
-          InputLabelProps={{
-            sx: {
-              color: theme.palette.text.secondary,
-              "&.Mui-focused": {
-                color: theme.palette.secondary.main,
-              },
-            },
-          }}
-          sx={{
-            "& .MuiInputBase-root": { color: theme.palette.text.primary },
-          }}
-        />
-        <Button
-          variant="contained"
-          onClick={handleAdd}
-          sx={{
-            backgroundColor: theme.palette.secondary.main,
-            color: theme.palette.background.default,
-            "&:hover": { backgroundColor: theme.palette.secondary.dark },
-            padding: "8px 12px",
+            zIndex: 10,
+            filter: "drop-shadow(0px 3px 3px rgba(0,0,0,0.3))",
           }}
         >
-          추가
-        </Button>
+          <div
+             style={{
+                  width: 0, 
+                  height: 0, 
+                  borderLeft: "15px solid transparent",
+                  borderRight: "15px solid transparent",
+                  borderTop: `30px solid ${theme.palette.secondary.main}`,
+             }}
+          />
+        </Box>
+      </Box>
+      <Box sx={{ mt: 4, display: "flex", justifyContent: "center", mb: 4 }}>
         <Button
           variant="contained"
+          size="large"
           onClick={handleRotate}
+          disabled={isSpinning}
           sx={{
+            borderRadius: 50,
+            px: 6,
+            py: 1.5,
+            fontSize: "1.2rem",
+            fontWeight: "bold",
+            boxShadow: 4,
             backgroundColor: theme.palette.secondary.main,
             color: theme.palette.background.default,
-            "&:hover": { backgroundColor: theme.palette.secondary.dark },
-            padding: "8px 12px",
+            "&:hover": {
+              backgroundColor: theme.palette.secondary.dark,
+              transform: "scale(1.05)",
+              transition: "transform 0.2s",
+            },
+            "&:disabled": {
+               backgroundColor: theme.palette.action.disabledBackground,
+               color: theme.palette.text.disabled
+            }
           }}
         >
-          돌리기
+          {isSpinning ? "돌아가는 중..." : "돌리기"}
         </Button>
       </Box>
-      <TableContainer
-        component={Paper}
-        elevation={0}
-        sx={{ mt: 3, backgroundColor: "transparent" }}
+
+      <Card
+        elevation={3}
+        sx={{ borderRadius: 4, backgroundColor: theme.palette.background.paper }}
       >
-        <Table size="small">
-          <TableHead>
-            <TableRow>
-              <TableCell
-                sx={{
-                  borderBottom: `1px solid ${theme.palette.divider}`,
-                  color: theme.palette.text.secondary,
-                  textAlign: "center",
-                  width: "25%",
-                  backgroundColor: theme.palette.action.hover,
-                }}
-              >
-                메뉴
-              </TableCell>
-              <TableCell
-                sx={{
-                  borderBottom: `1px solid ${theme.palette.divider}`,
-                  color: theme.palette.text.secondary,
-                  textAlign: "center",
-                  backgroundColor: theme.palette.action.hover,
-                }}
-              >
-                비중
-              </TableCell>
-              <TableCell
-                sx={{
-                  borderBottom: `1px solid ${theme.palette.divider}`,
-                  color: theme.palette.text.secondary,
-                  textAlign: "center",
-                  backgroundColor: theme.palette.action.hover,
-                }}
-              />
-            </TableRow>
-          </TableHead>
-          <TableBody>
+        <CardHeader
+          title="메뉴 목록"
+          titleTypographyProps={{ variant: "h6", fontWeight: "bold" }}
+          action={
+            <Typography
+              variant="caption"
+              sx={{
+                display: "block",
+                pt: 1.5,
+                pr: 1,
+                color: theme.palette.text.secondary,
+              }}
+            >
+              총 {product.length}개
+            </Typography>
+          }
+        />
+        <Divider />
+        <CardContent>
+          <Box sx={{ display: "flex", gap: 1, mb: 2 }}>
+            <TextField
+              fullWidth
+              placeholder="새로운 메뉴 이름"
+              variant="outlined"
+              value={newMenu}
+              onChange={(e) => setNewMenu(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleAdd()}
+              size="small"
+              color="secondary"
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      onClick={handleAdd}
+                      edge="end"
+                      color="secondary"
+                    >
+                      <AddIcon />
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+              sx={{
+                "& .MuiOutlinedInput-root": {
+                  color: theme.palette.text.primary,
+                  "& fieldset": {
+                    borderColor: theme.palette.divider,
+                  },
+                  "&:hover fieldset": {
+                    borderColor: theme.palette.text.secondary,
+                  },
+                },
+              }}
+            />
+          </Box>
+
+          <List dense sx={{ maxHeight: 300, overflow: "auto" }}>
             {product.map((item, index) => (
-              <TableRow key={index}>
-                <TableCell
-                  sx={{
-                    borderBottom: `1px solid ${theme.palette.divider}`,
+              <ListItem
+                key={index}
+                divider={index !== product.length - 1}
+                sx={{
+                  "&:hover": {
+                    backgroundColor: theme.palette.action.hover,
+                  },
+                }}
+                secondaryAction={
+                  <IconButton
+                    edge="end"
+                    aria-label="delete"
+                    onClick={() => handleDelete(index)}
+                    size="small"
+                  >
+                    <DeleteIcon color="error" fontSize="small" />
+                  </IconButton>
+                }
+              >
+                <ListItemText
+                  primary={item.name}
+                  primaryTypographyProps={{
+                    fontWeight: 500,
                     color: theme.palette.text.primary,
-                    textAlign: "center",
-                    width: "25%",
+                  }}
+                />
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    mr: 2,
+                    gap: 1,
                   }}
                 >
-                  {item.name}
-                </TableCell>
-                <TableCell
-                  sx={{
-                    borderBottom: `1px solid ${theme.palette.divider}`,
-                    color: theme.palette.text.primary,
-                    textAlign: "center",
-                  }}
-                >
+                  <Typography variant="caption" color="text.secondary">
+                    비중
+                  </Typography>
                   <TextField
                     type="number"
                     value={item.weight}
                     onChange={(e) => handleWeightChange(index, e.target.value)}
-                    fullWidth
-                    variant="outlined"
+                    variant="standard"
                     size="small"
-                    color="secondary"
+                    inputProps={{
+                      style: { textAlign: "center", width: "50px" },
+                      min: 1,
+                    }}
                     sx={{
                       "& .MuiInputBase-root": {
                         color: theme.palette.text.primary,
                       },
                     }}
-                    inputProps={{ style: { textAlign: "center" } }}
-                    InputLabelProps={{
-                      sx: {
-                        color: theme.palette.text.secondary,
-                        "&.Mui-focused": {
-                          color: theme.palette.secondary.main,
-                        },
-                      },
-                    }}
                   />
-                </TableCell>
-                <TableCell
-                  sx={{
-                    borderBottom: `1px solid ${theme.palette.divider}`,
-                    color: theme.palette.text.primary,
-                    textAlign: "center",
-                  }}
-                >
-                  <Button
-                    variant="contained"
-                    color="error"
-                    onClick={() => handleDelete(index)}
-                    size="small"
-                  >
-                    삭제
-                  </Button>
-                </TableCell>
-              </TableRow>
+                </Box>
+              </ListItem>
             ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+            {product.length === 0 && (
+              <Typography
+                textAlign="center"
+                color="text.secondary"
+                sx={{ py: 4 }}
+              >
+                메뉴를 추가해주세요!
+              </Typography>
+            )}
+          </List>
+        </CardContent>
+      </Card>
     </Box>
   );
 };
