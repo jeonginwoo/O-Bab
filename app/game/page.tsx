@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { Container, Card, CardContent, Box, Tabs, Tab } from "@mui/material";
 import Ladder from "./components/Ladder";
 import Roulette from "./components/Roulette";
+import RandomFood from "./components/RandomFood";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -48,6 +49,7 @@ export default function GamePage() {
           >
             <Tab label="룰렛" id="game-tab-0" aria-controls="game-tabpanel-0" />
             <Tab label="사다리타기" id="game-tab-1" aria-controls="game-tabpanel-1" />
+            <Tab label="음식추천" id="game-tab-2" aria-controls="game-tabpanel-2" />
           </Tabs>
         </Box>
         <CardContent>
@@ -56,6 +58,9 @@ export default function GamePage() {
           </TabPanel>
           <TabPanel value={value} index={1}>
             <Ladder />
+          </TabPanel>
+          <TabPanel value={value} index={2}>
+            <RandomFood />
           </TabPanel>
         </CardContent>
       </Card>
