@@ -71,7 +71,13 @@ export class Minimap implements UIObject {
     
     this.currentScale = availableHeight / stage.goalY;
 
-    this.boundingBox.h = availableHeight;
+    // Limit width to 13% of screen width
+    const widthLimit = params.size.x * 0.13;
+    if (26 * this.currentScale > widthLimit) {
+      this.currentScale = widthLimit / 26;
+    }
+
+    this.boundingBox.h = stage.goalY * this.currentScale;
     this.boundingBox.w = 26 * this.currentScale;
     this.boundingBox.x = 10;
     this.boundingBox.y = padding;
