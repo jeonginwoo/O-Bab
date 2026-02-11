@@ -54,7 +54,7 @@ export default function Navigation() {
 
   const navItems = [
     { label: "오밥뭐?", path: "/" },
-    { label: "사다리타기", path: "/ladder" },
+    { label: "랜덤뽑기", path: "/game" },
     { label: "맛집", path: "/map" },
   ];
 

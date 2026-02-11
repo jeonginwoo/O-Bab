@@ -34,6 +34,7 @@ const Roulette = () => {
   ]);
   const [newMenu, setNewMenu] = useState("");
   const [isSpinning, setIsSpinning] = useState(false);
+  const [winningMenu, setWinningMenu] = useState<string | null>(null);
   const colors = useRef<string[]>([]);
   const angle = useRef(0);
   const currentSpeed = useRef(0);
@@ -151,7 +152,7 @@ const Roulette = () => {
         const arc = (product[i].weight / totalWeight) * 2 * Math.PI;
         if (winningAngleRad >= start && winningAngleRad < start + arc) {
           setTimeout(
-            () => alert(`오늘의 점심은?! 🎉 ${product[i].name} 🎉`),
+            () => setWinningMenu(product[i].name),
             100
           );
           break;
@@ -182,6 +183,7 @@ const Roulette = () => {
     }
     if (rotateInterval.current) return;
 
+    setWinningMenu(null);
     setIsSpinning(true);
     currentSpeed.current = Math.random() * 10 + 15;
     angle.current = 0;
@@ -198,7 +200,7 @@ const Roulette = () => {
       setProduct([...product, { name: newMenu.trim(), weight: 5 }]);
       setNewMenu("");
     } else {
-      alert("메뉴를 입력한 후 버튼을 클릭 해 주세요");
+      alert("이름을 입력한 후 버튼을 클릭 해 주세요");
     }
   };
 
@@ -308,12 +310,24 @@ const Roulette = () => {
         </Button>
       </Box>
 
+      {winningMenu && (
+        <Typography
+          variant="h5"
+          component="p"
+          color="secondary"
+          align="center"
+          sx={{ mt: 2, mb: 2, fontWeight: "bold" }}
+        >
+          🎉 당첨: {winningMenu} 🎉
+        </Typography>
+      )}
+
       <Card
         elevation={3}
         sx={{ borderRadius: 4, backgroundColor: theme.palette.background.paper }}
       >
         <CardHeader
-          title="메뉴 목록"
+          title="목록"
           titleTypographyProps={{ variant: "h6", fontWeight: "bold" }}
           action={
             <Typography
@@ -334,7 +348,7 @@ const Roulette = () => {
           <Box sx={{ display: "flex", gap: 1, mb: 2 }}>
             <TextField
               fullWidth
-              placeholder="새로운 메뉴 이름"
+              placeholder="새로운 이름"
               variant="outlined"
               value={newMenu}
               onChange={(e) => setNewMenu(e.target.value)}
@@ -432,7 +446,7 @@ const Roulette = () => {
                 color="text.secondary"
                 sx={{ py: 4 }}
               >
-                메뉴를 추가해주세요!
+                목록을 추가해주세요!
               </Typography>
             )}
           </List>

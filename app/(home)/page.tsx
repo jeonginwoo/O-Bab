@@ -2,14 +2,12 @@
 
 import { Analytics } from "@vercel/analytics/next";
 import { SpeedInsights } from "@vercel/speed-insights/next";
-import HomeGameTabs from "./components/home/HomeGameTabs";
+import FoodRecommendation from "./components/home/FoodRecommendation";
 import Menu from "./components/menu/Menu";
 import React from "react";
 import {
   Box,
   Container,
-  Card,
-  CardContent,
   useTheme,
 } from "@mui/material";
 
@@ -40,11 +38,7 @@ export default function Home() {
               <Menu title="윤스" apiUrl={yunsUrl} />
             </Box>
             <Box sx={{ flex: "1 1 400px" }}>
-              <Card sx={{ height: "100%" }}>
-                <CardContent sx={{ height: "100%" }}>
-                  <HomeGameTabs />
-                </CardContent>
-              </Card>
+              <FoodRecommendation />
             </Box>
           </Box>
         </Container>

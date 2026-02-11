@@ -7,7 +7,7 @@ import { usePathname } from 'next/navigation';
 
 export default function LayoutShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const isMapPage = pathname === '/map';
+  const isHomePage = pathname === '/';
 
   return (
     <div style={{ height: "100vh", display: "flex", flexDirection: "column" }}>
@@ -16,7 +16,7 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
         <Box sx={{ flexGrow: 1 }}>
           {children}
         </Box>
-        {!isMapPage && <Footer />}
+        {isHomePage && <Footer />}
       </Box>
     </div>
   );
