@@ -170,7 +170,7 @@ const Ladder = () => {
           currentCtx.beginPath();
           currentCtx.moveTo(path[i].x, path[i].y);
           currentCtx.lineTo(path[i + 1].x, path[i + 1].y);
-          currentCtx.strokeStyle = theme.palette.secondary.main;
+          currentCtx.strokeStyle = "#FF0000";
           currentCtx.lineWidth = 3;
           currentCtx.stroke();
           currentCtx.restore();
@@ -183,7 +183,7 @@ const Ladder = () => {
       }
       drawSegment(ctx);
     },
-    [theme.palette.secondary.main, setWinningPlayerName]
+    [setWinningPlayerName]
   );
 
   const handleTrace = useCallback(() => {
@@ -263,44 +263,82 @@ const Ladder = () => {
   return (
     <Box sx={{ p: 2, maxWidth: 600, mx: "auto" }}>
       {gameState === "initial" && (
-        <Box sx={{ display: "flex", gap: 1, justifyContent: "center" }}>
-          <TextField
-            fullWidth
-            label="이름 (쉼표로 구분)"
-            variant="outlined"
-            value={playerInput}
-            onChange={(e) => setPlayerInput(e.target.value)}
-            onKeyPress={(e) => {
-              if (e.key === "Enter") {
-                handleStart();
-              }
-            }}
-            size="small"
-            color="secondary"
-            InputLabelProps={{
-              sx: {
-                color: theme.palette.text.secondary,
-                "&.Mui-focused": {
-                  color: theme.palette.secondary.main,
+        <>
+          <Box sx={{ display: "flex", gap: 1, justifyContent: "center" }}>
+            <TextField
+              fullWidth
+              label="이름 (쉼표로 구분)"
+              variant="outlined"
+              value={playerInput}
+              onChange={(e) => setPlayerInput(e.target.value)}
+              onKeyPress={(e) => {
+                if (e.key === "Enter") {
+                  handleStart();
+                }
+              }}
+              size="small"
+              color="secondary"
+              InputLabelProps={{
+                sx: {
+                  color: theme.palette.text.secondary,
+                  "&.Mui-focused": {
+                    color: theme.palette.secondary.main,
+                  },
                 },
-              },
-            }}
-            sx={{
-              "& .MuiInputBase-root": { color: theme.palette.text.primary },
-            }}
-          />
-          <Button
-            variant="contained"
-            onClick={handleStart}
-            sx={{
-              backgroundColor: theme.palette.secondary.main,
-              color: theme.palette.background.default,
-              "&:hover": { backgroundColor: theme.palette.secondary.dark },
-            }}
-          >
-            시작
-          </Button>
-        </Box>
+              }}
+              sx={{
+                "& .MuiInputBase-root": { color: theme.palette.text.primary },
+              }}
+            />
+            <Button
+              variant="contained"
+              onClick={handleStart}
+              sx={{
+                backgroundColor: theme.palette.secondary.main,
+                color: theme.palette.background.default,
+                "&:hover": { backgroundColor: theme.palette.secondary.dark },
+              }}
+            >
+              시작
+            </Button>
+          </Box>
+          <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
+            <svg width="400" height="400" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <g stroke={theme.palette.secondary.main} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M315 160 C365 160, 370 225, 295 230 L 300 215 C 355 215, 350 175, 315 175 Z" fill="#ffffff" />
+                <path d="M80 140 Q80 280 200 280 Q320 280 320 140" fill="#ffffff" />
+                <ellipse cx="200" cy="140" rx="120" ry="40" fill="#ffffff" />
+                <ellipse
+                  cx="200"
+                  cy="140"
+                  rx="110"
+                  ry="35"
+                  fill="#5d3a1a"
+                  fillOpacity="0.9"
+                  stroke="none"
+                />
+                <path
+                  d="M130 125 A95 30 0 0 1 270 125"
+                  stroke="#ffffff"
+                  strokeWidth="2"
+                  strokeOpacity="0.15"
+                />
+                <path
+                  d="M160 145 A45 15 0 0 0 240 145"
+                  stroke="#ffffff"
+                  strokeWidth="1.8"
+                  strokeOpacity="0.12"
+                />
+                <path
+                  d="M185 138 A15 6 0 0 1 215 138"
+                  stroke="#ffffff"
+                  strokeWidth="1.5"
+                  strokeOpacity="0.1"
+                />
+              </g>
+            </svg>
+          </Box>
+        </>
       )}
       {gameState !== "initial" && (
         <Box sx={{ display: "flex", gap: 1, justifyContent: "center", mb: 2 }}>

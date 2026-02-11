@@ -35,11 +35,14 @@ const Roulette = () => {
   const [newMenu, setNewMenu] = useState("");
   const [isSpinning, setIsSpinning] = useState(false);
   const [winningMenu, setWinningMenu] = useState<string | null>(null);
+  const [powerGauge, setPowerGauge] = useState(0);
+  const [isCharging, setIsCharging] = useState(false);
   const colors = useRef<string[]>([]);
   const angle = useRef(0);
   const currentSpeed = useRef(0);
   const rotateInterval = useRef<NodeJS.Timeout | null>(null);
   const stopRequested = useRef(false);
+  const chargeInterval = useRef<NodeJS.Timeout | null>(null);
   const theme = useTheme();
 
   const generatePastelColor = () => {
@@ -176,23 +179,59 @@ const Roulette = () => {
     ctx.restore();
   };
 
-  const handleRotate = () => {
+  const handleChargeStart = () => {
     if (product.length <= 1) {
       alert("메뉴는 최소 2개 이상이어야 합니다.");
       return;
     }
-    if (rotateInterval.current) return;
+    if (isSpinning) return;
+
+    setIsCharging(true);
+    setPowerGauge(0);
+    
+    chargeInterval.current = setInterval(() => {
+      setPowerGauge((prev) => {
+        if (prev >= 100) {
+          return 100;
+        }
+        return prev + 2;
+      });
+    }, 20);
+  };
+
+  const handleChargeEnd = () => {
+    if (!isCharging) return;
+    
+    setIsCharging(false);
+    if (chargeInterval.current) {
+      clearInterval(chargeInterval.current);
+      chargeInterval.current = null;
+    }
+
+    if (powerGauge < 10) {
+      setPowerGauge(0);
+      return;
+    }
+
+    // 게이지에 따라 속도 계산 (10-100 범위를 5-25 속도로 매핑)
+    const baseSpeed = 5 + (powerGauge / 100) * 20;
+    const spinDuration = 1000 + (powerGauge / 100) * 2000;
 
     setWinningMenu(null);
     setIsSpinning(true);
-    currentSpeed.current = Math.random() * 10 + 15;
+    currentSpeed.current = baseSpeed;
     angle.current = 0;
     stopRequested.current = false;
     rotateInterval.current = setInterval(spin, 10);
 
     setTimeout(() => {
       stopRequested.current = true;
-    }, Math.random() * 1000 + 1000);
+    }, spinDuration);
+
+    // 게이지 초기화
+    setTimeout(() => {
+      setPowerGauge(0);
+    }, 300);
   };
 
   const handleAdd = () => {
@@ -244,6 +283,17 @@ const Roulette = () => {
     draw();
   }, [product, theme]);
 
+  useEffect(() => {
+    return () => {
+      if (chargeInterval.current) {
+        clearInterval(chargeInterval.current);
+      }
+      if (rotateInterval.current) {
+        clearInterval(rotateInterval.current);
+      }
+    };
+  }, []);
+
     return (
       <Box sx={{ p: 2, maxWidth: 600, mx: "auto" }}>
         <Box
@@ -280,11 +330,15 @@ const Roulette = () => {
           />
         </Box>
       </Box>
-      <Box sx={{ mt: 4, display: "flex", justifyContent: "center", mb: 4 }}>
+      <Box sx={{ mt: 4, display: "flex", justifyContent: "center", mb: 4, position: "relative" }}>
         <Button
           variant="contained"
           size="large"
-          onClick={handleRotate}
+          onMouseDown={handleChargeStart}
+          onMouseUp={handleChargeEnd}
+          onMouseLeave={handleChargeEnd}
+          onTouchStart={handleChargeStart}
+          onTouchEnd={handleChargeEnd}
           disabled={isSpinning}
           sx={{
             borderRadius: 50,
@@ -293,21 +347,48 @@ const Roulette = () => {
             fontSize: "1.2rem",
             fontWeight: "bold",
             boxShadow: 4,
-            backgroundColor: theme.palette.secondary.main,
+            background: isSpinning 
+              ? theme.palette.action.disabledBackground
+              : `linear-gradient(to right, ${theme.palette.secondary.dark} ${powerGauge}%, ${theme.palette.secondary.main} ${powerGauge}%)`,
             color: theme.palette.background.default,
+            transition: "transform 0.2s",
             "&:hover": {
-              backgroundColor: theme.palette.secondary.dark,
-              transform: "scale(1.05)",
-              transition: "transform 0.2s",
+              background: isSpinning
+                ? theme.palette.action.disabledBackground
+                : `linear-gradient(to right, ${theme.palette.secondary.dark} ${powerGauge}%, ${theme.palette.secondary.main} ${powerGauge}%)`,
+              transform: isSpinning ? "none" : "scale(1.05)",
             },
             "&:disabled": {
                backgroundColor: theme.palette.action.disabledBackground,
                color: theme.palette.text.disabled
+            },
+            "&:active": {
+              transform: "scale(0.98)",
             }
           }}
         >
-          {isSpinning ? "돌아가는 중..." : "돌리기"}
+          {isSpinning ? "돌아가는 중..." : isCharging ? "충전 중..." : "꾹 눌러서 돌리기"}
         </Button>
+        {!isSpinning && powerGauge > 0 && (
+          <Typography 
+            variant="body2" 
+            sx={{ 
+              position: "absolute",
+              right: 0,
+              top: "50%",
+              transform: "translateY(-50%)",
+              fontWeight: "bold",
+              backgroundColor: theme.palette.background.paper,
+              px: 1.5,
+              py: 0.5,
+              borderRadius: 2,
+              color: powerGauge < 10 ? theme.palette.error.main : theme.palette.secondary.main,
+              border: `2px solid ${powerGauge < 10 ? theme.palette.error.main : theme.palette.secondary.main}`,
+            }}
+          >
+            {powerGauge}%
+          </Typography>
+        )}
       </Box>
 
       {winningMenu && (
@@ -383,7 +464,11 @@ const Roulette = () => {
           </Box>
 
           <List dense sx={{ maxHeight: 300, overflow: "auto" }}>
-            {product.map((item, index) => (
+            {product.map((item, index) => {
+              const totalWeight = product.reduce((sum, p) => sum + p.weight, 0);
+              const probability = totalWeight > 0 ? ((item.weight / totalWeight) * 100).toFixed(1) : 0;
+              
+              return (
               <ListItem
                 key={index}
                 divider={index !== product.length - 1}
@@ -437,9 +522,21 @@ const Roulette = () => {
                       },
                     }}
                   />
+                  <Typography 
+                    variant="caption" 
+                    color="secondary"
+                    sx={{ 
+                      fontWeight: "bold",
+                      minWidth: "45px",
+                      textAlign: "right"
+                    }}
+                  >
+                    {probability}%
+                  </Typography>
                 </Box>
               </ListItem>
-            ))}
+              );
+            })}
             {product.length === 0 && (
               <Typography
                 textAlign="center"
