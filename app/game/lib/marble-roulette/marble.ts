@@ -28,6 +28,7 @@ export class Marble {
   private lastPosition: VectorLike = { x: 0, y: 0 };
   private theme: ColorTheme = Themes.dark;
   private variation: number = 0;
+  private colorIndex: number = 0;
 
   private physics: IPhysics;
 
@@ -79,6 +80,7 @@ export class Marble {
     
     this.id = order;
     this.variation = (Math.random() * 10) - 5;
+    this.colorIndex = Math.floor(Math.random() * 10000);
     this.updatePalette(palette);
 
     physics.createMarble(
@@ -90,7 +92,7 @@ export class Marble {
 
   public updatePalette(palette: number[]) {
     if (!palette || palette.length === 0) return;
-    this.hue = palette[this.id % palette.length];
+    this.hue = palette[this.colorIndex % palette.length];
     this.hue = (this.hue + this.variation + 360) % 360;
     this.color = `hsl(${this.hue} 100% 70%)`;
   }
