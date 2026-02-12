@@ -304,7 +304,29 @@ const Ladder = () => {
           </Box>
           <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
             <svg width="400" height="400" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <g stroke={theme.palette.secondary.main} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+              <style>
+                {`
+                  @keyframes steam {
+                    0% { transform: translateY(0) scaleX(1); opacity: 0; }
+                    10% { opacity: 0.5; }
+                    50% { transform: translateY(-60px) scaleX(1.1); opacity: 0.3; }
+                    100% { transform: translateY(-120px) scaleX(1.3); opacity: 0; }
+                  }
+                  .steam-path {
+                    opacity: 0; /* 처음에는 보이지 않게 설정 */
+                    animation: steam 4s infinite ease-in-out;
+                    stroke: #a0a0a0;
+                    stroke-width: 4;
+                    stroke-linecap: round;
+                    fill: none;
+                  }
+                  /* 각 연기마다 지연 시간을 주어 순차적으로 나타나게 함 */
+                  .steam-1 { animation-delay: 0s; }
+                  .steam-2 { animation-delay: 1.3s; }
+                  .steam-3 { animation-delay: 2.6s; }
+                `}
+              </style>
+              <g stroke="#6F4E37" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
                 <path d="M315 160 C365 160, 370 225, 295 230 L 300 215 C 355 215, 350 175, 315 175 Z" fill="#ffffff" />
                 <path d="M80 140 Q80 280 200 280 Q320 280 320 140" fill="#ffffff" />
                 <ellipse cx="200" cy="140" rx="120" ry="40" fill="#ffffff" />
@@ -335,6 +357,11 @@ const Ladder = () => {
                   strokeWidth="1.5"
                   strokeOpacity="0.1"
                 />
+              </g>
+              <g className="steam-container">
+                <path className="steam-path steam-1" d="M160 130 C150 110, 170 90, 160 70" />
+                <path className="steam-path steam-2" d="M200 135 C190 115, 210 95, 200 75" />
+                <path className="steam-path steam-3" d="M240 130 C230 110, 250 90, 240 70" />
               </g>
             </svg>
           </Box>
