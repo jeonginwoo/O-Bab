@@ -5,6 +5,7 @@ import { Box, Button, TextField, Typography, Paper, FormControl, InputLabel, Sel
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import { Roulette } from "../lib/marble-roulette/roulette";
 import { stages } from "../lib/marble-roulette/data/maps";
+import { Translations } from "../lib/marble-roulette/data/languages";
 import styles from "./MarbleRoulette.module.scss";
 import { ColorTheme } from "../lib/marble-roulette/types/ColorTheme";
 import { themeMarblePalettes } from "../../theme/theme";
@@ -216,7 +217,7 @@ export default function MarbleRoulette() {
               >
                 {stages.map((stage, index) => (
                   <MenuItem key={index} value={index}>
-                    {stage.title}
+                    {(Translations.ko as Record<string, string>)[stage.title] || stage.title}
                   </MenuItem>
                 ))}
               </Select>

@@ -56,6 +56,10 @@ export class Camera {
 
     this._position = { x: centerX, y: initialY };
     this._targetPosition = { x: centerX, y: initialY };
+
+    this._zoom = 1.5;
+    this._targetZoom = 1.5;
+
     this._shouldFollowMarbles = false;
   }
 

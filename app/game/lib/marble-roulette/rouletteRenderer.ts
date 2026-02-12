@@ -71,7 +71,7 @@ export class RouletteRenderer {
     this._canvas.width = canvasWidth;
     this._canvas.height = canvasHeight;
     this.ctx = this._canvas.getContext('2d', {
-      alpha: false,
+      alpha: true,
     }) as CanvasRenderingContext2D;
 
     container.appendChild(this._canvas);
