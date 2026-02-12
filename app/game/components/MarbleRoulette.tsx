@@ -61,7 +61,7 @@ export default function MarbleRoulette() {
       minimapViewport: mainColor,
       winnerText: textColor,
       winnerOutline: 'transparent',
-      winnerBackground: 'rgba(0,0,0,0.5)', 
+      winnerBackground: 'transparent', 
       marbleGlow: isDark ? 'rgba(255, 255, 255, 0.4)' : 'rgba(0, 0, 0, 0.2)',
       marblePalette: themeMarblePalettes[currentTheme] || themeMarblePalettes['dark'],
     };

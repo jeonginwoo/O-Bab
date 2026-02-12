@@ -332,6 +332,8 @@ export class Roulette extends EventTarget {
         this._renderer.canvas.addEventListener(ev.toLowerCase().replace('mouse', 'pointer'), this.mouseHandler.bind(this, ev));
       },
     );
+    this._renderer.canvas.addEventListener('pointercancel', (e) => this.mouseHandler('MouseUp', e));
+    this._renderer.canvas.addEventListener('pointerleave', (e) => this.mouseHandler('MouseUp', e));
     this._renderer.canvas.addEventListener('contextmenu', (e) => {
       e.preventDefault();
     });

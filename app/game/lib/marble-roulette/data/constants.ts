@@ -55,7 +55,7 @@ export const Themes: Record<string, ColorTheme> = {
     minimapBackground: '#fefefe',
     minimapViewport: '#6699cc',
 
-    winnerBackground: 'rgba(255, 255, 255, 0.5)',
+    winnerBackground: 'transparent',
     winnerOutline: 'black',
     winnerText: '#cccccc',
     marbleGlow: 'rgba(0, 0, 0, 0.5)', // Dark glow for light theme
@@ -101,7 +101,7 @@ export const Themes: Record<string, ColorTheme> = {
     rankBackground: 'rgba(255, 255, 255, 0.2)',
     minimapBackground: '#333333',
     minimapViewport: 'white',
-    winnerBackground: 'rgba(0, 0, 0, 0.5)',
+    winnerBackground: 'transparent',
     winnerOutline: 'black',
     winnerText: 'white',
     marbleGlow: 'rgba(255, 255, 255, 0.3)', // Light glow for dark theme
