@@ -61,6 +61,7 @@ export default function Navigation() {
   return (
     <AppBar
       position="static"
+      elevation={0}
       sx={{
         backgroundColor: theme.palette.background.paper,
         borderBottom: `1px solid ${theme.palette.secondary.main}`,

@@ -138,6 +138,7 @@ export class Minimap implements UIObject {
           const h = shape.height * 2;
           this.ctx.rotate(shape.rotation);
           this.ctx.fillRect(-w / 2, -h / 2, w, h);
+          this.ctx.strokeRect(-w / 2, -h / 2, w, h);
           break;
         case 'circle':
           this.ctx.beginPath();

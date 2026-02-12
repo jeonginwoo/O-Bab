@@ -383,6 +383,15 @@ export class Roulette extends EventTarget {
     this._theme = Themes[themeName];
   }
 
+  public setCustomTheme(theme: ColorTheme) {
+    this._theme = theme;
+    if (this._marbles.length > 0 && theme.marblePalette) {
+      this._marbles.forEach((marble) => {
+        marble.updatePalette(theme.marblePalette);
+      });
+    }
+  }
+
   public getSpeed() {
     return this._speed;
   }
@@ -439,6 +448,7 @@ export class Roulette extends EventTarget {
               totalCount,
               member.name,
               member.weight,
+              this._theme.marblePalette,
             ),
           );
         }

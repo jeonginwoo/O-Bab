@@ -118,7 +118,8 @@ export class RouletteRenderer {
   }
 
   private async _load(): Promise<void> {
-    const loadPromises =
+    const loadPromises: Promise<void>[] = [];
+    /*
       [
         { name: '챔루', imgUrl: '/roulette-assets/images/chamru.png' },
         { name: '쿠빈', imgUrl: '/roulette-assets/images/kubin.png' },
@@ -132,8 +133,10 @@ export class RouletteRenderer {
           this._images[name] = await this._loadImage(imgUrl.toString());
         })();
       });
+    */
 
     loadPromises.push((async () => {
+      // Keep only UI assets if any
       await this._loadImage('/roulette-assets/images/ff.svg');
     })());
 

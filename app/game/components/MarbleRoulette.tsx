@@ -1,13 +1,18 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
-import { Box, Button, TextField, Typography, Paper, FormControl, InputLabel, Select, MenuItem, SelectChangeEvent, IconButton, Tooltip } from "@mui/material";
+import React, { useEffect, useRef, useState, useMemo } from "react";
+import { Box, Button, TextField, Typography, Paper, FormControl, InputLabel, Select, MenuItem, SelectChangeEvent, IconButton, Tooltip, useTheme } from "@mui/material";
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import { Roulette } from "../lib/marble-roulette/roulette";
 import { stages } from "../lib/marble-roulette/data/maps";
 import styles from "./MarbleRoulette.module.scss";
+import { ColorTheme } from "../lib/marble-roulette/types/ColorTheme";
+import { themeMarblePalettes } from "../../theme/theme";
+import { useThemeContext } from "../../theme/ThemeContext";
 
 export default function MarbleRoulette() {
+  const theme = useTheme();
+  const { currentTheme } = useThemeContext();
   const containerRef = useRef<HTMLDivElement>(null);
   const rouletteRef = useRef<Roulette | null>(null);
   const [names, setNames] = useState<string>("돈토*3, 윤스*2, 맘터, 국밥*4");
@@ -16,6 +21,51 @@ export default function MarbleRoulette() {
   const [errorMSG, setErrorMSG] = useState<string | null>(null);
   const [selectedMap, setSelectedMap] = useState<number>(0);
 
+  const gameTheme: ColorTheme = useMemo(() => {
+    const isDark = theme.palette.mode === 'dark';
+    const mainColor = isDark ? theme.palette.secondary.main : theme.palette.primary.main;
+    const bgColor = theme.palette.background.default;
+    const paperColor = theme.palette.background.paper;
+    const textColor = theme.palette.text.primary;
+    
+    return {
+      background: bgColor,
+      marbleLightness: isDark ? 60 : 50,
+      marbleWinningBorder: mainColor,
+      skillColor: mainColor,
+      coolTimeIndicator: theme.palette.text.secondary,
+      entity: {
+        box: {
+          fill: paperColor,
+          outline: mainColor,
+          bloom: mainColor,
+          bloomRadius: 10,
+        },
+        circle: {
+          fill: paperColor,
+          outline: mainColor,
+          bloom: mainColor,
+          bloomRadius: 10,
+        },
+        polyline: {
+          fill: 'transparent',
+          outline: textColor,
+          bloom: 'transparent',
+          bloomRadius: 0,
+        },
+      },
+      rankStroke: 'black',
+      rankBackground: isDark ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.2)',
+      minimapBackground: paperColor, // Ideally with opacity, but hex is fine or we can assume it's opaque
+      minimapViewport: mainColor,
+      winnerText: textColor,
+      winnerOutline: 'transparent',
+      winnerBackground: 'rgba(0,0,0,0.5)', 
+      marbleGlow: isDark ? 'rgba(255, 255, 255, 0.4)' : 'rgba(0, 0, 0, 0.2)',
+      marblePalette: themeMarblePalettes[currentTheme] || themeMarblePalettes['dark'],
+    };
+  }, [theme, currentTheme]);
+
   useEffect(() => {
     if (containerRef.current && !rouletteRef.current) {
       const r = new Roulette(containerRef.current);
@@ -23,6 +73,7 @@ export default function MarbleRoulette() {
 
       const handleReady = () => {
         setIsReady(true);
+        r.setCustomTheme(gameTheme);
       };
 
       const handleError = (e: Event) => {
@@ -54,6 +105,13 @@ export default function MarbleRoulette() {
       }
     };
   }, []);
+
+  // Sync Timer Theme with Game
+  useEffect(() => {
+    if (rouletteRef.current && isReady) {
+      rouletteRef.current.setCustomTheme(gameTheme);
+    }
+  }, [gameTheme, isReady]);
 
   // Update marbles when names change
   useEffect(() => {

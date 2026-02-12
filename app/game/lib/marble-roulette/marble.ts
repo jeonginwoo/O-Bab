@@ -7,6 +7,9 @@ import { IPhysics } from './IPhysics';
 import { ColorTheme } from './types/ColorTheme';
 import { transformGuard } from './utils/transformGuard';
 
+// Fallback palette
+const DEFAULT_PALETTE = [0, 30, 60, 120, 180, 210, 270, 300, 330];
+
 export class Marble {
   type = 'marble' as const;
   name: string = '';
@@ -24,6 +27,7 @@ export class Marble {
   private _stuckTime = 0;
   private lastPosition: VectorLike = { x: 0, y: 0 };
   private theme: ColorTheme = Themes.dark;
+  private variation: number = 0;
 
   private physics: IPhysics;
 
@@ -59,6 +63,7 @@ export class Marble {
     max: number,
     name?: string,
     weight: number = 1,
+    palette: number[] = DEFAULT_PALETTE,
   ) {
     this.name = name || `M${order}`;
     this.weight = weight;
@@ -71,15 +76,23 @@ export class Marble {
     const maxLine = Math.ceil(max / 10);
     const line = Math.floor(order / 10);
     const lineDelta = -Math.max(0, Math.ceil(maxLine - 5));
-    this.hue = (360 / max) * order;
-    this.color = `hsl(${this.hue} 100% 70%)`;
+    
     this.id = order;
+    this.variation = (Math.random() * 10) - 5;
+    this.updatePalette(palette);
 
     physics.createMarble(
       order,
       10.25 + (order % 10) * 0.6,
       maxLine - line + lineDelta,
     );
+  }
+
+  public updatePalette(palette: number[]) {
+    if (!palette || palette.length === 0) return;
+    this.hue = palette[this.id % palette.length];
+    this.hue = (this.hue + this.variation + 360) % 360;
+    this.color = `hsl(${this.hue} 100% 70%)`;
   }
 
   update(deltaTime: number) {
@@ -175,6 +188,12 @@ export class Marble {
 
     ctx.fillStyle = `hsl(${this.hue} 100% ${this.theme.marbleLightness + 25 * Math.min(1, this.impact / 500)}%`;
 
+    // Apply glow based on theme
+    if (this.theme.marbleGlow) {
+      ctx.shadowColor = this.theme.marbleGlow;
+      ctx.shadowBlur = zoom / 3;
+    }
+
     // ctx.shadowColor = this.color;
     // ctx.shadowBlur = zoom / 2;
     if (skin) {
@@ -187,8 +206,12 @@ export class Marble {
       this._drawMarbleBody(ctx, false);
     }
 
+    // Reset shadow only if we want to change it for text, but we want text to glow too.
+    // However, text might need DIFFERENT shadow settings (e.g. smaller blur for text).
+    // Let's reset here and let _drawName apply its own suitable glow.
     ctx.shadowColor = '';
     ctx.shadowBlur = 0;
+
     this._drawName(ctx, zoom);
 
     if (outline) {
@@ -203,13 +226,32 @@ export class Marble {
   private _drawName(ctx: CanvasRenderingContext2D, zoom: number) {
     transformGuard(ctx, () => {
       ctx.font = `12pt sans-serif`;
-      ctx.strokeStyle = 'black';
-      ctx.lineWidth = 2;
+      
+      // Removed black outline for cleaner look to match theme
+      // ctx.strokeStyle = 'black';
+      // ctx.lineWidth = 2;
+      
+      if (this.theme.rankStroke) {
+        ctx.strokeStyle = this.theme.rankStroke;
+        ctx.lineWidth = 3;
+        ctx.lineJoin = 'round';
+      }
+
       ctx.fillStyle = this.color;
-      ctx.shadowBlur = 0;
+
+      if (this.theme.marbleGlow) {
+        ctx.shadowColor = this.theme.marbleGlow;
+        ctx.shadowBlur = 4; // Consistent small glow for text
+      } else {
+        ctx.shadowBlur = 0;
+      }
+      
       ctx.translate(this.x, this.y + 0.25);
       ctx.scale(1 / zoom, 1 / zoom);
-      ctx.strokeText(this.name, 0, 0);
+      
+      if (this.theme.rankStroke) {
+        ctx.strokeText(this.name, 0, 0);
+      }
       ctx.fillText(this.name, 0, 0);
     });
   }

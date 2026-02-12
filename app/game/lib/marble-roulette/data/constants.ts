@@ -51,12 +51,25 @@ export const Themes: Record<string, ColorTheme> = {
       },
     },
     rankStroke: 'black',
+    rankBackground: 'rgba(0, 0, 0, 0.5)',
     minimapBackground: '#fefefe',
     minimapViewport: '#6699cc',
 
     winnerBackground: 'rgba(255, 255, 255, 0.5)',
     winnerOutline: 'black',
     winnerText: '#cccccc',
+    marbleGlow: 'rgba(0, 0, 0, 0.5)', // Dark glow for light theme
+    marblePalette: [
+      0,   // Red
+      30,  // Orange
+      60,  // Yellow
+      120, // Green
+      180, // Cyan
+      210, // Blue
+      270, // Purple
+      300, // Magenta
+      330, // Pink
+    ],
   },
   dark: {
     background: 'black',
@@ -84,11 +97,16 @@ export const Themes: Record<string, ColorTheme> = {
         bloomRadius: 15,
       },
     },
-    rankStroke: '',
+    rankStroke: 'black',
+    rankBackground: 'rgba(255, 255, 255, 0.2)',
     minimapBackground: '#333333',
     minimapViewport: 'white',
     winnerBackground: 'rgba(0, 0, 0, 0.5)',
     winnerOutline: 'black',
     winnerText: 'white',
+    marbleGlow: 'rgba(255, 255, 255, 0.3)', // Light glow for dark theme
+    marblePalette: [
+      160, 190, 210, 260, 320, 340, 25, 50, 120
+    ],
   },
 };

@@ -174,6 +174,30 @@ export const themeOptions: Record<string, ThemeOptions> = {
   },
 };
 
+export const themeMarblePalettes: Record<string, number[]> = {
+  // Dark: Neon Mint/Cyan/Pink for high contrast
+  dark: [160, 190, 210, 260, 320, 340, 25, 50, 120],
+  
+  // Ocean: Range of blues, Cyans, Teals, and a touch of coral
+  ocean: [160, 170, 180, 190, 200, 210, 220, 230, 240, 330],
+  
+  // Light: Bright primary rainbow
+  light: [0, 30, 60, 120, 180, 210, 270, 300, 330],
+  
+  // Forest: Greens, Earthy Browns (Oranges), Sky Blue, Flora Reds
+  forest: [90, 100, 110, 120, 130, 140, 30, 45, 200, 350],
+  
+  // Coffee: Warm tones - Oranges, Yellows, Red-Browns
+  coffee: [20, 25, 30, 35, 40, 45, 10, 15, 5, 0],
+  
+  // Lavender: Purples, Violets, Pinks, Soft Blues
+  lavender: [240, 250, 260, 270, 280, 290, 300, 310, 320, 200],
+  
+  // Olive Meadow: Yellow-Greens, Olives, Pale yellows
+  oliveMeadow: [60, 70, 80, 90, 100, 45, 50, 55, 120],
+};
+
+
 export const createCustomTheme = (themeName: string) => {
   return createTheme(themeOptions[themeName] || themeOptions["dark"]);
 };

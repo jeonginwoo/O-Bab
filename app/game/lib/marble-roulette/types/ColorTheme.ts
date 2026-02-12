@@ -17,9 +17,12 @@ export interface ColorTheme {
     polyline: ShapeColor;
   };
   rankStroke: string;
+  rankBackground: string;
   minimapBackground: string;
   minimapViewport: string;
   winnerText: string;
   winnerOutline: string;
   winnerBackground: string;
+  marbleGlow: string;
+  marblePalette: number[];
 }
