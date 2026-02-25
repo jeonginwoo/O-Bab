@@ -194,9 +194,9 @@ const Roulette = () => {
         if (prev >= 100) {
           return 100;
         }
-        return prev + 2;
+        return prev + 1;
       });
-    }, 20);
+    }, 15);
   };
 
   const handleChargeEnd = () => {
@@ -369,7 +369,7 @@ const Roulette = () => {
         >
           {isSpinning ? "돌아가는 중..." : isCharging ? "충전 중..." : "꾹 눌러서 돌리기"}
         </Button>
-        {!isSpinning && powerGauge > 0 && (
+        {powerGauge > 0 && (
           <Typography 
             variant="body2" 
             sx={{ 
@@ -443,6 +443,7 @@ const Roulette = () => {
                       onClick={handleAdd}
                       edge="end"
                       color="secondary"
+                      disabled={!newMenu.trim()}
                     >
                       <AddIcon />
                     </IconButton>
@@ -543,7 +544,7 @@ const Roulette = () => {
                 color="text.secondary"
                 sx={{ py: 4 }}
               >
-                목록을 추가해주세요!
+                이름을 추가해주세요!
               </Typography>
             )}
           </List>
