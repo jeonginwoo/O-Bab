@@ -361,6 +361,7 @@ function Menu({ title, apiUrl }: { title:string; apiUrl: string }) {
             navigation
             pagination={{ clickable: true }}
             keyboard={{ enabled: true }}
+            loop
             initialSlide={initialSlide}
             style={{
               '--swiper-navigation-color': '#e4e4e4',
