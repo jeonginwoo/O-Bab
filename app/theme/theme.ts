@@ -66,7 +66,7 @@ export const themeOptions: Record<string, ThemeOptions> = {
         main: "#9c27b0",
       },
       background: {
-        default: "#f5f5f5",
+        default: "#f8f6ff",
         paper: "#ffffff",
       },
       text: {
@@ -90,7 +90,7 @@ export const themeOptions: Record<string, ThemeOptions> = {
         main: "#ff6f00",
       },
       background: {
-        default: "#e8f5e9",
+        default: "#f4fbf4",
         paper: "#ffffff",
       },
     },
@@ -107,10 +107,10 @@ export const themeOptions: Record<string, ThemeOptions> = {
         main: "#795548",
       },
       secondary: {
-        main: "#d7ccc8",
+        main: "#a1887f",
       },
       background: {
-        default: "#efebe9",
+        default: "#faf7f5",
         paper: "#ffffff",
       },
       text: {
@@ -134,7 +134,7 @@ export const themeOptions: Record<string, ThemeOptions> = {
         main: "#e040fb",
       },
       background: {
-        default: "#f3e5f5",
+        default: "#fdf6ff",
         paper: "#ffffff",
       },
       text: {
@@ -155,10 +155,10 @@ export const themeOptions: Record<string, ThemeOptions> = {
         main: "#89986D",
       },
       secondary: {
-        main: "#C5D89D",
+        main: "#8fa870",
       },
       background: {
-        default: "#F6F0D7",
+        default: "#fdfaf0",
         paper: "#ffffff",
       },
       text: {

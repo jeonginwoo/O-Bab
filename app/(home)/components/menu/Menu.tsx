@@ -214,15 +214,25 @@ function Menu({ title, apiUrl }: { title:string; apiUrl: string }) {
           />
         ) : (
           menuImages.map((media, index) => (
-            <Box key={index} sx={{ mb: 2 }}>
+            <Box
+              key={index}
+              sx={{
+                mb: 2,
+                borderRadius: 1,
+                overflow: 'hidden',
+                '&:hover img': { transform: 'scale(1.03)' },
+              }}
+            >
               <img
                 src={media.url}
                 alt={`${menu.title} menu image ${index + 1}`}
                 style={{
                   width: "100%",
                   height: "auto",
+                  display: 'block',
                   borderRadius: 4,
                   cursor: "pointer",
+                  transition: 'transform 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
                 }}
                 onClick={() => handleImageClick(media.url)}
               />
@@ -232,18 +242,42 @@ function Menu({ title, apiUrl }: { title:string; apiUrl: string }) {
         {foodImages.length > 0 && (
           <ImageList sx={{ mt: 2 }} cols={3} gap={8}>
             {foodImages.map((media, index) => (
-              <ImageListItem key={index}>
+              <ImageListItem
+                key={index}
+                onClick={() => handleImageClick(media.url)}
+                sx={{
+                  borderRadius: 1,
+                  overflow: 'hidden',
+                  aspectRatio: '1 / 1',
+                  '&:hover img': { transform: 'scale(1.07)' },
+                  '&:hover::after': { opacity: 1 },
+                  position: 'relative',
+                  cursor: 'pointer',
+                  '&::after': {
+                    content: '""',
+                    position: 'absolute',
+                    inset: 0,
+                    background: 'rgba(0,0,0,0.08)',
+                    opacity: 0,
+                    transition: 'opacity 0.2s ease',
+                    borderRadius: 1,
+                    pointerEvents: 'none',
+                  },
+                }}
+              >
                 <img
                   src={media.url}
                   alt={`${menu.title} food image ${index + 1}`}
                   loading="lazy"
                   style={{
                     width: "100%",
-                    height: "auto",
+                    height: "100%",
+                    display: 'block',
+                    objectFit: 'cover',
                     borderRadius: 4,
                     cursor: "pointer",
+                    transition: 'transform 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
                   }}
-                  onClick={() => handleImageClick(media.url)}
                 />
               </ImageListItem>
             ))}
@@ -254,21 +288,66 @@ function Menu({ title, apiUrl }: { title:string; apiUrl: string }) {
   };
 
   return (
-    <Card sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
+    <Card
+      sx={{
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        position: 'relative',
+        border: (t) => `1px solid ${t.palette.secondary.main}22`,
+        backgroundColor: (t) => `${t.palette.background.paper}e8`,
+        backdropFilter: 'blur(8px)',
+        WebkitBackdropFilter: 'blur(8px)',
+        transition: 'transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.28s ease',
+        '&::after': {
+          content: '""',
+          position: 'absolute',
+          inset: 0,
+          borderRadius: 'inherit',
+          boxShadow: (t) => `0 20px 48px ${t.palette.secondary.main}22, 0 4px 16px rgba(0,0,0,0.18)`,
+          opacity: 0,
+          transition: 'opacity 0.28s ease',
+          pointerEvents: 'none',
+        },
+        '&:hover': {
+          borderColor: (t) => `${t.palette.secondary.main}55`,
+        },
+        '&:hover::after': { opacity: 1 },
+      }}
+    >
       <CardContent sx={{ flexGrow: 1 }}>
         <Typography
           variant="h5"
           component="div"
-          color="secondary"
           align="center"
-          fontWeight={"bold"}
+          fontWeight="bold"
           gutterBottom
+          sx={{
+            color: 'secondary.main',
+            letterSpacing: '0.04em',
+            position: 'relative',
+            pb: 0.5,
+            '&::after': {
+              content: '""',
+              position: 'absolute',
+              bottom: 0,
+              left: '50%',
+              transform: 'translateX(-50%)',
+              width: '40%',
+              height: '2px',
+              borderRadius: '2px',
+              background: 'linear-gradient(90deg, transparent, currentColor, transparent)',
+            },
+          }}
         >
           {title}
         </Typography>
         {loading && (
-          <Box sx={{ display: "flex", justifyContent: "center", my: 2 }}>
-            <CircularProgress color="secondary" />
+          <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", my: 4, gap: 2 }}>
+            <CircularProgress color="secondary" size={36} thickness={3.5} />
+            <Typography variant="caption" color="text.secondary" sx={{ letterSpacing: '0.06em' }}>
+              메뉴 불러오는 중...
+            </Typography>
           </Box>
         )}
         {error && (

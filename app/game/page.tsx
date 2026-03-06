@@ -44,8 +44,33 @@ export default function GamePage() {
   };
 
   return (
-    <Container maxWidth="md" sx={{ my: 2 }}>
-      <Card>
+    <Container maxWidth="md" sx={{ my: 4 }}>
+      <Card
+        className="animate-fade-in-up"
+        sx={{
+          position: 'relative',
+          border: (t) => `1px solid ${t.palette.secondary.main}22`,
+          backgroundColor: (t) => `${t.palette.background.paper}e8`,
+          backdropFilter: 'blur(8px)',
+          WebkitBackdropFilter: 'blur(8px)',
+          transition: 'transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), border-color 0.28s ease',
+          '&::after': {
+            content: '""',
+            position: 'absolute',
+            inset: 0,
+            borderRadius: 'inherit',
+            boxShadow: (t) => `0 20px 48px ${t.palette.secondary.main}22, 0 4px 16px rgba(0,0,0,0.18)`,
+            opacity: 0,
+            transition: 'opacity 0.28s ease',
+            pointerEvents: 'none',
+          },
+          '&:hover': {
+            transform: 'translateY(-4px)',
+            borderColor: (t) => `${t.palette.secondary.main}55`,
+          },
+          '&:hover::after': { opacity: 1 },
+        }}
+      >
         <Box sx={{ borderBottom: 1, borderColor: "divider" }}>
           {isMobile ? (
             <Box sx={{ p: 2 }}>

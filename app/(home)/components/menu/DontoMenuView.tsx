@@ -65,61 +65,65 @@ const DontoMenuView: React.FC<DontoMenuViewProps> = ({
 
   if (view === "preview") {
     return (
+      /* Outer: clips the scaled content */
       <Box
         sx={{
-          display: "flex",
           width: "100%",
           borderRadius: 1,
           overflow: "hidden",
+          position: "relative",
           mb: 2,
           cursor: "pointer",
+          '&:hover .donto-inner': {
+            transform: 'scale(1.05)',
+          },
         }}
         onClick={onClick}
       >
+        {/* Inner: the whole split-image row — scaled as one unit */}
         <Box
+          className="donto-inner"
           sx={{
-            width: "calc(50% - 0.5px)",
-            overflow: "hidden",
-            position: "relative",
+            display: "flex",
+            width: "100%",
+            transition: 'transform 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
+            transformOrigin: 'center center',
           }}
         >
-          <img
-            src={menuImages[0].url}
-            alt={`${menuTitle} menu image 1`}
-            style={{
-              width: "160%",
-              height: "auto",
-              display: "block",
-              marginLeft: "-30%",
+          <Box sx={{ width: "calc(50% - 0.5px)", position: "relative", overflow: "hidden" }}>
+            <img
+              src={menuImages[0].url}
+              alt={`${menuTitle} menu image 1`}
+              style={{
+                width: "160%",
+                height: "auto",
+                display: "block",
+                marginLeft: "-30%",
+              }}
+            />
+          </Box>
+          <Box
+            sx={{
+              width: "1px",
+              borderLeft: "1px dashed",
+              borderLeftColor: "#8892B0",
+              backgroundColor: "#012346",
+              flexShrink: 0,
+              zIndex: 1,
             }}
           />
-        </Box>
-        <Box
-          sx={{
-            width: "1px",
-            borderLeft: "1px dashed",
-            borderLeftColor: "#8892B0",
-            backgroundColor: "#012346",
-            flexShrink: 0,
-          }}
-        />
-        <Box
-          sx={{
-            width: "calc(50% - 0.5px)",
-            overflow: "hidden",
-            position: "relative",
-          }}
-        >
-          <img
-            src={menuImages[1].url}
-            alt={`${menuTitle} menu image 2`}
-            style={{
-              width: "160%",
-              height: "auto",
-              display: "block",
-              marginLeft: "-30%",
-            }}
-          />
+          <Box sx={{ width: "calc(50% - 0.5px)", position: "relative", overflow: "hidden" }}>
+            <img
+              src={menuImages[1].url}
+              alt={`${menuTitle} menu image 2`}
+              style={{
+                width: "160%",
+                height: "auto",
+                display: "block",
+                marginLeft: "-30%",
+              }}
+            />
+          </Box>
         </Box>
       </Box>
     );

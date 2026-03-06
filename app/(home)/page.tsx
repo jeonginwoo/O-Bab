@@ -7,6 +7,7 @@ import React from "react";
 import {
   Box,
   Container,
+  Typography,
   useTheme,
 } from "@mui/material";
 
@@ -21,23 +22,31 @@ export default function Home() {
     <>
       <Analytics />
       <SpeedInsights />
-        <Container maxWidth="lg" sx={{ my: 4, flexGrow: 1 }}>
+      <Container maxWidth="lg" sx={{ my: 4, flexGrow: 1 }}>
+
+        {/* Menu cards */}
+        <Box
+          sx={{
+            display: "flex",
+            flexWrap: "wrap",
+            justifyContent: "center",
+            gap: theme.spacing(3),
+          }}
+        >
           <Box
-            sx={{
-              display: "flex",
-              flexWrap: "wrap",
-              justifyContent: "center",
-              gap: theme.spacing(3),
-            }}
+            className="animate-fade-in-up stagger-1"
+            sx={{ flex: "1 1 400px" }}
           >
-            <Box sx={{ flex: "1 1 400px" }}>
-              <Menu title="돈토" apiUrl={dontoUrl} />
-            </Box>
-            <Box sx={{ flex: "1 1 400px" }}>
-              <Menu title="윤스" apiUrl={yunsUrl} />
-            </Box>
+            <Menu title="돈토" apiUrl={dontoUrl} />
           </Box>
-        </Container>
+          <Box
+            className="animate-fade-in-up stagger-2"
+            sx={{ flex: "1 1 400px" }}
+          >
+            <Menu title="윤스" apiUrl={yunsUrl} />
+          </Box>
+        </Box>
+      </Container>
     </>
   );
 }

@@ -60,11 +60,17 @@ export default function Navigation() {
 
   return (
     <AppBar
-      position="static"
+      position="sticky"
       elevation={0}
       sx={{
-        backgroundColor: theme.palette.background.paper,
-        borderBottom: `1px solid ${theme.palette.secondary.main}`,
+        top: 0,
+        zIndex: 1200,
+        backgroundColor: `${theme.palette.background.paper}e8`,
+        backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)',
+        borderBottom: `1px solid ${theme.palette.secondary.main}28`,
+        boxShadow: `0 1px 12px rgba(0,0,0,0.10)`,
+        transition: 'border-color 0.3s ease',
       }}
     >
       <Toolbar sx={{ justifyContent: "space-between" }}>
@@ -77,21 +83,55 @@ export default function Navigation() {
                 width={100}
                 height={45}
                 priority
-                style={{ height: "auto" }}
+                style={{
+                  height: "auto",
+                  transition: 'opacity 0.2s ease, transform 0.2s ease',
+                }}
+                onMouseEnter={(e) => {
+                  (e.currentTarget as HTMLImageElement).style.opacity = '0.82';
+                  (e.currentTarget as HTMLImageElement).style.transform = 'scale(1.04)';
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLImageElement).style.opacity = '1';
+                  (e.currentTarget as HTMLImageElement).style.transform = 'scale(1)';
+                }}
               />
            </Link>
 
            {/* Navigation Links (Desktop) */}
-           <Stack direction="row" spacing={1} sx={{ display: { xs: 'none', md: 'flex' } }}>
+           <Stack direction="row" spacing={0.5} sx={{ display: { xs: 'none', md: 'flex' } }}>
              {navItems.map((item) => (
                <Button
                  key={item.path}
                  component={Link}
                  href={item.path}
                  sx={{ 
-                   fontWeight: pathname === item.path ? "bold" : "normal",
-                   color: pathname === item.path ? theme.palette.secondary.main : theme.palette.text.primary 
-                  }}
+                   fontWeight: pathname === item.path ? 700 : 400,
+                   color: pathname === item.path
+                     ? theme.palette.secondary.main
+                     : theme.palette.text.primary,
+                   letterSpacing: '0.02em',
+                   position: 'relative',
+                   px: 1.5,
+                   '&::after': {
+                     content: '""',
+                     position: 'absolute',
+                     bottom: 4,
+                     left: '50%',
+                     transform: 'translateX(-50%)',
+                     width: pathname === item.path ? '75%' : '0%',
+                     height: '2px',
+                     borderRadius: '2px',
+                     background: `linear-gradient(90deg, ${theme.palette.secondary.main}, ${theme.palette.secondary.main}88)`,
+                     transition: 'width 0.28s cubic-bezier(0.4, 0, 0.2, 1)',
+                   },
+                   '&:hover::after': { width: '75%' },
+                   '&:hover': {
+                     color: theme.palette.secondary.main,
+                     backgroundColor: `${theme.palette.secondary.main}10`,
+                   },
+                   transition: 'color 0.2s ease, background-color 0.2s ease',
+                 }}
                >
                  {item.label}
                </Button>
