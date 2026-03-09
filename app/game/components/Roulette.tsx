@@ -50,13 +50,19 @@ const Roulette = () => {
       colors.current = participants.map(() => generatePastelColor());
     }
 
+    // Reset transform to identity before clearing to ensure full canvas is cleared
+    // (spin() applies a rotation transform, so clearRect would otherwise miss corners)
+    ctx.save();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.restore();
 
     // Draw Wheel Background/Shadow
-    ctx.shadowColor = "rgba(0,0,0,0.2)";
-    ctx.shadowBlur = 10;
+    const isDark = theme.palette.mode === "dark";
+    ctx.shadowColor = isDark ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.2)";
+    ctx.shadowBlur = isDark ? 20 : 10;
     ctx.shadowOffsetX = 0;
-    ctx.shadowOffsetY = 5;
+    ctx.shadowOffsetY = 0;
 
     ctx.beginPath();
     ctx.arc(cw, ch, cw - 10, 0, 2 * Math.PI);
@@ -70,11 +76,25 @@ const Roulette = () => {
       ctx.beginPath();
       ctx.fillStyle = colors.current[i];
       ctx.moveTo(cw, ch);
-      ctx.arc(cw, ch, cw - 15, startAngle, startAngle + arc); // Slightly smaller radius
-      ctx.fill();
-      ctx.stroke(); // Add subtle stroke between segments
+      ctx.arc(cw, ch, cw - 15, startAngle, startAngle + arc);
       ctx.closePath();
+      ctx.fill();
       startAngle += arc;
+    });
+
+    // Draw divider lines (one per boundary, consistent thickness)
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = theme.palette.background.paper;
+    let dividerAngle = 0;
+    participants.forEach((item) => {
+      ctx.beginPath();
+      ctx.moveTo(cw, ch);
+      ctx.lineTo(
+        cw + Math.cos(dividerAngle) * (cw - 15),
+        ch + Math.sin(dividerAngle) * (cw - 15)
+      );
+      ctx.stroke();
+      dividerAngle += (item.multiplier / totalWeight) * 2 * Math.PI;
     });
 
     // Draw Text
@@ -102,8 +122,8 @@ const Roulette = () => {
     });
 
     // Draw Center Circle (Hub)
-    ctx.shadowColor = "rgba(0,0,0,0.2)";
-    ctx.shadowBlur = 5;
+    ctx.shadowColor = isDark ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.2)";
+    ctx.shadowBlur = isDark ? 12 : 5;
     ctx.beginPath();
     ctx.arc(cw, ch, 25, 0, 2 * Math.PI);
     ctx.fillStyle = theme.palette.background.paper;
