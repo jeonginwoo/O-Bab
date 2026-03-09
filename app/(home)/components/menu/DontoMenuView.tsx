@@ -75,7 +75,7 @@ const DontoMenuView: React.FC<DontoMenuViewProps> = ({
           mb: 2,
           cursor: "pointer",
           '&:hover .donto-inner': {
-            transform: 'scale(1.05)',
+            opacity: 0.8,
           },
         }}
         onClick={onClick}
@@ -86,8 +86,7 @@ const DontoMenuView: React.FC<DontoMenuViewProps> = ({
           sx={{
             display: "flex",
             width: "100%",
-            transition: 'transform 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
-            transformOrigin: 'center center',
+            transition: 'opacity 0.2s',
           }}
         >
           <Box sx={{ width: "calc(50% - 0.5px)", position: "relative", overflow: "hidden" }}>

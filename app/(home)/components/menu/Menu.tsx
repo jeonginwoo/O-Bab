@@ -240,7 +240,7 @@ function Menu({ title, apiUrl }: { title:string; apiUrl: string }) {
                 mb: 2,
                 borderRadius: 1,
                 overflow: 'hidden',
-                '&:hover img': { transform: 'scale(1.03)' },
+                '&:hover img': { opacity: 0.8 },
               }}
             >
               <img
@@ -252,7 +252,7 @@ function Menu({ title, apiUrl }: { title:string; apiUrl: string }) {
                   display: 'block',
                   borderRadius: 4,
                   cursor: "pointer",
-                  transition: 'transform 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
+                  transition: 'opacity 0.2s',
                 }}
                 onClick={() => handleImageClick(media.url)}
               />
@@ -269,20 +269,9 @@ function Menu({ title, apiUrl }: { title:string; apiUrl: string }) {
                   borderRadius: 1,
                   overflow: 'hidden',
                   aspectRatio: '1 / 1',
-                  '&:hover img': { transform: 'scale(1.07)' },
-                  '&:hover::after': { opacity: 1 },
+                  '&:hover img': { opacity: 0.8 },
                   position: 'relative',
                   cursor: 'pointer',
-                  '&::after': {
-                    content: '""',
-                    position: 'absolute',
-                    inset: 0,
-                    background: 'rgba(0,0,0,0.08)',
-                    opacity: 0,
-                    transition: 'opacity 0.2s ease',
-                    borderRadius: 1,
-                    pointerEvents: 'none',
-                  },
                 }}
               >
                 <img
@@ -296,7 +285,7 @@ function Menu({ title, apiUrl }: { title:string; apiUrl: string }) {
                     objectFit: 'cover',
                     borderRadius: 4,
                     cursor: "pointer",
-                    transition: 'transform 0.35s cubic-bezier(0.4, 0, 0.2, 1)',
+                    transition: 'opacity 0.2s',
                   }}
                 />
               </ImageListItem>
