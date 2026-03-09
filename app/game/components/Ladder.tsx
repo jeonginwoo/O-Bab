@@ -3,17 +3,15 @@
 import React, { useRef, useEffect, useState, useCallback } from "react";
 import {
   Box,
-  TextField,
-  Button,
   Slider,
   Typography,
   useTheme,
   IconButton,
   Tooltip,
 } from "@mui/material";
-import DeleteIcon from "@mui/icons-material/Delete";
-import ReplayIcon from "@mui/icons-material/Replay";
-import VisibilityIcon from "@mui/icons-material/Visibility";
+import RestartAltIcon from "@mui/icons-material/RestartAlt";
+import PlayArrowIcon from "@mui/icons-material/PlayArrow";
+import ParticipantList, { Participant } from "./ParticipantList";
 
 interface Rung {
   y: number;
@@ -36,7 +34,9 @@ const Ladder = () => {
   const [gameState, setGameState] = useState<
     "initial" | "started" | "tracing" | "finished"
   >("initial");
-  const [playerInput, setPlayerInput] = useState("");
+  const [participants, setParticipants] = useState<Participant[]>([]);
+  const [newName, setNewName] = useState("");
+  const [globalMultiplier, setGlobalMultiplier] = useState(1);
   const [winningPlayerName, setWinningPlayerName] = useState<string | null>(
     null
   );
@@ -69,7 +69,7 @@ const Ladder = () => {
 
     for (let i = 0; i < num; i++) {
       const x = step * (i + 1);
-      ctx.fillText(names[i] || "", x, 20);
+      if (names[i] !== "커피") ctx.fillText(names[i] || "", x, 20);
       ctx.beginPath();
       ctx.moveTo(x, 30);
       ctx.lineTo(x, height - 30);
@@ -122,18 +122,59 @@ const Ladder = () => {
     setNames(newNames);
   }, []);
 
-  const handleStart = () => {
-    const parsedPlayers = playerInput
-      .split(",")
-      .map((s) => s.trim())
-      .filter(Boolean);
-    if (parsedPlayers.length < 2) {
-      alert("이름을 2명 이상 입력해주세요.");
+  // Auto-generate ladder whenever participants (or their multipliers) change
+  useEffect(() => {
+    const expandedPlayers = participants.flatMap((p) =>
+      Array(p.multiplier).fill(p.name)
+    );
+    if (expandedPlayers.length < 2) {
+      setPlayers([]);
+      setResults([]);
+      setNames([]);
+      setLadderData([]);
+      setWinningPlayerName(null);
+      setGameState("initial");
+      const canvas = canvasRef.current;
+      if (canvas) {
+        const ctx = canvas.getContext("2d");
+        ctx?.clearRect(0, 0, canvas.width, canvas.height);
+      }
       return;
     }
-    setPlayers(parsedPlayers);
-    randomizeAndDraw(parsedPlayers);
+    setWinningPlayerName(null);
+    setPlayers(expandedPlayers);
+    randomizeAndDraw(expandedPlayers);
     setGameState("started");
+  }, [participants, randomizeAndDraw]);
+
+  const handleAdd = () => {
+    const trimmed = newName.trim();
+    if (!trimmed) return;
+    setParticipants((prev) => [...prev, { id: Date.now().toString(), name: trimmed, multiplier: globalMultiplier }]);
+    setNewName("");
+  };
+
+  const handleRemove = (id: string) => {
+    setParticipants((prev) => prev.filter((p) => p.id !== id));
+  };
+
+  const handleChangeMultiplier = (id: string, delta: number) => {
+    setParticipants((prev) =>
+      prev.map((p) => (p.id === id ? { ...p, multiplier: Math.max(1, p.multiplier + delta) } : p))
+    );
+  };
+
+  const handleGlobalMultiplierChange = (delta: number) => {
+    setGlobalMultiplier((prev) => {
+      const next = Math.min(1000, Math.max(1, prev + delta));
+      setParticipants((parts) => parts.map((p) => ({ ...p, multiplier: next })));
+      return next;
+    });
+  };
+
+  const handleGlobalMultiplierInput = (value: number) => {
+    setGlobalMultiplier(value);
+    setParticipants((parts) => parts.map((p) => ({ ...p, multiplier: value })));
   };
 
   const handleRetry = () => {
@@ -141,21 +182,7 @@ const Ladder = () => {
     setGameState("started");
   };
 
-  const handleReset = () => {
-    setPlayers([]);
-    setResults([]);
-    setNames([]);
-    setGameState("initial");
-    setWinningPlayerName(null);
 
-    const canvas = canvasRef.current;
-    if (canvas) {
-      const ctx = canvas.getContext("2d");
-      if (ctx) {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-      }
-    }
-  };
   const animatePath = useCallback(
     (path: PathPoint[], winnerName: string) => {
       let i = 0;
@@ -262,46 +289,7 @@ const Ladder = () => {
 
   return (
     <Box sx={{ p: 2, maxWidth: 600, mx: "auto" }}>
-      {gameState === "initial" && (
-        <>
-          <Box sx={{ display: "flex", gap: 1, justifyContent: "center" }}>
-            <TextField
-              fullWidth
-              label="이름 (쉼표로 구분)"
-              variant="outlined"
-              value={playerInput}
-              onChange={(e) => setPlayerInput(e.target.value)}
-              onKeyPress={(e) => {
-                if (e.key === "Enter") {
-                  handleStart();
-                }
-              }}
-              size="small"
-              color="secondary"
-              InputLabelProps={{
-                sx: {
-                  color: theme.palette.text.secondary,
-                  "&.Mui-focused": {
-                    color: theme.palette.secondary.main,
-                  },
-                },
-              }}
-              sx={{
-                "& .MuiInputBase-root": { color: theme.palette.text.primary },
-              }}
-            />
-            <Button
-              variant="contained"
-              onClick={handleStart}
-              sx={{
-                backgroundColor: theme.palette.secondary.main,
-                color: theme.palette.background.default,
-                "&:hover": { backgroundColor: theme.palette.secondary.dark },
-              }}
-            >
-              시작
-            </Button>
-          </Box>
+      {players.length < 2 && (
           <Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}>
             <svg width="400" height="400" viewBox="0 0 400 400" fill="none" xmlns="http://www.w3.org/2000/svg">
               <style>
@@ -365,25 +353,10 @@ const Ladder = () => {
               </g>
             </svg>
           </Box>
-        </>
       )}
-      {gameState !== "initial" && (
+      {players.length >= 2 && (
         <Box sx={{ display: "flex", gap: 1, justifyContent: "center", mb: 2 }}>
-          <Tooltip title="재구성" placement="top">
-            <IconButton
-              onClick={handleRetry}
-              disabled={gameState === "tracing"}
-              color="secondary"
-              sx={{
-                backgroundColor: theme.palette.secondary.main,
-                color: theme.palette.background.default,
-                "&:hover": { backgroundColor: theme.palette.secondary.dark },
-              }}
-            >
-              <ReplayIcon />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title="결과 확인" placement="top">
+          <Tooltip title="시작" placement="top">
             <IconButton
               onClick={handleTrace}
               disabled={gameState === "finished" || gameState === "tracing"}
@@ -394,21 +367,21 @@ const Ladder = () => {
                 "&:hover": { backgroundColor: theme.palette.success.dark },
               }}
             >
-              <VisibilityIcon />
+              <PlayArrowIcon />
             </IconButton>
           </Tooltip>
           <Tooltip title="초기화" placement="top">
             <IconButton
-              onClick={handleReset}
-              color="secondary"
+              onClick={handleRetry}
               disabled={gameState === "tracing"}
+              color="secondary"
               sx={{
                 backgroundColor: theme.palette.secondary.main,
                 color: theme.palette.background.default,
                 "&:hover": { backgroundColor: theme.palette.secondary.dark },
               }}
             >
-              <DeleteIcon />
+              <RestartAltIcon />
             </IconButton>
           </Tooltip>
         </Box>
@@ -433,17 +406,54 @@ const Ladder = () => {
         </Box>
       )}
 
-      {gameState !== "initial" && (
-        <canvas
-          ref={canvasRef}
-          style={{
-            marginTop: theme.spacing(2),
-            backgroundColor: theme.palette.background.paper,
-            borderRadius: theme.shape.borderRadius,
-            width: "100%",
-            display: "block",
-          }}
-        ></canvas>
+      {players.length >= 2 && (
+        <Box sx={{ position: "relative", mt: 2 }}>
+          <canvas
+            ref={canvasRef}
+            style={{
+              backgroundColor: theme.palette.background.paper,
+              borderRadius: theme.shape.borderRadius,
+              width: "100%",
+              display: "block",
+            }}
+          ></canvas>
+          {names.indexOf("커피") !== -1 && (
+            <Box
+              sx={{
+                position: "absolute",
+                top: 2,
+                left: `${((names.indexOf("커피") + 1) / (players.length + 1)) * 100}%`,
+                transform: "translateX(-50%)",
+                pointerEvents: "none",
+                width: 36,
+                height: 36,
+              }}
+            >
+              <svg viewBox="0 0 400 400" width="36" height="36" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <style>{`
+                  @keyframes steam-mini {
+                    0% { transform: translateY(0) scaleX(1); opacity: 0; }
+                    10% { opacity: 0.5; }
+                    50% { transform: translateY(-60px) scaleX(1.1); opacity: 0.3; }
+                    100% { transform: translateY(-120px) scaleX(1.3); opacity: 0; }
+                  }
+                  .sm1 { opacity:0; animation: steam-mini 4s infinite ease-in-out 0s; stroke:#a0a0a0; stroke-width:4; stroke-linecap:round; fill:none; }
+                  .sm2 { opacity:0; animation: steam-mini 4s infinite ease-in-out 1.3s; stroke:#a0a0a0; stroke-width:4; stroke-linecap:round; fill:none; }
+                  .sm3 { opacity:0; animation: steam-mini 4s infinite ease-in-out 2.6s; stroke:#a0a0a0; stroke-width:4; stroke-linecap:round; fill:none; }
+                `}</style>
+                <g stroke="#6F4E37" strokeWidth="18" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M315 160 C365 160, 370 225, 295 230 L300 215 C355 215, 350 175, 315 175 Z" fill="#ffffff" />
+                  <path d="M80 140 Q80 280 200 280 Q320 280 320 140" fill="#ffffff" />
+                  <ellipse cx="200" cy="140" rx="120" ry="40" fill="#ffffff" />
+                  <ellipse cx="200" cy="140" rx="110" ry="35" fill="#6F4E37" stroke="none" />
+                </g>
+                <path className="sm1" d="M160 130 C150 110, 170 90, 160 70" />
+                <path className="sm2" d="M200 135 C190 115, 210 95, 200 75" />
+                <path className="sm3" d="M240 130 C230 110, 250 90, 240 70" />
+              </svg>
+            </Box>
+          )}
+        </Box>
       )}
 
       {gameState === "finished" && winningPlayerName && (
@@ -457,6 +467,24 @@ const Ladder = () => {
           🎉 당첨: {winningPlayerName} 🎉
         </Typography>
       )}
+
+      {/* Participant Card - always visible */}
+      <ParticipantList
+        participants={participants}
+        newName={newName}
+        globalMultiplier={globalMultiplier}
+        onNewNameChange={setNewName}
+        onAdd={handleAdd}
+        onRemove={handleRemove}
+        onChangeMultiplier={handleChangeMultiplier}
+        onGlobalMultiplierChange={handleGlobalMultiplierChange}
+        onGlobalMultiplierInput={handleGlobalMultiplierInput}
+        title="참가자"
+        totalLabel="명"
+        inputPlaceholder="이름 입력"
+        emptyText="이름을 추가해주세요!"
+        sx={{ mt: 2 }}
+      />
     </Box>
   );
 };

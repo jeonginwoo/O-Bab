@@ -4,8 +4,6 @@ import React, { useEffect, useRef, useState, useMemo, useCallback } from "react"
 import { Box, Button, TextField, Typography, Paper, FormControl, InputLabel, Select, MenuItem, SelectChangeEvent, IconButton, Tooltip, useTheme, Divider, InputAdornment } from "@mui/material";
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import AddIcon from '@mui/icons-material/Add';
-import RemoveIcon from '@mui/icons-material/Remove';
-import CloseIcon from '@mui/icons-material/Close';
 import { Roulette } from "../lib/marble-roulette/roulette";
 import { stages } from "../lib/marble-roulette/data/maps";
 import { Translations } from "../lib/marble-roulette/data/languages";
@@ -13,12 +11,7 @@ import styles from "./MarbleRoulette.module.scss";
 import { ColorTheme } from "../lib/marble-roulette/types/ColorTheme";
 import { themeMarblePalettes } from "../../theme/theme";
 import { useThemeContext } from "../../theme/ThemeContext";
-
-interface Participant {
-  id: string;
-  name: string;
-  multiplier: number;
-}
+import ParticipantList, { Participant } from "./ParticipantList";
 
 export default function MarbleRoulette() {
   const theme = useTheme();
@@ -204,6 +197,11 @@ export default function MarbleRoulette() {
     });
   };
 
+  const handleGlobalMultiplierInput = (value: number) => {
+    setGlobalMultiplier(value);
+    setParticipants(parts => parts.map(p => ({ ...p, multiplier: value })));
+  };
+
   const handleMapChange = (event: SelectChangeEvent<number>) => {
     const newIndex = Number(event.target.value);
     setSelectedMap(newIndex);
@@ -306,113 +304,22 @@ export default function MarbleRoulette() {
             <Divider />
 
             {/* Participant list */}
-            <Box sx={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 1, minHeight: 0 }}>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Typography variant="subtitle1" fontWeight="medium">참가자 목록</Typography>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                  <Typography variant="caption" color="text.secondary" sx={{ mr: 0.5 }}>전체 배수</Typography>
-                  <IconButton
-                    size="small"
-                    onClick={() => handleGlobalMultiplierChange(-1)}
-                    disabled={globalMultiplier <= 1}
-                  >
-                    <RemoveIcon fontSize="small" />
-                  </IconButton>
-                  <TextField
-                    size="small"
-                    value={globalMultiplier}
-                    onChange={(e) => {
-                      const val = parseInt(e.target.value);
-                      if (!isNaN(val) && val >= 1) {
-                        const clamped = Math.min(1000, val);
-                        setGlobalMultiplier(clamped);
-                        setParticipants(parts => parts.map(p => ({ ...p, multiplier: clamped })));
-                      } else if (e.target.value === '') {
-                        setGlobalMultiplier(1);
-                      }
-                    }}
-                    inputProps={{ min: 1, max: 1000, style: { textAlign: 'center', padding: '2px 4px', width: 32 } }}
-                    variant="outlined"
-                    sx={{ '& .MuiOutlinedInput-root': { fontSize: '0.8rem', fontWeight: 'bold' } }}
-                  />
-                  <IconButton size="small" onClick={() => handleGlobalMultiplierChange(1)} disabled={globalMultiplier >= 1000}>
-                    <AddIcon fontSize="small" />
-                  </IconButton>
-                  <Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
-                  <Typography variant="caption" color="text.secondary">
-                    총 {participants.reduce((sum, p) => sum + p.multiplier, 0)}개 마블
-                  </Typography>
-                </Box>
-              </Box>
-              <Box
-                sx={{
-                  flex: 1,
-                  overflowY: 'auto',
-                  display: 'flex',
-                  flexWrap: 'wrap',
-                  gap: 1,
-                  alignContent: 'flex-start',
-                  minHeight: 120,
-                }}
-              >
-                {participants.length === 0 && (
-                  <Typography variant="body2" color="text.disabled" sx={{ m: 'auto' }}>
-                    참가자를 추가해주세요
-                  </Typography>
-                )}
-                {participants.map(p => (
-                  <Box
-                    key={p.id}
-                    sx={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      border: '1px solid',
-                      borderColor: 'secondary.main',
-                      borderRadius: 2,
-                      px: 1,
-                      py: 0.5,
-                      bgcolor: 'secondary.main',
-                      color: 'background.paper',
-                      minWidth: 70,
-                    }}
-                  >
-                    <Box sx={{ display: 'flex', alignItems: 'center', width: '100%', justifyContent: 'space-between', gap: 0.5 }}>
-                      <Typography variant="body2" fontWeight="medium" noWrap sx={{ flex: 1, textAlign: 'center', color: 'background.paper' }}>
-                        {p.name}
-                      </Typography>
-                      <IconButton
-                        size="small"
-                        onClick={() => handleRemoveParticipant(p.id)}
-                        sx={{ p: 0.25, color: 'background.paper' }}
-                      >
-                        <CloseIcon sx={{ fontSize: 12 }} />
-                      </IconButton>
-                    </Box>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.25 }}>
-                      <IconButton
-                        size="small"
-                        onClick={() => handleChangeMultiplier(p.id, -1)}
-                        disabled={p.multiplier <= 1}
-                        sx={{ p: 0.25, color: 'background.paper', '&.Mui-disabled': { color: 'background.paper', opacity: 0.4} }}
-                      >
-                        <RemoveIcon sx={{ fontSize: 12 }} />
-                      </IconButton>
-                      <Typography variant="caption" sx={{ minWidth: 24, textAlign: 'center', color: 'background.paper' }}>
-                        {p.multiplier}x
-                      </Typography>
-                      <IconButton
-                        size="small"
-                        onClick={() => handleChangeMultiplier(p.id, 1)}
-                        sx={{ p: 0.25, color: 'background.paper' }}
-                      >
-                        <AddIcon sx={{ fontSize: 12 }} />
-                      </IconButton>
-                    </Box>
-                  </Box>
-                ))}
-              </Box>
-            </Box>
+            <ParticipantList
+              variant="plain"
+              showInput={false}
+              participants={participants}
+              newName={newName}
+              globalMultiplier={globalMultiplier}
+              onNewNameChange={setNewName}
+              onAdd={handleAddParticipant}
+              onRemove={handleRemoveParticipant}
+              onChangeMultiplier={handleChangeMultiplier}
+              onGlobalMultiplierChange={handleGlobalMultiplierChange}
+              onGlobalMultiplierInput={handleGlobalMultiplierInput}
+              title="참가자 목록"
+              totalLabel="개 마블"
+              emptyText="참가자를 추가해주세요"
+            />
 
             {errorMSG && (
               <Typography color="error" variant="body2">{errorMSG}</Typography>
