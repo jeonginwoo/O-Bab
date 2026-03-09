@@ -26,11 +26,13 @@ import "swiper/css/pagination";
 
 // 식당별 메뉴 이미지 설정 (폴백용 - 자동 감지 실패 시 사용)
 const MENU_IMAGE_CONFIG: Record<string, {
-  position: 'first' | 'last';  // 이미지 목록에서 메뉴판 위치
-  count: number;               // 메뉴판 이미지 개수
+  position?: 'first' | 'last'; // 이미지 목록에서 메뉴판 위치
+  count?: number;              // 메뉴판 이미지 개수
+  indices?: number[];          // 사용할 메뉴판 이미지 인덱스 (명시적 지정)
+  exclude?: number[];          // 제외할 이미지 인덱스
 }> = {
-  돈토: { position: 'first', count: 2 },  // 처음 2개가 메뉴판
-  윤스: { position: 'first', count: 1 },   // 처음 1개가 메뉴판 (위치 변동 가능)
+  돈토: { exclude: [1], position: 'first', count: 2 },  // 1=저녁메뉴 제외, 나머지 처음 2개가 메뉴판
+  윤스: { position: 'first', count: 1 },
 };
 
 // MediaImage 타입을 utils에서 가져와서 Media로 사용
@@ -122,12 +124,21 @@ function Menu({ title, apiUrl }: { title:string; apiUrl: string }) {
       // 폴백: 설정 사용
       const config = MENU_IMAGE_CONFIG[title];
       if (config) {
-        if (config.position === 'first') {
-          menuImages = imageMedia.slice(0, config.count);
-          foodImages = imageMedia.slice(config.count);
+        const filtered = config.exclude
+          ? imageMedia.filter((_, i) => !config.exclude!.includes(i))
+          : imageMedia;
+        if (config.indices) {
+          menuImages = config.indices.map((i) => filtered[i]).filter(Boolean);
+          foodImages = filtered.filter((_, i) => !config.indices!.includes(i));
+        } else if (config.position === 'first') {
+          menuImages = filtered.slice(0, config.count);
+          foodImages = filtered.slice(config.count);
+        } else if (config.position === 'last') {
+          menuImages = filtered.slice(-(config.count ?? 1));
+          foodImages = filtered.slice(0, -(config.count ?? 1));
         } else {
-          menuImages = imageMedia.slice(-config.count);
-          foodImages = imageMedia.slice(0, -config.count);
+          menuImages = filtered;
+          foodImages = [];
         }
       } else {
         menuImages = [];
@@ -190,12 +201,21 @@ function Menu({ title, apiUrl }: { title:string; apiUrl: string }) {
       const config = MENU_IMAGE_CONFIG[title];
       
       if (config) {
-        if (config.position === 'first') {
-          menuImages = imageMedia.slice(0, config.count);
-          foodImages = imageMedia.slice(config.count);
+        const filtered = config.exclude
+          ? imageMedia.filter((_, i) => !config.exclude!.includes(i))
+          : imageMedia;
+        if (config.indices) {
+          menuImages = config.indices.map((i) => filtered[i]).filter(Boolean);
+          foodImages = filtered.filter((_, i) => !config.indices!.includes(i));
+        } else if (config.position === 'first') {
+          menuImages = filtered.slice(0, config.count);
+          foodImages = filtered.slice(config.count);
         } else if (config.position === 'last') {
-          menuImages = imageMedia.slice(-config.count);
-          foodImages = imageMedia.slice(0, -config.count);
+          menuImages = filtered.slice(-(config.count ?? 1));
+          foodImages = filtered.slice(0, -(config.count ?? 1));
+        } else {
+          menuImages = filtered;
+          foodImages = [];
         }
       } else {
         // 3단계: 설정도 없으면 모두 음식 이미지로 처리
