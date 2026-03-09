@@ -22,6 +22,7 @@ import {
 import PaletteIcon from "@mui/icons-material/Palette";
 import MenuIcon from "@mui/icons-material/Menu";
 import QuestionAnswerIcon from "@mui/icons-material/QuestionAnswer";
+import ArticleIcon from "@mui/icons-material/Article";
 import { useThemeContext } from "../../theme/ThemeContext";
 import { themeOptions } from "../../theme/theme";
 
@@ -177,6 +178,16 @@ export default function Navigation() {
         </Box>
 
         <Box sx={{ display: 'flex', gap: 1 }}>
+          <Tooltip title="업데이트 기록" placement="bottom">
+            <IconButton
+              color="inherit"
+              component={Link}
+              href="/changelog"
+              sx={{ color: theme.palette.text.primary }}
+            >
+              <ArticleIcon />
+            </IconButton>
+          </Tooltip>
           <Tooltip title="문의하기" placement="bottom">
             <IconButton
               color="inherit"
