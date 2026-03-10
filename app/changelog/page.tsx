@@ -27,9 +27,16 @@ type ChangelogEntry = {
 
 const changelog: ChangelogEntry[] = [
   {
-    version: "3.8.2",
+    version: "3.8.3",
     date: "2026-03-10",
     label: "최신",
+    changes: [
+      { type: "update", text: "맛집 페이지 음식 사진 9개씩 렌더링 후 스크롤 시 추가 로딩" },
+    ],
+  },
+  {
+    version: "3.8.2",
+    date: "2026-03-10",
     changes: [
       { type: "style", text: "메인페이지 메뉴 이미지 비율 변경 (1:1 → 5:4)" },
     ],

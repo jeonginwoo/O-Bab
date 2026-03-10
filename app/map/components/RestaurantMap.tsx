@@ -91,6 +91,9 @@ const RestaurantMap = () => {
   const [imageLoading, setImageLoading] = useState<Record<number, boolean>>({});
   const fetchedIdsRef = useRef<Set<number>>(new Set());
 
+  // Paginated image rendering
+  const [visibleImageCount, setVisibleImageCount] = useState(9);
+
   const handleImageClick = (idx: number) => {
     setImageModalSlide(idx);
     setOpenImageModal(true);
@@ -98,6 +101,13 @@ const RestaurantMap = () => {
 
   const handleCloseImageModal = () => {
     setOpenImageModal(false);
+  };
+
+  const handleGridScroll = (e: React.UIEvent<HTMLDivElement>, totalCount: number) => {
+    const el = e.currentTarget;
+    if (el.scrollHeight - el.scrollTop - el.clientHeight < 60) {
+      setVisibleImageCount(prev => Math.min(prev + 9, totalCount));
+    }
   };
 
   const toggleViewMode = () => {
@@ -243,6 +253,10 @@ const RestaurantMap = () => {
       .then(data => setImageCache(prev => ({ ...prev, [id]: data.photos ?? [] })))
       .catch(() => setImageCache(prev => ({ ...prev, [id]: [] })))
       .finally(() => setImageLoading(prev => ({ ...prev, [id]: false })));
+  }, [selectedRestaurant?.id]);
+
+  useEffect(() => {
+    setVisibleImageCount(9);
   }, [selectedRestaurant?.id]);
 
   const handleListItemClick = (restaurant: Restaurant) => {
@@ -449,6 +463,7 @@ const RestaurantMap = () => {
                 </Box>
               ) : (
               <Box
+                onScroll={(e) => handleGridScroll(e, currentImages.length)}
                 sx={{
                   display: 'grid',
                   gridTemplateColumns: 'repeat(3, 1fr)',
@@ -464,7 +479,7 @@ const RestaurantMap = () => {
                   '&::-webkit-scrollbar-thumb:hover': { background: 'rgba(0,0,0,0.45)' },
                 }}
               >
-                {currentImages.map((url, idx) => (
+                {currentImages.slice(0, visibleImageCount).map((url, idx) => (
                   <Box
                     key={idx}
                     component="img"
