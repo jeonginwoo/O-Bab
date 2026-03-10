@@ -268,7 +268,7 @@ function Menu({ title, apiUrl }: { title:string; apiUrl: string }) {
                 sx={{
                   borderRadius: 1,
                   overflow: 'hidden',
-                  aspectRatio: '1 / 1',
+                  aspectRatio: '5 / 4',
                   '&:hover img': { opacity: 0.8 },
                   position: 'relative',
                   cursor: 'pointer',

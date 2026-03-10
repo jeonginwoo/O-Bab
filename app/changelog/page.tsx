@@ -27,9 +27,16 @@ type ChangelogEntry = {
 
 const changelog: ChangelogEntry[] = [
   {
-    version: "3.8.1",
+    version: "3.8.2",
     date: "2026-03-10",
     label: "최신",
+    changes: [
+      { type: "style", text: "메인페이지 메뉴 이미지 비율 변경 (1:1 → 5:4)" },
+    ],
+  },
+  {
+    version: "3.8.1",
+    date: "2026-03-10",
     changes: [
       { type: "feat", text: "룰렛·사다리타기·마블 룰렛 참가자 목록 실시간 공유 (Context)" },
       { type: "feat", text: "참가자 목록 새로고침 후에도 유지 (localStorage)" },
