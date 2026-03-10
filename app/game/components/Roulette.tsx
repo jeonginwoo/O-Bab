@@ -1,24 +1,20 @@
 "use client";
 
-import React, { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect, useState, useCallback } from "react";
 import {
   Box,
   Button,
   useTheme,
   Typography,
 } from "@mui/material";
-import ParticipantList, { Participant } from "./ParticipantList";
+import ParticipantList from "./ParticipantList";
+import { useSharedParticipants } from "../hooks/useSharedParticipants";
 
 const Roulette = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [participants, setParticipants] = useState<Participant[]>([
-    { id: '1', name: "돈토", multiplier: 5 },
-    { id: '2', name: "윤스", multiplier: 5 },
-  ]);
-  const [newMenu, setNewMenu] = useState("");
+  const { participants } = useSharedParticipants();
   const [isSpinning, setIsSpinning] = useState(false);
   const [winningMenu, setWinningMenu] = useState<string | null>(null);
-  const [globalMultiplier, setGlobalMultiplier] = useState(5);
   const [powerGauge, setPowerGauge] = useState(0);
   const [isCharging, setIsCharging] = useState(false);
   const colors = useRef<string[]>([]);
@@ -27,6 +23,8 @@ const Roulette = () => {
   const rotateInterval = useRef<NodeJS.Timeout | null>(null);
   const stopRequested = useRef(false);
   const chargeInterval = useRef<NodeJS.Timeout | null>(null);
+  const isChargingRef = useRef(false);
+  const powerGaugeRef = useRef(0);
   const theme = useTheme();
 
   const generatePastelColor = () => {
@@ -183,43 +181,25 @@ const Roulette = () => {
     ctx.restore();
   };
 
-  const handleChargeStart = () => {
-    if (participants.length <= 1) {
-      alert("메뉴는 최소 2개 이상이어야 합니다.");
-      return;
-    }
-    if (isSpinning) return;
+  const handleChargeEnd = useCallback(() => {
+    if (!isChargingRef.current) return;
 
-    setIsCharging(true);
-    setPowerGauge(0);
-    
-    chargeInterval.current = setInterval(() => {
-      setPowerGauge((prev) => {
-        if (prev >= 100) {
-          return 100;
-        }
-        return prev + 1;
-      });
-    }, 15);
-  };
-
-  const handleChargeEnd = () => {
-    if (!isCharging) return;
-    
+    isChargingRef.current = false;
     setIsCharging(false);
     if (chargeInterval.current) {
       clearInterval(chargeInterval.current);
       chargeInterval.current = null;
     }
 
-    if (powerGauge < 10) {
+    const gauge = powerGaugeRef.current;
+    if (gauge < 10) {
       setPowerGauge(0);
+      powerGaugeRef.current = 0;
       return;
     }
 
-    // 게이지에 따라 속도 계산 (10-100 범위를 5-25 속도로 매핑)
-    const baseSpeed = 5 + (powerGauge / 100) * 20;
-    const spinDuration = 1000 + (powerGauge / 100) * 2000;
+    const baseSpeed = 5 + (gauge / 100) * 20;
+    const spinDuration = 1000 + (gauge / 100) * 2000;
 
     setWinningMenu(null);
     setIsSpinning(true);
@@ -232,43 +212,38 @@ const Roulette = () => {
       stopRequested.current = true;
     }, spinDuration);
 
-    // 게이지 초기화
     setTimeout(() => {
       setPowerGauge(0);
+      powerGaugeRef.current = 0;
     }, 300);
-  };
+  }, [spin]);
 
-  const handleAdd = () => {
-    if (!newMenu.trim()) {
-      alert("이름을 입력한 후 버튼을 클릭 해 주세요");
+  useEffect(() => {
+    window.addEventListener("mouseup", handleChargeEnd);
+    return () => window.removeEventListener("mouseup", handleChargeEnd);
+  }, [handleChargeEnd]);
+
+  const handleChargeStart = () => {
+    if (participants.length <= 1) {
+      alert("메뉴는 최소 2개 이상이어야 합니다.");
       return;
     }
-    setParticipants(prev => [...prev, { id: Date.now().toString(), name: newMenu.trim(), multiplier: globalMultiplier }]);
-    setNewMenu("");
+    if (isSpinning) return;
+
+    isChargingRef.current = true;
+    setIsCharging(true);
+    setPowerGauge(0);
+    powerGaugeRef.current = 0;
+    
+    chargeInterval.current = setInterval(() => {
+      setPowerGauge((prev) => {
+        const next = prev >= 100 ? 100 : prev + 1;
+        powerGaugeRef.current = next;
+        return next;
+      });
+    }, 15);
   };
 
-  const handleRemove = (id: string) => {
-    setParticipants(prev => prev.filter(p => p.id !== id));
-  };
-
-  const handleChangeMultiplier = (id: string, delta: number) => {
-    setParticipants(prev =>
-      prev.map(p => p.id === id ? { ...p, multiplier: Math.max(1, p.multiplier + delta) } : p)
-    );
-  };
-
-  const handleGlobalMultiplierChange = (delta: number) => {
-    setGlobalMultiplier(prev => {
-      const next = Math.min(1000, Math.max(1, prev + delta));
-      setParticipants(parts => parts.map(p => ({ ...p, multiplier: next })));
-      return next;
-    });
-  };
-
-  const handleGlobalMultiplierInput = (value: number) => {
-    setGlobalMultiplier(value);
-    setParticipants(parts => parts.map(p => ({ ...p, multiplier: value })));
-  };
 
   useEffect(() => {
     const resizeCanvas = () => {
@@ -342,8 +317,6 @@ const Roulette = () => {
           variant="contained"
           size="large"
           onMouseDown={handleChargeStart}
-          onMouseUp={handleChargeEnd}
-          onMouseLeave={handleChargeEnd}
           onTouchStart={handleChargeStart}
           onTouchEnd={handleChargeEnd}
           disabled={isSpinning}
@@ -410,21 +383,7 @@ const Roulette = () => {
         </Typography>
       )}
 
-      <ParticipantList
-        participants={participants}
-        newName={newMenu}
-        globalMultiplier={globalMultiplier}
-        onNewNameChange={setNewMenu}
-        onAdd={handleAdd}
-        onRemove={handleRemove}
-        onChangeMultiplier={handleChangeMultiplier}
-        onGlobalMultiplierChange={handleGlobalMultiplierChange}
-        onGlobalMultiplierInput={handleGlobalMultiplierInput}
-        title="목록"
-        totalLabel="개"
-        inputPlaceholder="새로운 이름"
-        emptyText="이름을 추가해주세요!"
-      />
+      <ParticipantList totalLabel="개" />
     </Box>
   );
 };

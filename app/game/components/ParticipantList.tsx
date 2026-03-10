@@ -1,11 +1,10 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import {
   Box,
   TextField,
-  Card,
-  CardContent,
+  Paper,
   IconButton,
   Divider,
   InputAdornment,
@@ -16,6 +15,7 @@ import {
 import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
 import CloseIcon from "@mui/icons-material/Close";
+import { useSharedParticipants } from "../hooks/useSharedParticipants";
 
 export interface Participant {
   id: string;
@@ -24,20 +24,11 @@ export interface Participant {
 }
 
 interface ParticipantListProps {
-  participants: Participant[];
-  newName: string;
-  globalMultiplier: number;
-  onNewNameChange: (name: string) => void;
-  onAdd: () => void;
-  onRemove: (id: string) => void;
-  onChangeMultiplier: (id: string, delta: number) => void;
-  onGlobalMultiplierChange: (delta: number) => void;
-  onGlobalMultiplierInput: (value: number) => void;
   title?: string;
   totalLabel?: string;
   inputPlaceholder?: string;
   emptyText?: string;
-  /** 'card': wrapped in Card (default). 'plain': raw Box, for embedding inside an existing Paper. */
+  /** 'card': wrapped in Paper (default). 'plain': raw Box, for embedding inside an existing Paper. */
   variant?: "card" | "plain";
   /** When false, the add-participant TextField is not rendered (input lives outside the component). */
   showInput?: boolean;
@@ -45,23 +36,30 @@ interface ParticipantListProps {
 }
 
 export default function ParticipantList({
-  participants,
-  newName,
-  globalMultiplier,
-  onNewNameChange,
-  onAdd,
-  onRemove,
-  onChangeMultiplier,
-  onGlobalMultiplierChange,
-  onGlobalMultiplierInput,
   title = "참가자 목록",
   totalLabel = "개",
-  inputPlaceholder = "이름 입력",
+  inputPlaceholder = "참가자 이름 입력",
   emptyText = "참가자를 추가해주세요",
   variant = "card",
   showInput = true,
   sx,
 }: ParticipantListProps) {
+  const [newName, setNewName] = useState("");
+  const {
+    participants,
+    globalMultiplier,
+    handleAdd: hookHandleAdd,
+    handleRemove,
+    handleChangeMultiplier,
+    handleGlobalMultiplierChange,
+    handleGlobalMultiplierInput,
+  } = useSharedParticipants();
+
+  const handleAdd = () => {
+    hookHandleAdd(newName);
+    setNewName("");
+  };
+
   const inner = (
     <>
       {/* Header: title + 전체배수 controls */}
@@ -82,7 +80,7 @@ export default function ParticipantList({
           </Typography>
           <IconButton
             size="small"
-            onClick={() => onGlobalMultiplierChange(-1)}
+            onClick={() => handleGlobalMultiplierChange(-1)}
             disabled={globalMultiplier <= 1}
           >
             <RemoveIcon fontSize="small" />
@@ -93,9 +91,9 @@ export default function ParticipantList({
             onChange={(e) => {
               const val = parseInt(e.target.value);
               if (!isNaN(val) && val >= 1) {
-                onGlobalMultiplierInput(Math.min(1000, val));
+                handleGlobalMultiplierInput(Math.min(1000, val));
               } else if (e.target.value === "") {
-                onGlobalMultiplierInput(1);
+                handleGlobalMultiplierInput(1);
               }
             }}
             inputProps={{
@@ -108,7 +106,7 @@ export default function ParticipantList({
           />
           <IconButton
             size="small"
-            onClick={() => onGlobalMultiplierChange(1)}
+            onClick={() => handleGlobalMultiplierChange(1)}
             disabled={globalMultiplier >= 1000}
           >
             <AddIcon fontSize="small" />
@@ -127,15 +125,15 @@ export default function ParticipantList({
           placeholder={inputPlaceholder}
           variant="outlined"
           value={newName}
-          onChange={(e) => onNewNameChange(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && onAdd()}
+          onChange={(e) => setNewName(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && handleAdd()}
           size="small"
           color="secondary"
           InputProps={{
             endAdornment: (
               <InputAdornment position="end">
                 <IconButton
-                  onClick={onAdd}
+                  onClick={handleAdd}
                   edge="end"
                   color="secondary"
                   disabled={!newName.trim()}
@@ -193,6 +191,13 @@ export default function ParticipantList({
                 gap: 0.5,
               }}
             >
+              <IconButton
+                size="small"
+                onClick={() => handleRemove(p.id)}
+                sx={{ p: 0.25, color: "background.paper" }}
+              >
+                <CloseIcon sx={{ fontSize: 12 }} />
+              </IconButton>
               <Typography
                 variant="body2"
                 fontWeight="medium"
@@ -201,18 +206,11 @@ export default function ParticipantList({
               >
                 {p.name}
               </Typography>
-              <IconButton
-                size="small"
-                onClick={() => onRemove(p.id)}
-                sx={{ p: 0.25, color: "background.paper" }}
-              >
-                <CloseIcon sx={{ fontSize: 12 }} />
-              </IconButton>
             </Box>
             <Box sx={{ display: "flex", alignItems: "center", gap: 0.25 }}>
               <IconButton
                 size="small"
-                onClick={() => onChangeMultiplier(p.id, -1)}
+                onClick={() => handleChangeMultiplier(p.id, -1)}
                 disabled={p.multiplier <= 1}
                 sx={{
                   p: 0.25,
@@ -230,7 +228,7 @@ export default function ParticipantList({
               </Typography>
               <IconButton
                 size="small"
-                onClick={() => onChangeMultiplier(p.id, 1)}
+                onClick={() => handleChangeMultiplier(p.id, 1)}
                 sx={{ p: 0.25, color: "background.paper" }}
               >
                 <AddIcon sx={{ fontSize: 12 }} />
@@ -260,8 +258,8 @@ export default function ParticipantList({
   }
 
   return (
-    <Card elevation={3} sx={{ borderRadius: 4, ...(sx as object) }}>
-      <CardContent>{inner}</CardContent>
-    </Card>
+    <Paper elevation={3} sx={{ p: 3, ...(sx as object) }}>
+      {inner}
+    </Paper>
   );
 }

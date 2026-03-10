@@ -183,7 +183,7 @@ export default function Navigation() {
               color="inherit"
               component={Link}
               href="/changelog"
-              sx={{ color: theme.palette.text.primary }}
+              sx={{ color: theme.palette.text.primary, display: "none" }}
             >
               <ArticleIcon />
             </IconButton>

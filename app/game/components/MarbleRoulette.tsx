@@ -12,20 +12,18 @@ import { ColorTheme } from "../lib/marble-roulette/types/ColorTheme";
 import { themeMarblePalettes } from "../../theme/theme";
 import { useThemeContext } from "../../theme/ThemeContext";
 import ParticipantList, { Participant } from "./ParticipantList";
+import { useSharedParticipants } from "../hooks/useSharedParticipants";
 
 export default function MarbleRoulette() {
   const theme = useTheme();
   const { currentTheme } = useThemeContext();
   const containerRef = useRef<HTMLDivElement>(null);
   const rouletteRef = useRef<Roulette | null>(null);
-  const [participants, setParticipants] = useState<Participant[]>([
-    { id: '1', name: '돈토', multiplier: 3 },
-    { id: '2', name: '윤스', multiplier: 2 },
-    { id: '3', name: '맘터', multiplier: 1 },
-    { id: '4', name: '국밥', multiplier: 4 },
-  ]);
+  const {
+    participants,
+    handleAdd,
+  } = useSharedParticipants();
   const [newName, setNewName] = useState('');
-  const [globalMultiplier, setGlobalMultiplier] = useState(1);
   const [isReady, setIsReady] = useState(false);
   const [winner, setWinner] = useState<string | null>(null);
   const [errorMSG, setErrorMSG] = useState<string | null>(null);
@@ -168,38 +166,8 @@ export default function MarbleRoulette() {
   };
 
   const handleAddParticipant = () => {
-    const trimmed = newName.trim();
-    if (!trimmed) return;
-    setParticipants(prev => [
-      ...prev,
-      { id: Date.now().toString(), name: trimmed, multiplier: 1 },
-    ]);
+    handleAdd(newName);
     setNewName('');
-  };
-
-  const handleRemoveParticipant = (id: string) => {
-    setParticipants(prev => prev.filter(p => p.id !== id));
-  };
-
-  const handleChangeMultiplier = (id: string, delta: number) => {
-    setParticipants(prev =>
-      prev.map(p =>
-        p.id === id ? { ...p, multiplier: Math.max(1, p.multiplier + delta) } : p
-      )
-    );
-  };
-
-  const handleGlobalMultiplierChange = (delta: number) => {
-    setGlobalMultiplier(prev => {
-      const next = Math.min(1000, Math.max(1, prev + delta));
-      setParticipants(parts => parts.map(p => ({ ...p, multiplier: next })));
-      return next;
-    });
-  };
-
-  const handleGlobalMultiplierInput = (value: number) => {
-    setGlobalMultiplier(value);
-    setParticipants(parts => parts.map(p => ({ ...p, multiplier: value })));
   };
 
   const handleMapChange = (event: SelectChangeEvent<number>) => {
@@ -307,18 +275,7 @@ export default function MarbleRoulette() {
             <ParticipantList
               variant="plain"
               showInput={false}
-              participants={participants}
-              newName={newName}
-              globalMultiplier={globalMultiplier}
-              onNewNameChange={setNewName}
-              onAdd={handleAddParticipant}
-              onRemove={handleRemoveParticipant}
-              onChangeMultiplier={handleChangeMultiplier}
-              onGlobalMultiplierChange={handleGlobalMultiplierChange}
-              onGlobalMultiplierInput={handleGlobalMultiplierInput}
-              title="참가자 목록"
               totalLabel="개 마블"
-              emptyText="참가자를 추가해주세요"
             />
 
             {errorMSG && (

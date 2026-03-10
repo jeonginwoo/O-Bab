@@ -6,6 +6,7 @@ import Ladder from "./components/Ladder";
 import Roulette from "./components/Roulette";
 import RandomFood from "./components/RandomFood";
 import MarbleRoulette from "./components/MarbleRoulette";
+import { ParticipantsProvider } from "./hooks/useSharedParticipants";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -100,24 +101,26 @@ export default function GamePage() {
             >
               <Tab label="룰렛" id="game-tab-0" aria-controls="game-tabpanel-0" />
               <Tab label="사다리타기" id="game-tab-1" aria-controls="game-tabpanel-1" />
-              <Tab label="음식추천" id="game-tab-2" aria-controls="game-tabpanel-2" />
-              <Tab label="마블 룰렛" id="game-tab-3" aria-controls="game-tabpanel-3" />
+              <Tab label="마블 룰렛" id="game-tab-2" aria-controls="game-tabpanel-2" />
+              <Tab label="음식추천" id="game-tab-3" aria-controls="game-tabpanel-3" />
             </Tabs>
           )}
         </Box>
         <CardContent>
-          <TabPanel value={value} index={0}>
+          <ParticipantsProvider>
+          <TabPanel value={value} index={0} noPadding>
             <Roulette />
           </TabPanel>
-          <TabPanel value={value} index={1}>
+          <TabPanel value={value} index={1} noPadding>
             <Ladder />
           </TabPanel>
-          <TabPanel value={value} index={2}>
-            <RandomFood />
-          </TabPanel>
-          <TabPanel value={value} index={3} noPadding>
+          <TabPanel value={value} index={2} noPadding>
             <MarbleRoulette />
           </TabPanel>
+          <TabPanel value={value} index={3} noPadding>
+            <RandomFood />
+          </TabPanel>
+          </ParticipantsProvider>
         </CardContent>
       </Card>
     </Container>

@@ -11,7 +11,8 @@ import {
 } from "@mui/material";
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
-import ParticipantList, { Participant } from "./ParticipantList";
+import ParticipantList from "./ParticipantList";
+import { useSharedParticipants } from "../hooks/useSharedParticipants";
 
 interface Rung {
   y: number;
@@ -34,12 +35,8 @@ const Ladder = () => {
   const [gameState, setGameState] = useState<
     "initial" | "started" | "tracing" | "finished"
   >("initial");
-  const [participants, setParticipants] = useState<Participant[]>([]);
-  const [newName, setNewName] = useState("");
-  const [globalMultiplier, setGlobalMultiplier] = useState(1);
-  const [winningPlayerName, setWinningPlayerName] = useState<string | null>(
-    null
-  );
+  const { participants } = useSharedParticipants();
+  const [winningPlayerName, setWinningPlayerName] = useState<string | null>(null);
   const theme = useTheme();
 
   const drawLadder = useCallback(() => {
@@ -146,36 +143,6 @@ const Ladder = () => {
     randomizeAndDraw(expandedPlayers);
     setGameState("started");
   }, [participants, randomizeAndDraw]);
-
-  const handleAdd = () => {
-    const trimmed = newName.trim();
-    if (!trimmed) return;
-    setParticipants((prev) => [...prev, { id: Date.now().toString(), name: trimmed, multiplier: globalMultiplier }]);
-    setNewName("");
-  };
-
-  const handleRemove = (id: string) => {
-    setParticipants((prev) => prev.filter((p) => p.id !== id));
-  };
-
-  const handleChangeMultiplier = (id: string, delta: number) => {
-    setParticipants((prev) =>
-      prev.map((p) => (p.id === id ? { ...p, multiplier: Math.max(1, p.multiplier + delta) } : p))
-    );
-  };
-
-  const handleGlobalMultiplierChange = (delta: number) => {
-    setGlobalMultiplier((prev) => {
-      const next = Math.min(1000, Math.max(1, prev + delta));
-      setParticipants((parts) => parts.map((p) => ({ ...p, multiplier: next })));
-      return next;
-    });
-  };
-
-  const handleGlobalMultiplierInput = (value: number) => {
-    setGlobalMultiplier(value);
-    setParticipants((parts) => parts.map((p) => ({ ...p, multiplier: value })));
-  };
 
   const handleRetry = () => {
     randomizeAndDraw(players);
@@ -469,22 +436,7 @@ const Ladder = () => {
       )}
 
       {/* Participant Card - always visible */}
-      <ParticipantList
-        participants={participants}
-        newName={newName}
-        globalMultiplier={globalMultiplier}
-        onNewNameChange={setNewName}
-        onAdd={handleAdd}
-        onRemove={handleRemove}
-        onChangeMultiplier={handleChangeMultiplier}
-        onGlobalMultiplierChange={handleGlobalMultiplierChange}
-        onGlobalMultiplierInput={handleGlobalMultiplierInput}
-        title="참가자"
-        totalLabel="명"
-        inputPlaceholder="이름 입력"
-        emptyText="이름을 추가해주세요!"
-        sx={{ mt: 2 }}
-      />
+      <ParticipantList sx={{ mt: 2 }} />
     </Box>
   );
 };

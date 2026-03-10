@@ -27,9 +27,20 @@ type ChangelogEntry = {
 
 const changelog: ChangelogEntry[] = [
   {
+    version: "3.8.1",
+    date: "2026-03-10",
+    label: "최신",
+    changes: [
+      { type: "feat", text: "룰렛·사다리타기·마블 룰렛 참가자 목록 실시간 공유 (Context)" },
+      { type: "feat", text: "참가자 목록 새로고침 후에도 유지 (localStorage)" },
+      { type: "fix", text: "마블 룰렛 신규 참가자 전체배수 미적용 버그 수정" },
+      { type: "fix", text: "룰렛 충전 중 마우스가 버튼 밖으로 나가도 충전 유지" },
+      { type: "style", text: "참가자 카드 삭제 버튼 왼쪽으로 이동" },
+    ],
+  },
+  {
     version: "3.8.0",
     date: "2026-03-09",
-    label: "최신",
     changes: [
       { type: "feat", text: "업데이트 기록 페이지 추가" },
       { type: "feat", text: "앱바에 업데이트 기록 버튼 추가" },
