@@ -4,15 +4,20 @@ import React, { useRef, useEffect, useState, useCallback } from "react";
 import {
   Box,
   Button,
-  useTheme,
+  IconButton,
+  Tooltip,
   Typography,
+  useTheme,
 } from "@mui/material";
+import ShuffleIcon from "@mui/icons-material/Shuffle";
+import SortByAlphaIcon from "@mui/icons-material/SortByAlpha";
 import ParticipantList from "./ParticipantList";
+import CelebrationEmojis from "./CelebrationEmojis";
 import { useSharedParticipants } from "../hooks/useSharedParticipants";
 
 const Roulette = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const { participants } = useSharedParticipants();
+  const { participants, setParticipants } = useSharedParticipants();
   const [isSpinning, setIsSpinning] = useState(false);
   const [winningMenu, setWinningMenu] = useState<string | null>(null);
   const [powerGauge, setPowerGauge] = useState(0);
@@ -223,6 +228,20 @@ const Roulette = () => {
     return () => window.removeEventListener("mouseup", handleChargeEnd);
   }, [handleChargeEnd]);
 
+  const handleShuffle = useCallback(() => {
+    if (isSpinning) return;
+    setParticipants((prev) => [...prev].sort(() => Math.random() - 0.5));
+    colors.current = [];
+    setWinningMenu(null);
+  }, [isSpinning, setParticipants]);
+
+  const handleSort = useCallback(() => {
+    if (isSpinning) return;
+    setParticipants((prev) => [...prev].sort((a, b) => a.name.localeCompare(b.name, "ko", { numeric: true })));
+    colors.current = [];
+    setWinningMenu(null);
+  }, [isSpinning, setParticipants]);
+
   const handleChargeStart = () => {
     if (participants.length <= 1) {
       alert("메뉴는 최소 2개 이상이어야 합니다.");
@@ -312,7 +331,7 @@ const Roulette = () => {
           />
         </Box>
       </Box>
-      <Box sx={{ mt: 4, display: "flex", justifyContent: "center", mb: 4, position: "relative" }}>
+      <Box sx={{ mt: 2, display: "flex", justifyContent: "center", alignItems: "center", mb: 4, position: "relative" }}>
         <Button
           variant="contained"
           size="large"
@@ -322,55 +341,66 @@ const Roulette = () => {
           disabled={isSpinning}
           sx={{
             borderRadius: 50,
-            px: 6,
+            width: 240,
             py: 1.5,
             fontSize: "1.2rem",
             fontWeight: "bold",
             boxShadow: 4,
-            background: isSpinning 
+            background: isSpinning
               ? theme.palette.action.disabledBackground
+              : isCharging && powerGauge < 10
+              ? `linear-gradient(to right, ${theme.palette.error.dark} ${powerGauge}%, ${theme.palette.error.main} ${powerGauge}%)`
               : `linear-gradient(to right, ${theme.palette.secondary.dark} ${powerGauge}%, ${theme.palette.secondary.main} ${powerGauge}%)`,
             color: theme.palette.background.default,
             transition: "transform 0.2s",
             "&:hover": {
               background: isSpinning
                 ? theme.palette.action.disabledBackground
+                : isCharging && powerGauge < 10
+                ? `linear-gradient(to right, ${theme.palette.error.dark} ${powerGauge}%, ${theme.palette.error.main} ${powerGauge}%)`
                 : `linear-gradient(to right, ${theme.palette.secondary.dark} ${powerGauge}%, ${theme.palette.secondary.main} ${powerGauge}%)`,
               transform: isSpinning ? "none" : "scale(1.05)",
             },
             "&:disabled": {
-               backgroundColor: theme.palette.action.disabledBackground,
-               color: theme.palette.text.disabled
+              backgroundColor: theme.palette.action.disabledBackground,
+              color: theme.palette.text.disabled,
             },
             "&:active": {
               transform: "scale(0.98)",
-            }
+            },
           }}
         >
-          {isSpinning ? "돌아가는 중..." : isCharging ? "충전 중..." : "꾹 눌러서 돌리기"}
+          {isSpinning ? "돌아가는 중..." : isCharging ? `${powerGauge}%` : "꾹 눌러서 돌리기"}
         </Button>
-        {powerGauge > 0 && (
-          <Typography 
-            variant="body2" 
-            sx={{ 
-              position: "absolute",
-              right: 0,
-              top: "50%",
-              transform: "translateY(-50%)",
-              fontWeight: "bold",
-              backgroundColor: theme.palette.background.paper,
-              px: 1.5,
-              py: 0.5,
-              borderRadius: 2,
-              color: powerGauge < 10 ? theme.palette.error.main : theme.palette.secondary.main,
-              border: `2px solid ${powerGauge < 10 ? theme.palette.error.main : theme.palette.secondary.main}`,
-            }}
-          >
-            {powerGauge}%
-          </Typography>
-        )}
+        <Box sx={{ position: "absolute", right: 0, display: "flex", flexDirection: "column", gap: 1 }}>
+          <Tooltip title="가나다순 정렬" placement="left">
+            <span>
+              <IconButton
+                onClick={handleSort}
+                disabled={isSpinning}
+                color="secondary"
+                sx={{ border: '1px solid', borderColor: 'divider' }}
+              >
+                <SortByAlphaIcon />
+              </IconButton>
+            </span>
+          </Tooltip>
+          <Tooltip title="순서 섞기" placement="left">
+            <span>
+              <IconButton
+                onClick={handleShuffle}
+                disabled={isSpinning}
+                color="secondary"
+                sx={{ border: '1px solid', borderColor: 'divider' }}
+              >
+                <ShuffleIcon />
+              </IconButton>
+            </span>
+          </Tooltip>
+        </Box>
       </Box>
 
+      <CelebrationEmojis show={!!winningMenu} />
       {winningMenu && (
         <Typography
           variant="h5"
@@ -383,7 +413,7 @@ const Roulette = () => {
         </Typography>
       )}
 
-      <ParticipantList totalLabel="개" />
+      <ParticipantList totalLabel=" 비중" />
     </Box>
   );
 };

@@ -27,9 +27,24 @@ type ChangelogEntry = {
 
 const changelog: ChangelogEntry[] = [
   {
+    version: "3.8.4",
+    date: "2026-03-12",
+    label: "최신",
+    changes: [
+      { type: "feat", text: "사다리타기 하단에 시작·초기화 버튼 추가" },
+      { type: "feat", text: "당첨 축하 이모지 파티클 효과 공용 컴포넌트(CelebrationEmojis) 추가" },
+      { type: "feat", text: "룰렛 순서 정렬 버튼 추가 (가나다순, 숫자 자연 정렬 지원)" },
+      { type: "feat", text: "룰렛 순서 섞기 버튼 추가" },
+      { type: "update", text: "룰렛 충전 중 퍼센트 표시, 10% 미만 시 버튼 빨간색 표시" },
+      { type: "update", text: "마블 룰렛 시작 버튼 아이콘화 및 사다리타기와 동일한 스타일 적용" },
+      { type: "update", text: "마블 룰렛 당첨 표시 위치 변경 (게임 영역 아래로 이동)" },
+      { type: "style", text: "사다리타기·룰렛 초기화 버튼 스타일 마블 룰렛과 통일" },
+      { type: "fix", text: "돈토 메뉴 슬라이더에서 잘못된 이미지 표시 버그 수정" },
+    ],
+  },
+  {
     version: "3.8.3",
     date: "2026-03-10",
-    label: "최신",
     changes: [
       { type: "update", text: "맛집 페이지 음식 사진 9개씩 렌더링 후 스크롤 시 추가 로딩" },
     ],

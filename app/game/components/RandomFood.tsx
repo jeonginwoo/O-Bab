@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { Box, Button, Typography, useTheme, Zoom } from "@mui/material";
 import RestaurantMenuIcon from "@mui/icons-material/RestaurantMenu";
+import CelebrationEmojis from "./CelebrationEmojis";
 
 const foodList = [
   "김치찌개", "된장찌개", "부대찌개", "비빔밥", "불고기",
@@ -47,6 +48,10 @@ const RandomFood = () => {
 
   return (
     <Box sx={{ textAlign: "center", display: 'flex', flexDirection: 'column', alignItems: 'center', height: '100%', minHeight: '500px', position: 'relative', overflow: 'hidden' }}>
+        <CelebrationEmojis
+          show={showCelebration}
+          emojis={['🍕', '🍱', '🍜', '🍲', '🍗', '🍣', '🍔', '🍛', '🥘', '🍝']}
+        />
         <Box sx={{ flexGrow: 1, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <Zoom in={true}>
                 <Typography 
@@ -72,36 +77,6 @@ const RandomFood = () => {
                 </Typography>
             </Zoom>
         </Box>
-
-        {showCelebration && (
-            <Box sx={{ 
-                position: 'absolute', 
-                top: 0, left: 0, right: 0, bottom: 0, 
-                pointerEvents: 'none',
-                zIndex: 0
-            }}>
-                {[...Array(30)].map((_, i) => (
-                    <Box
-                        key={i}
-                        sx={{
-                            position: 'absolute',
-                            left: `${Math.random() * 100}%`,
-                            top: `${Math.random() * 100}%`,
-                            fontSize: `${Math.random() * 20 + 20}px`,
-                            animation: `celebrate ${Math.random() * 2 + 1}s ease-out forwards`,
-                            opacity: 0,
-                            '@keyframes celebrate': {
-                                '0%': { transform: 'translateY(100px) rotate(0deg)', opacity: 0 },
-                                '20%': { opacity: 1 },
-                                '100%': { transform: `translateY(-${Math.random() * 400 + 200}px) rotate(${Math.random() * 720 - 360}deg)`, opacity: 0 }
-                            }
-                        }}
-                    >
-                        {['🎉', '✨', '🍕', '🍱', '🍜', '🍲', '🍗', '🍣', '🍔'][Math.floor(Math.random() * 9)]}
-                    </Box>
-                ))}
-            </Box>
-        )}
 
       <Box sx={{ mb: 4, zIndex: 1 }}>
         <Button

@@ -12,6 +12,7 @@ import {
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
 import PlayArrowIcon from "@mui/icons-material/PlayArrow";
 import ParticipantList from "./ParticipantList";
+import CelebrationEmojis from "./CelebrationEmojis";
 import { useSharedParticipants } from "../hooks/useSharedParticipants";
 
 interface Rung {
@@ -342,11 +343,7 @@ const Ladder = () => {
               onClick={handleRetry}
               disabled={gameState === "tracing"}
               color="secondary"
-              sx={{
-                backgroundColor: theme.palette.secondary.main,
-                color: theme.palette.background.default,
-                "&:hover": { backgroundColor: theme.palette.secondary.dark },
-              }}
+              sx={{ border: '1px solid', borderColor: 'divider' }}
             >
               <RestartAltIcon />
             </IconButton>
@@ -423,6 +420,36 @@ const Ladder = () => {
         </Box>
       )}
 
+      {players.length >= 2 && (
+        <Box sx={{ display: "flex", gap: 1, justifyContent: "center", mt: 2 }}>
+          <Tooltip title="시작" placement="top">
+            <IconButton
+              onClick={handleTrace}
+              disabled={gameState === "finished" || gameState === "tracing"}
+              color="success"
+              sx={{
+                backgroundColor: theme.palette.success.main,
+                color: theme.palette.success.contrastText,
+                "&:hover": { backgroundColor: theme.palette.success.dark },
+              }}
+            >
+              <PlayArrowIcon />
+            </IconButton>
+          </Tooltip>
+          <Tooltip title="초기화" placement="top">
+            <IconButton
+              onClick={handleRetry}
+              disabled={gameState === "tracing"}
+              color="secondary"
+              sx={{ border: '1px solid', borderColor: 'divider' }}
+            >
+              <RestartAltIcon />
+            </IconButton>
+          </Tooltip>
+        </Box>
+      )}
+
+      <CelebrationEmojis show={gameState === "finished" && !!winningPlayerName} />
       {gameState === "finished" && winningPlayerName && (
         <Typography
           variant="h5"

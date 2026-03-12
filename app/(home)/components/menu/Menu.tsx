@@ -158,6 +158,24 @@ function Menu({ title, apiUrl }: { title:string; apiUrl: string }) {
     }
   }, [menu, title]);
 
+  const dontoMenuImages: Media[] = React.useMemo(() => {
+    if (!menu || title !== "돈토") return [];
+    const imageMedia = menu.media.filter((m) => m.type === "image");
+    const detected = detectMenuImages(imageMedia);
+    if (detected) return detected.menuImages;
+    const config = MENU_IMAGE_CONFIG[title];
+    if (config) {
+      const filtered = config.exclude
+        ? imageMedia.filter((_, i) => !config.exclude!.includes(i))
+        : imageMedia;
+      if (config.indices) return config.indices.map((i) => filtered[i]).filter(Boolean);
+      if (config.position === 'first') return filtered.slice(0, config.count);
+      if (config.position === 'last') return filtered.slice(-(config.count ?? 1));
+      return filtered;
+    }
+    return imageMedia.slice(0, 2);
+  }, [menu, title]);
+
   const handleImageClick = (imageUrl: string) => {
     const index = allImages.indexOf(imageUrl);
     if (index !== -1) {
@@ -465,7 +483,7 @@ function Menu({ title, apiUrl }: { title:string; apiUrl: string }) {
                 }}>
                   {imageUrl === "combined_donto_view" && menu ? (
                     <DontoMenuView
-                      menuImages={menu.media.filter(m => m.type === 'image').slice(0, 2)}
+                      menuImages={dontoMenuImages}
                       menuTitle={menu.title}
                       view="modal"
                     />

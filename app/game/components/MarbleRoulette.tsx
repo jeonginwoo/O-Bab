@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState, useMemo, useCallback } from "react";
 import { Box, Button, TextField, Typography, Paper, FormControl, InputLabel, Select, MenuItem, SelectChangeEvent, IconButton, Tooltip, useTheme, Divider, InputAdornment } from "@mui/material";
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import AddIcon from '@mui/icons-material/Add';
 import { Roulette } from "../lib/marble-roulette/roulette";
 import { stages } from "../lib/marble-roulette/data/maps";
@@ -12,6 +13,7 @@ import { ColorTheme } from "../lib/marble-roulette/types/ColorTheme";
 import { themeMarblePalettes } from "../../theme/theme";
 import { useThemeContext } from "../../theme/ThemeContext";
 import ParticipantList, { Participant } from "./ParticipantList";
+import CelebrationEmojis from "./CelebrationEmojis";
 import { useSharedParticipants } from "../hooks/useSharedParticipants";
 
 export default function MarbleRoulette() {
@@ -191,6 +193,17 @@ export default function MarbleRoulette() {
         <div className={styles.leftPanel}>
           <div ref={containerRef} className={styles.gameContainer}></div>
         </div>
+        {winner && (
+          <Typography
+            variant="h5"
+            component="p"
+            color="secondary"
+            align="center"
+            sx={{ mt: 2, fontWeight: "bold", width: "100%" }}
+          >
+            🎉 당첨: {winner} 🎉
+          </Typography>
+        )}
         <div className={styles.rightPanel}>
           <Paper elevation={3} sx={{ p: 3, height: '100%', display: 'flex', flexDirection: 'column', gap: 2 }}>
             <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -198,16 +211,22 @@ export default function MarbleRoulette() {
                 게임 설정
               </Typography>
               <Box sx={{ display: 'flex', gap: 1 }}>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  size="small"
-                  onClick={handleStart}
-                  disabled={!isReady}
-                  sx={{ fontWeight: 'bold' }}
-                >
-                  시작
-                </Button>
+                <Tooltip title="시작">
+                  <IconButton
+                    onClick={handleStart}
+                    disabled={!isReady}
+                    color="success"
+                    size="small"
+                    sx={{
+                      backgroundColor: 'success.main',
+                      color: 'success.contrastText',
+                      '&:hover': { backgroundColor: 'success.dark' },
+                      '&.Mui-disabled': { backgroundColor: 'action.disabledBackground' },
+                    }}
+                  >
+                    <PlayArrowIcon />
+                  </IconButton>
+                </Tooltip>
                 <Tooltip title="초기화">
                   <IconButton
                     onClick={handleClear}
@@ -281,21 +300,10 @@ export default function MarbleRoulette() {
             {errorMSG && (
               <Typography color="error" variant="body2">{errorMSG}</Typography>
             )}
-
-            {winner && (
-              <Typography
-                variant="h5"
-                component="p"
-                color="secondary"
-                align="center"
-                sx={{ mt: 2, fontWeight: "bold" }}
-              >
-                🎉 당첨: {winner} 🎉
-              </Typography>
-            )}
           </Paper>
         </div>
       </div>
+      <CelebrationEmojis show={!!winner} />
       <Typography variant="body2" color="text.secondary" align="center" sx={{ mt: 2 }}>
         Reference: <a href="https://lazygyu.github.io/roulette/" target="_blank" rel="noopener noreferrer" style={{ color: 'inherit', textDecoration: 'underline' }}>Marble Roulette by LazyGyu</a>
       </Typography>
