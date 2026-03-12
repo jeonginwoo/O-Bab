@@ -321,7 +321,7 @@ function Menu({ title, apiUrl }: { title:string; apiUrl: string }) {
         display: "flex",
         flexDirection: "column",
         position: 'relative',
-        border: (t) => `1px solid ${t.palette.secondary.main}22`,
+        border: (t) => `1px solid ${t.palette.primary.main}22`,
         backgroundColor: (t) => `${t.palette.background.paper}e8`,
         backdropFilter: 'blur(8px)',
         WebkitBackdropFilter: 'blur(8px)',
@@ -331,13 +331,13 @@ function Menu({ title, apiUrl }: { title:string; apiUrl: string }) {
           position: 'absolute',
           inset: 0,
           borderRadius: 'inherit',
-          boxShadow: (t) => `0 20px 48px ${t.palette.secondary.main}22, 0 4px 16px rgba(0,0,0,0.18)`,
+          boxShadow: (t) => `0 20px 48px ${t.palette.primary.main}22, 0 4px 16px rgba(0,0,0,0.18)`,
           opacity: 0,
           transition: 'opacity 0.28s ease',
           pointerEvents: 'none',
         },
         '&:hover': {
-          borderColor: (t) => `${t.palette.secondary.main}55`,
+          borderColor: (t) => `${t.palette.primary.main}55`,
         },
         '&:hover::after': { opacity: 1 },
       }}
@@ -350,7 +350,7 @@ function Menu({ title, apiUrl }: { title:string; apiUrl: string }) {
           fontWeight="bold"
           gutterBottom
           sx={{
-            color: 'secondary.main',
+            color: 'primary.main',
             letterSpacing: '0.04em',
             position: 'relative',
             pb: 0.5,
@@ -371,7 +371,7 @@ function Menu({ title, apiUrl }: { title:string; apiUrl: string }) {
         </Typography>
         {loading && (
           <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", my: 4, gap: 2 }}>
-            <CircularProgress color="secondary" size={36} thickness={3.5} />
+            <CircularProgress color="primary" size={36} thickness={3.5} />
             <Typography variant="caption" color="text.secondary" sx={{ letterSpacing: '0.06em' }}>
               메뉴 불러오는 중...
             </Typography>

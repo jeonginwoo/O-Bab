@@ -135,7 +135,7 @@ const Roulette = () => {
     // Center Dot
     ctx.beginPath();
     ctx.arc(cw, ch, 10, 0, 2 * Math.PI);
-    ctx.fillStyle = theme.palette.secondary.main;
+    ctx.fillStyle = theme.palette.primary.main;
     ctx.fill();
     ctx.shadowColor = "transparent"; // Reset for next frame
   };
@@ -326,7 +326,7 @@ const Roulette = () => {
                   height: 0, 
                   borderLeft: "15px solid transparent",
                   borderRight: "15px solid transparent",
-                  borderTop: `30px solid ${theme.palette.secondary.main}`,
+                  borderTop: `30px solid ${theme.palette.primary.main}`,
              }}
           />
         </Box>
@@ -350,7 +350,7 @@ const Roulette = () => {
               ? theme.palette.action.disabledBackground
               : isCharging && powerGauge < 10
               ? `linear-gradient(to right, ${theme.palette.error.dark} ${powerGauge}%, ${theme.palette.error.main} ${powerGauge}%)`
-              : `linear-gradient(to right, ${theme.palette.secondary.dark} ${powerGauge}%, ${theme.palette.secondary.main} ${powerGauge}%)`,
+              : `linear-gradient(to right, ${theme.palette.primary.dark} ${powerGauge}%, ${theme.palette.primary.main} ${powerGauge}%)`,
             color: theme.palette.background.default,
             transition: "transform 0.2s",
             "&:hover": {
@@ -358,7 +358,7 @@ const Roulette = () => {
                 ? theme.palette.action.disabledBackground
                 : isCharging && powerGauge < 10
                 ? `linear-gradient(to right, ${theme.palette.error.dark} ${powerGauge}%, ${theme.palette.error.main} ${powerGauge}%)`
-                : `linear-gradient(to right, ${theme.palette.secondary.dark} ${powerGauge}%, ${theme.palette.secondary.main} ${powerGauge}%)`,
+                : `linear-gradient(to right, ${theme.palette.primary.dark} ${powerGauge}%, ${theme.palette.primary.main} ${powerGauge}%)`,
               transform: isSpinning ? "none" : "scale(1.05)",
             },
             "&:disabled": {
@@ -378,7 +378,7 @@ const Roulette = () => {
               <IconButton
                 onClick={handleSort}
                 disabled={isSpinning}
-                color="secondary"
+                color="primary"
                 sx={{ border: '1px solid', borderColor: 'divider' }}
               >
                 <SortByAlphaIcon />
@@ -390,7 +390,7 @@ const Roulette = () => {
               <IconButton
                 onClick={handleShuffle}
                 disabled={isSpinning}
-                color="secondary"
+                color="primary"
                 sx={{ border: '1px solid', borderColor: 'divider' }}
               >
                 <ShuffleIcon />
@@ -405,7 +405,7 @@ const Roulette = () => {
         <Typography
           variant="h5"
           component="p"
-          color="secondary"
+          color="primary"
           align="center"
           sx={{ mt: 2, mb: 2, fontWeight: "bold" }}
         >

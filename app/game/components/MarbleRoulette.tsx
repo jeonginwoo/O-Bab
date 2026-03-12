@@ -39,7 +39,7 @@ export default function MarbleRoulette() {
 
   const gameTheme: ColorTheme = useMemo(() => {
     const isDark = theme.palette.mode === 'dark';
-    const mainColor = isDark ? theme.palette.secondary.main : theme.palette.primary.main;
+    const mainColor = isDark ? theme.palette.primary.main : theme.palette.secondary.main;
     const bgColor = theme.palette.background.default;
     const paperColor = theme.palette.background.paper;
     const textColor = theme.palette.text.primary;
@@ -197,7 +197,7 @@ export default function MarbleRoulette() {
           <Typography
             variant="h5"
             component="p"
-            color="secondary"
+            color="primary"
             align="center"
             sx={{ mt: 2, fontWeight: "bold", width: "100%" }}
           >
@@ -231,7 +231,7 @@ export default function MarbleRoulette() {
                   <IconButton
                     onClick={handleClear}
                     disabled={!isReady}
-                    color="secondary"
+                    color="primary"
                     size="small"
                     sx={{ border: '1px solid', borderColor: 'divider' }}
                   >
@@ -276,7 +276,7 @@ export default function MarbleRoulette() {
                           onClick={handleAddParticipant}
                           disabled={!newName.trim()}
                           edge="end"
-                          color="primary"
+                          color="secondary"
                           size="small"
                         >
                           <AddIcon fontSize="small" />

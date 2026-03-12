@@ -50,7 +50,7 @@ export default function GamePage() {
         className="animate-fade-in-up"
         sx={{
           position: 'relative',
-          border: (t) => `1px solid ${t.palette.secondary.main}22`,
+          border: (t) => `1px solid ${t.palette.primary.main}22`,
           backgroundColor: (t) => `${t.palette.background.paper}e8`,
           backdropFilter: 'blur(8px)',
           WebkitBackdropFilter: 'blur(8px)',
@@ -60,14 +60,14 @@ export default function GamePage() {
             position: 'absolute',
             inset: 0,
             borderRadius: 'inherit',
-            boxShadow: (t) => `0 20px 48px ${t.palette.secondary.main}22, 0 4px 16px rgba(0,0,0,0.18)`,
+            boxShadow: (t) => `0 20px 48px ${t.palette.primary.main}22, 0 4px 16px rgba(0,0,0,0.18)`,
             opacity: 0,
             transition: 'opacity 0.28s ease',
             pointerEvents: 'none',
           },
           '&:hover': {
             transform: 'translateY(-4px)',
-            borderColor: (t) => `${t.palette.secondary.main}55`,
+            borderColor: (t) => `${t.palette.primary.main}55`,
           },
           '&:hover::after': { opacity: 1 },
         }}
@@ -96,8 +96,8 @@ export default function GamePage() {
               onChange={handleChange}
               aria-label="게임 선택"
               centered
-              textColor="secondary"
-              indicatorColor="secondary"
+              textColor="primary"
+              indicatorColor="primary"
             >
               <Tab label="룰렛" id="game-tab-0" aria-controls="game-tabpanel-0" />
               <Tab label="사다리타기" id="game-tab-1" aria-controls="game-tabpanel-1" />

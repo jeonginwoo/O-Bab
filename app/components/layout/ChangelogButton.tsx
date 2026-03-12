@@ -10,7 +10,7 @@ export default function ChangelogButton() {
   return (
     <Tooltip title="업데이트 기록" placement="left">
       <Fab
-        color="secondary"
+        color="primary"
         aria-label="업데이트 기록"
         onClick={() => router.push("/changelog")}
         sx={{

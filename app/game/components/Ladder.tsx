@@ -342,7 +342,7 @@ const Ladder = () => {
             <IconButton
               onClick={handleRetry}
               disabled={gameState === "tracing"}
-              color="secondary"
+              color="primary"
               sx={{ border: '1px solid', borderColor: 'divider' }}
             >
               <RestartAltIcon />
@@ -364,7 +364,7 @@ const Ladder = () => {
             step={50}
             marks
             valueLabelDisplay="auto"
-            color="secondary"
+            color="primary"
             sx={{ width: "100%", mx: "auto" }}
           />
         </Box>
@@ -440,7 +440,7 @@ const Ladder = () => {
             <IconButton
               onClick={handleRetry}
               disabled={gameState === "tracing"}
-              color="secondary"
+              color="primary"
               sx={{ border: '1px solid', borderColor: 'divider' }}
             >
               <RestartAltIcon />
@@ -454,7 +454,7 @@ const Ladder = () => {
         <Typography
           variant="h5"
           component="p"
-          color="secondary"
+          color="primary"
           align="center"
           sx={{ mt: 2, fontWeight: "bold" }}
         >

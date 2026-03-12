@@ -59,14 +59,14 @@ const RandomFood = () => {
                     component="div" 
                     sx={{ 
                         fontWeight: 'bold', 
-                        color: theme.palette.secondary.main,
+                        color: theme.palette.primary.main,
                         transition: 'transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
                         ...(showCelebration && {
                             animation: 'shimmer 1.5s infinite alternate ease-in-out',
                             '@keyframes shimmer': {
-                                '0%': { textShadow: `0 0 10px ${theme.palette.secondary.main}` },
-                                '50%': { textShadow: `0 0 30px ${theme.palette.secondary.main}` },
-                                '100%': { textShadow: `0 0 10px ${theme.palette.secondary.main}` },
+                                '0%': { textShadow: `0 0 10px ${theme.palette.primary.main}` },
+                                '50%': { textShadow: `0 0 30px ${theme.palette.primary.main}` },
+                                '100%': { textShadow: `0 0 10px ${theme.palette.primary.main}` },
                             },
                         }),
                         textShadow: showCelebration ? undefined : 'none',
@@ -86,9 +86,9 @@ const RandomFood = () => {
             startIcon={<RestaurantMenuIcon />}
             disabled={isAnimating}
             sx={{
-            backgroundColor: theme.palette.secondary.main,
+            backgroundColor: theme.palette.primary.main,
             color: theme.palette.background.default,
-            "&:hover": { backgroundColor: theme.palette.secondary.dark },
+            "&:hover": { backgroundColor: theme.palette.primary.dark },
             px: 4,
             py: 1.5,
             fontSize: '1.2rem'

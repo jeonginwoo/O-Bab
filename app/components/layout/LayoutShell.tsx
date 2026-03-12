@@ -10,8 +10,8 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
   const isHomePage = pathname === '/';
   const theme = useTheme();
 
-  const sec  = theme.palette.secondary.main;
-  const pri  = theme.palette.primary.main;
+  const sec  = theme.palette.primary.main;
+  const pri  = theme.palette.secondary.main;
   const isDark = theme.palette.mode === 'dark';
 
   return (
@@ -44,10 +44,9 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
           top: '-20%', left: '-15%',
           width: '70vw', height: '70vw',
           borderRadius: '42% 58% 55% 45% / 52% 44% 56% 48%',
-          background: `radial-gradient(ellipse at 38% 38%, ${sec}${isDark ? '28' : '45'} 0%, ${sec}${isDark ? '0c' : '18'} 50%, transparent 75%)`,
-          willChange: 'opacity',
+          background: `radial-gradient(ellipse at 38% 38%, ${sec}${isDark ? '2a' : '48'} 0%, ${sec}${isDark ? '22' : '38'} 20%, ${sec}${isDark ? '16' : '28'} 38%, ${sec}${isDark ? '0a' : '14'} 56%, ${sec}${isDark ? '03' : '06'} 68%, transparent 78%)`,
+          filter: 'blur(32px)',
           transform: 'translateZ(0)',
-          animation: 'aurora 12s ease-in-out infinite',
         }} />
 
         {/* Aurora blob — bottom-right */}
@@ -56,10 +55,9 @@ export default function LayoutShell({ children }: { children: React.ReactNode })
           bottom: '-22%', right: '-12%',
           width: '65vw', height: '65vw',
           borderRadius: '55% 45% 42% 58% / 46% 56% 44% 54%',
-          background: `radial-gradient(ellipse at 62% 62%, ${sec}${isDark ? '24' : '42'} 0%, ${pri}${isDark ? '10' : '28'} 45%, transparent 72%)`,
-          willChange: 'opacity',
+          background: `radial-gradient(ellipse at 62% 62%, ${sec}${isDark ? '26' : '44'} 0%, ${sec}${isDark ? '1c' : '34'} 18%, ${pri}${isDark ? '14' : '2a'} 34%, ${pri}${isDark ? '0a' : '18'} 50%, ${pri}${isDark ? '03' : '08'} 64%, transparent 76%)`,
+          filter: 'blur(40px)',
           transform: 'translateZ(0)',
-          animation: 'aurora 16s ease-in-out infinite 4s',
         }} />
 
       </Box>

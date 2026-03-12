@@ -69,7 +69,7 @@ export default function Navigation() {
         backgroundColor: `${theme.palette.background.paper}e8`,
         backdropFilter: 'blur(12px)',
         WebkitBackdropFilter: 'blur(12px)',
-        borderBottom: `1px solid ${theme.palette.secondary.main}28`,
+        borderBottom: `1px solid ${theme.palette.primary.main}28`,
         boxShadow: `0 1px 12px rgba(0,0,0,0.10)`,
         transition: 'border-color 0.3s ease',
       }}
@@ -109,7 +109,7 @@ export default function Navigation() {
                  sx={{ 
                    fontWeight: pathname === item.path ? 700 : 400,
                    color: pathname === item.path
-                     ? theme.palette.secondary.main
+                     ? theme.palette.primary.main
                      : theme.palette.text.primary,
                    letterSpacing: '0.02em',
                    position: 'relative',
@@ -123,13 +123,13 @@ export default function Navigation() {
                      width: pathname === item.path ? '75%' : '0%',
                      height: '2px',
                      borderRadius: '2px',
-                     background: `linear-gradient(90deg, ${theme.palette.secondary.main}, ${theme.palette.secondary.main}88)`,
+                     background: `linear-gradient(90deg, ${theme.palette.primary.main}, ${theme.palette.primary.main}88)`,
                      transition: 'width 0.28s cubic-bezier(0.4, 0, 0.2, 1)',
                    },
                    '&:hover::after': { width: '75%' },
                    '&:hover': {
-                     color: theme.palette.secondary.main,
-                     backgroundColor: `${theme.palette.secondary.main}10`,
+                     color: theme.palette.primary.main,
+                     backgroundColor: `${theme.palette.primary.main}10`,
                    },
                    transition: 'color 0.2s ease, background-color 0.2s ease',
                  }}
@@ -166,7 +166,7 @@ export default function Navigation() {
                      textAlign="center"
                      sx={{ 
                        fontWeight: pathname === item.path ? "bold" : "normal",
-                       color: pathname === item.path ? theme.palette.secondary.main : theme.palette.text.primary 
+                       color: pathname === item.path ? theme.palette.primary.main : theme.palette.text.primary 
                      }}
                    >
                      {item.label}
@@ -277,7 +277,7 @@ export default function Navigation() {
                             minWidth: currentTheme === key ? 28 : 24,
                             minHeight: currentTheme === key ? 28 : 24,
                             borderRadius: "50%",
-                            background: `linear-gradient(90deg, ${background} 50%, ${secondary} 50%)`,
+                            background: `linear-gradient(90deg, ${background} 50%, ${primary} 50%)`,
                             border: `2px solid ${background}`,
                             boxShadow: 3,
                             transition: "all 0.2s ease-in-out",

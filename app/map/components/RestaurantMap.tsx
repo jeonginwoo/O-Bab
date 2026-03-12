@@ -62,7 +62,7 @@ const RestaurantChip = ({
       </span>
     }
     onClick={onClick}
-    color={isSelected ? "secondary" : "default"}
+    color={isSelected ? "primary" : "default"}
     variant={isSelected ? "filled" : "outlined"}
     clickable
   />
@@ -321,7 +321,7 @@ const RestaurantMap = () => {
             label="프로텐"
             onClick={handleCenterMap}
             clickable
-            color="primary"
+            color="secondary"
             variant="filled"
           />
           <Tooltip title="간략히 보기">
@@ -352,7 +352,7 @@ const RestaurantMap = () => {
               label="프로텐"
               onClick={handleCenterMap}
               clickable
-              color="primary"
+              color="secondary"
               variant="filled"
             />
             <Tooltip title="펼쳐 보기">
@@ -382,7 +382,7 @@ const RestaurantMap = () => {
                     </span>
                   </span>
                 }
-                color="secondary"
+                color="primary"
                />
             )}
             <Menu

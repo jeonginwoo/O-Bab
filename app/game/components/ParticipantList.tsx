@@ -128,14 +128,14 @@ export default function ParticipantList({
           onChange={(e) => setNewName(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleAdd()}
           size="small"
-          color="secondary"
+          color="primary"
           InputProps={{
             endAdornment: (
               <InputAdornment position="end">
                 <IconButton
                   onClick={handleAdd}
                   edge="end"
-                  color="secondary"
+                  color="primary"
                   disabled={!newName.trim()}
                   size="small"
                 >
@@ -173,11 +173,11 @@ export default function ParticipantList({
               flexDirection: "column",
               alignItems: "center",
               border: "1px solid",
-              borderColor: "secondary.main",
+              borderColor: "primary.main",
               borderRadius: 2,
               px: 1,
               py: 0.5,
-              bgcolor: "secondary.main",
+              bgcolor: "primary.main",
               color: "background.paper",
               minWidth: 70,
             }}

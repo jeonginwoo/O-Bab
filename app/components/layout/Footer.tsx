@@ -5,7 +5,7 @@ import RiceBowlIcon from "@mui/icons-material/RiceBowl";
 
 export default function Footer() {
   const theme = useTheme();
-  const sec = theme.palette.secondary.main;
+  const sec = theme.palette.primary.main;
 
   return (
     <Box
@@ -38,7 +38,7 @@ export default function Footer() {
             fontSize: '0.75rem',
           }}
         >
-          밥밥밥 ver 3.8.4
+          밥밥밥 ver 3.8.5
         </Typography>
         <RiceBowlIcon sx={{ fontSize: 16, color: sec, opacity: 0.7 }} />
       </Toolbar>

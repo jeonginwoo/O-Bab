@@ -27,9 +27,18 @@ type ChangelogEntry = {
 
 const changelog: ChangelogEntry[] = [
   {
-    version: "3.8.4",
+    version: "3.8.5",
     date: "2026-03-12",
     label: "최신",
+    changes: [
+      { type: "style", text: "테마 primary/secondary 색상 역할 전환 — 강조색을 primary로 통일" },
+      { type: "style", text: "전체 컴포넌트 primary/secondary 사용처 일괄 교체 (네비게이션, 룰렛, 사다리, 지도 등)" },
+      { type: "style", text: "배경 오로라 그라디언트 밴딩 개선 — 중간 스탑 추가 및 블러 처리로 부드러운 표현" },
+    ],
+  },
+  {
+    version: "3.8.4",
+    date: "2026-03-12",
     changes: [
       { type: "feat", text: "사다리타기 하단에 시작·초기화 버튼 추가" },
       { type: "feat", text: "당첨 축하 이모지 파티클 효과 공용 컴포넌트(CelebrationEmojis) 추가" },
@@ -369,12 +378,12 @@ const typeConfig = {
   feat: { label: "기능 추가", color: "success" as const, Icon: StarIcon },
   update: { label: "개선", color: "info" as const, Icon: BuildIcon },
   fix: { label: "버그 수정", color: "error" as const, Icon: AutoFixHighIcon },
-  style: { label: "디자인", color: "secondary" as const, Icon: NewReleasesIcon },
+  style: { label: "디자인", color: "primary" as const, Icon: NewReleasesIcon },
 };
 
 export default function ChangelogPage() {
   const theme = useTheme();
-  const sec = theme.palette.secondary.main;
+  const sec = theme.palette.primary.main;
 
   // Group entries by major.minor (e.g. "3.7", "3.6", ...)
   const groups: { groupKey: string; entries: ChangelogEntry[] }[] = [];
@@ -470,7 +479,7 @@ export default function ChangelogPage() {
                   v{groupKey}.x
                 </Typography>
                 {hasLatest && (
-                  <Chip label="최신" size="small" color="secondary" sx={{ fontWeight: 700, fontSize: "0.7rem" }} />
+                  <Chip label="최신" size="small" color="primary" sx={{ fontWeight: 700, fontSize: "0.7rem" }} />
                 )}
                 <Typography variant="caption" sx={{ color: theme.palette.text.secondary }}>
                   {latestVer !== oldestVer ? `${oldestVer} ~ ${latestVer}` : `${latestVer}`}

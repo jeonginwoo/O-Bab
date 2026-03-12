@@ -4,10 +4,10 @@ import { createTheme, ThemeOptions } from "@mui/material/styles";
 const typography = {
   fontFamily: "Roboto, sans-serif",
   h1: {
-    color: "#64FFDA",
+    color: "#0A192F",
   },
   h2: {
-    color: "#64FFDA",
+    color: "#0A192F",
   },
 };
 
@@ -16,10 +16,10 @@ export const themeOptions: Record<string, ThemeOptions> = {
     palette: {
       mode: "dark",
       primary: {
-        main: "#0A192F",
+        main: "#64FFDA",
       },
       secondary: {
-        main: "#64FFDA",
+        main: "#0A192F",
       },
       background: {
         default: "#0A192F",
@@ -36,10 +36,10 @@ export const themeOptions: Record<string, ThemeOptions> = {
     palette: {
       mode: "dark",
       primary: {
-        main: "#0077be",
+        main: "#00e5ff",
       },
       secondary: {
-        main: "#00e5ff",
+        main: "#002b5c",
       },
       background: {
         default: "#001e3c",
@@ -60,10 +60,10 @@ export const themeOptions: Record<string, ThemeOptions> = {
     palette: {
       mode: "light",
       primary: {
-        main: "#1976d2",
+        main: "#9c27b0",
       },
       secondary: {
-        main: "#9c27b0",
+        main: "#1976d2",
       },
       background: {
         default: "#f8f6ff",
@@ -76,18 +76,18 @@ export const themeOptions: Record<string, ThemeOptions> = {
     },
     typography: {
       ...typography,
-      h1: { color: "#1976d2" },
-      h2: { color: "#1976d2" },
+      h1: { color: "#9c27b0" },
+      h2: { color: "#9c27b0" },
     },
   },
   forest: {
     palette: {
       mode: "light",
       primary: {
-        main: "#2e7d32",
+        main: "#ff6f00",
       },
       secondary: {
-        main: "#ff6f00",
+        main: "#2e7d32",
       },
       background: {
         default: "#f4fbf4",
@@ -96,18 +96,18 @@ export const themeOptions: Record<string, ThemeOptions> = {
     },
     typography: {
       ...typography,
-      h1: { color: "#2e7d32" },
-      h2: { color: "#2e7d32" },
+      h1: { color: "#ff6f00" },
+      h2: { color: "#ff6f00" },
     },
   },
   coffee: {
     palette: {
       mode: "light",
       primary: {
-        main: "#795548",
+        main: "#ffa000",
       },
       secondary: {
-        main: "#a1887f",
+        main: "#795548",
       },
       background: {
         default: "#faf7f5",
@@ -120,18 +120,18 @@ export const themeOptions: Record<string, ThemeOptions> = {
     },
     typography: {
       ...typography,
-      h1: { color: "#795548" },
-      h2: { color: "#795548" },
+      h1: { color: "#ffa000" },
+      h2: { color: "#ffa000" },
     },
   },
   lavender: {
     palette: {
       mode: "light",
       primary: {
-        main: "#673ab7",
+        main: "#f06292",
       },
       secondary: {
-        main: "#e040fb",
+        main: "#673ab7",
       },
       background: {
         default: "#fdf6ff",
@@ -144,18 +144,18 @@ export const themeOptions: Record<string, ThemeOptions> = {
     },
     typography: {
       ...typography,
-      h1: { color: "#673ab7" },
-      h2: { color: "#673ab7" },
+      h1: { color: "#f06292" },
+      h2: { color: "#f06292" },
     },
   },
   oliveMeadow: {
     palette: {
       mode: "light",
       primary: {
-        main: "#89986D",
+        main: "#d4956a",
       },
       secondary: {
-        main: "#8fa870",
+        main: "#89986D",
       },
       background: {
         default: "#fdfaf0",
@@ -168,8 +168,8 @@ export const themeOptions: Record<string, ThemeOptions> = {
     },
     typography: {
       ...typography,
-      h1: { color: "#89986D" },
-      h2: { color: "#89986D" },
+      h1: { color: "#d4956a" },
+      h2: { color: "#d4956a" },
     },
   },
 };
