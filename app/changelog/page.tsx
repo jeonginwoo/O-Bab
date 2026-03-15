@@ -27,9 +27,21 @@ type ChangelogEntry = {
 
 const changelog: ChangelogEntry[] = [
   {
+    version: "3.8.6",
+    date: "2026-03-15",
+    label: "최신",
+    changes: [
+      { type: "update", text: "룰렛 스핀 중 버튼 텍스트 — '돌아가는 중...' 제거, 최종 충전 퍼센트 표시로 변경" },
+      { type: "style", text: "룰렛 정렬·섞기 버튼 배경 블러 처리" },
+      { type: "style", text: "사다리타기·마블 룰렛 초기화 버튼 배경 블러 처리" },
+      { type: "style", text: "사다리타기·마블 룰렛 시작 버튼 색상을 테마 primary로 변경" },
+      { type: "fix", text: "테마별 시작 버튼 아이콘 색상 명시 — 밝은 테마 흰색, 어두운 테마(dark·ocean) 검은색" },
+      { type: "update", text: "게임 메뉴 순서 변경 — 마블 룰렛(2번)·음식추천(3번) 순으로 교체" },
+    ],
+  },
+  {
     version: "3.8.5",
     date: "2026-03-12",
-    label: "최신",
     changes: [
       { type: "style", text: "테마 primary/secondary 색상 역할 전환 — 강조색을 primary로 통일" },
       { type: "style", text: "전체 컴포넌트 primary/secondary 사용처 일괄 교체 (네비게이션, 룰렛, 사다리, 지도 등)" },

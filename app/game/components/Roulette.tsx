@@ -20,6 +20,7 @@ const Roulette = () => {
   const { participants, setParticipants } = useSharedParticipants();
   const [isSpinning, setIsSpinning] = useState(false);
   const [winningMenu, setWinningMenu] = useState<string | null>(null);
+  const [spinPower, setSpinPower] = useState<number | null>(null);
   const [powerGauge, setPowerGauge] = useState(0);
   const [isCharging, setIsCharging] = useState(false);
   const colors = useRef<string[]>([]);
@@ -161,10 +162,10 @@ const Roulette = () => {
       for (let i = 0; i < participants.length; i++) {
         const arc = (participants[i].multiplier / totalWeight) * 2 * Math.PI;
         if (winningAngleRad >= start && winningAngleRad < start + arc) {
-          setTimeout(
-            () => setWinningMenu(participants[i].name),
-            100
-          );
+          setTimeout(() => {
+            setWinningMenu(participants[i].name);
+            setSpinPower(null);
+          }, 100);
           break;
         }
         start += arc;
@@ -207,6 +208,7 @@ const Roulette = () => {
     const spinDuration = 1000 + (gauge / 100) * 2000;
 
     setWinningMenu(null);
+    setSpinPower(gauge);
     setIsSpinning(true);
     currentSpeed.current = baseSpeed;
     angle.current = 0;
@@ -370,7 +372,7 @@ const Roulette = () => {
             },
           }}
         >
-          {isSpinning ? "돌아가는 중..." : isCharging ? `${powerGauge}%` : "꾹 눌러서 돌리기"}
+          {isCharging ? `${powerGauge}%` : spinPower !== null ? `${Math.round(spinPower)}%` : "꾹 눌러서 돌리기"}
         </Button>
         <Box sx={{ position: "absolute", right: 0, display: "flex", flexDirection: "column", gap: 1 }}>
           <Tooltip title="가나다순 정렬" placement="left">
@@ -379,7 +381,7 @@ const Roulette = () => {
                 onClick={handleSort}
                 disabled={isSpinning}
                 color="primary"
-                sx={{ border: '1px solid', borderColor: 'divider' }}
+                sx={{ border: '1px solid', borderColor: 'divider', backdropFilter: 'blur(8px)', backgroundColor: 'rgba(128,128,128,0.15)' }}
               >
                 <SortByAlphaIcon />
               </IconButton>
@@ -391,7 +393,7 @@ const Roulette = () => {
                 onClick={handleShuffle}
                 disabled={isSpinning}
                 color="primary"
-                sx={{ border: '1px solid', borderColor: 'divider' }}
+                sx={{ border: '1px solid', borderColor: 'divider', backdropFilter: 'blur(8px)', backgroundColor: 'rgba(128,128,128,0.15)' }}
               >
                 <ShuffleIcon />
               </IconButton>

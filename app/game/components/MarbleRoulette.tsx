@@ -215,12 +215,12 @@ export default function MarbleRoulette() {
                   <IconButton
                     onClick={handleStart}
                     disabled={!isReady}
-                    color="success"
+                    color="primary"
                     size="small"
                     sx={{
-                      backgroundColor: 'success.main',
-                      color: 'success.contrastText',
-                      '&:hover': { backgroundColor: 'success.dark' },
+                      backgroundColor: 'primary.main',
+                      color: 'primary.contrastText',
+                      '&:hover': { backgroundColor: 'primary.dark' },
                       '&.Mui-disabled': { backgroundColor: 'action.disabledBackground' },
                     }}
                   >
@@ -233,7 +233,7 @@ export default function MarbleRoulette() {
                     disabled={!isReady}
                     color="primary"
                     size="small"
-                    sx={{ border: '1px solid', borderColor: 'divider' }}
+                    sx={{ border: '1px solid', borderColor: 'divider', backdropFilter: 'blur(8px)', backgroundColor: 'rgba(128,128,128,0.15)' }}
                   >
                     <RestartAltIcon />
                   </IconButton>

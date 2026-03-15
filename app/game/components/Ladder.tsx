@@ -328,11 +328,11 @@ const Ladder = () => {
             <IconButton
               onClick={handleTrace}
               disabled={gameState === "finished" || gameState === "tracing"}
-              color="success"
+              color="primary"
               sx={{
-                backgroundColor: theme.palette.success.main,
-                color: theme.palette.success.contrastText,
-                "&:hover": { backgroundColor: theme.palette.success.dark },
+                backgroundColor: theme.palette.primary.main,
+                color: theme.palette.primary.contrastText,
+                "&:hover": { backgroundColor: theme.palette.primary.dark },
               }}
             >
               <PlayArrowIcon />
@@ -343,7 +343,7 @@ const Ladder = () => {
               onClick={handleRetry}
               disabled={gameState === "tracing"}
               color="primary"
-              sx={{ border: '1px solid', borderColor: 'divider' }}
+              sx={{ border: '1px solid', borderColor: 'divider', backdropFilter: 'blur(8px)', backgroundColor: 'rgba(128,128,128,0.15)' }}
             >
               <RestartAltIcon />
             </IconButton>
@@ -426,11 +426,11 @@ const Ladder = () => {
             <IconButton
               onClick={handleTrace}
               disabled={gameState === "finished" || gameState === "tracing"}
-              color="success"
+              color="primary"
               sx={{
-                backgroundColor: theme.palette.success.main,
-                color: theme.palette.success.contrastText,
-                "&:hover": { backgroundColor: theme.palette.success.dark },
+                backgroundColor: theme.palette.primary.main,
+                color: theme.palette.primary.contrastText,
+                "&:hover": { backgroundColor: theme.palette.primary.dark },
               }}
             >
               <PlayArrowIcon />
@@ -441,7 +441,7 @@ const Ladder = () => {
               onClick={handleRetry}
               disabled={gameState === "tracing"}
               color="primary"
-              sx={{ border: '1px solid', borderColor: 'divider' }}
+              sx={{ border: '1px solid', borderColor: 'divider', backdropFilter: 'blur(8px)', backgroundColor: 'rgba(128,128,128,0.15)' }}
             >
               <RestartAltIcon />
             </IconButton>

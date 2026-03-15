@@ -17,6 +17,7 @@ export const themeOptions: Record<string, ThemeOptions> = {
       mode: "dark",
       primary: {
         main: "#64FFDA",
+        contrastText: "#000000",
       },
       secondary: {
         main: "#0A192F",
@@ -37,6 +38,7 @@ export const themeOptions: Record<string, ThemeOptions> = {
       mode: "dark",
       primary: {
         main: "#00e5ff",
+        contrastText: "#000000",
       },
       secondary: {
         main: "#002b5c",
@@ -61,6 +63,7 @@ export const themeOptions: Record<string, ThemeOptions> = {
       mode: "light",
       primary: {
         main: "#9c27b0",
+        contrastText: "#ffffff",
       },
       secondary: {
         main: "#1976d2",
@@ -85,6 +88,7 @@ export const themeOptions: Record<string, ThemeOptions> = {
       mode: "light",
       primary: {
         main: "#ff6f00",
+        contrastText: "#ffffff",
       },
       secondary: {
         main: "#2e7d32",
@@ -105,6 +109,7 @@ export const themeOptions: Record<string, ThemeOptions> = {
       mode: "light",
       primary: {
         main: "#ffa000",
+        contrastText: "#ffffff",
       },
       secondary: {
         main: "#795548",
@@ -129,6 +134,7 @@ export const themeOptions: Record<string, ThemeOptions> = {
       mode: "light",
       primary: {
         main: "#f06292",
+        contrastText: "#ffffff",
       },
       secondary: {
         main: "#673ab7",
@@ -153,6 +159,7 @@ export const themeOptions: Record<string, ThemeOptions> = {
       mode: "light",
       primary: {
         main: "#d4956a",
+        contrastText: "#ffffff",
       },
       secondary: {
         main: "#89986D",

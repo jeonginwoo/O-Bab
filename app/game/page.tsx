@@ -85,8 +85,8 @@ export default function GamePage() {
                 >
                   <MenuItem value={0}>룰렛</MenuItem>
                   <MenuItem value={1}>사다리타기</MenuItem>
-                  <MenuItem value={2}>음식추천</MenuItem>
-                  <MenuItem value={3}>마블 룰렛</MenuItem>
+                  <MenuItem value={2}>마블 룰렛</MenuItem>
+                  <MenuItem value={3}>음식추천</MenuItem>
                 </Select>
               </FormControl>
             </Box>
