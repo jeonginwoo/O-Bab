@@ -62,13 +62,45 @@ export default function ParticipantList({
 
   const inner = (
     <>
+      {/* Optional add-participant input */}
+      {showInput && (
+        <TextField
+          fullWidth
+          placeholder={inputPlaceholder}
+          variant="outlined"
+          value={newName}
+          onChange={(e) => setNewName(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && handleAdd()}
+          size="small"
+          color="primary"
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton
+                  onClick={handleAdd}
+                  edge="end"
+                  color="primary"
+                  disabled={!newName.trim()}
+                  size="small"
+                >
+                  <AddIcon fontSize="small" />
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
+          sx={{ mb: 2, maxWidth: 320 }}
+        />
+      )}
+
+      <Divider sx={{ mb: 2 }} />
+
       {/* Header: title + 전체배수 controls */}
       <Box
         sx={{
           display: "flex",
           justifyContent: "space-between",
           alignItems: "center",
-          mb: showInput ? 2 : 1,
+          mb: 1,
         }}
       >
         <Typography variant="subtitle1" fontWeight="medium">
@@ -117,36 +149,6 @@ export default function ParticipantList({
           </Typography>
         </Box>
       </Box>
-
-      {/* Optional add-participant input */}
-      {showInput && (
-        <TextField
-          fullWidth
-          placeholder={inputPlaceholder}
-          variant="outlined"
-          value={newName}
-          onChange={(e) => setNewName(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && handleAdd()}
-          size="small"
-          color="primary"
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconButton
-                  onClick={handleAdd}
-                  edge="end"
-                  color="primary"
-                  disabled={!newName.trim()}
-                  size="small"
-                >
-                  <AddIcon fontSize="small" />
-                </IconButton>
-              </InputAdornment>
-            ),
-          }}
-          sx={{ mb: 2 }}
-        />
-      )}
 
       {/* Participant chips */}
       <Box

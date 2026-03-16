@@ -27,9 +27,20 @@ type ChangelogEntry = {
 
 const changelog: ChangelogEntry[] = [
   {
+    version: "3.8.7",
+    date: "2026-03-16",
+    label: "최신",
+    changes: [
+      { type: "style", text: "룰렛 정렬·섞기 버튼 및 사다리타기·마블 룰렛 초기화 버튼 — 회색 배경색 제거, 블러 효과만 유지" },
+      { type: "update", text: "참가자 이름 입력란 위치 변경 — 참가자 목록 상단으로 이동" },
+      { type: "style", text: "참가자 이름 입력란 최대 너비 320px 적용 및 하단 구분선 추가" },
+      { type: "fix", text: "룰렛 최소 참가자 경고 문구 수정 — '메뉴' → '참가자'" },
+      { type: "style", text: "마블 룰렛 참가자 목록 위 구분선 제거" },
+    ],
+  },
+  {
     version: "3.8.6",
     date: "2026-03-15",
-    label: "최신",
     changes: [
       { type: "update", text: "룰렛 스핀 중 버튼 텍스트 — '돌아가는 중...' 제거, 최종 충전 퍼센트 표시로 변경" },
       { type: "style", text: "룰렛 정렬·섞기 버튼 배경 블러 처리" },

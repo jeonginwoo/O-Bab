@@ -343,7 +343,7 @@ const Ladder = () => {
               onClick={handleRetry}
               disabled={gameState === "tracing"}
               color="primary"
-              sx={{ border: '1px solid', borderColor: 'divider', backdropFilter: 'blur(8px)', backgroundColor: 'rgba(128,128,128,0.15)' }}
+              sx={{ border: '1px solid', borderColor: 'divider', backdropFilter: 'blur(8px)' }}
             >
               <RestartAltIcon />
             </IconButton>
@@ -441,7 +441,7 @@ const Ladder = () => {
               onClick={handleRetry}
               disabled={gameState === "tracing"}
               color="primary"
-              sx={{ border: '1px solid', borderColor: 'divider', backdropFilter: 'blur(8px)', backgroundColor: 'rgba(128,128,128,0.15)' }}
+              sx={{ border: '1px solid', borderColor: 'divider', backdropFilter: 'blur(8px)' }}
             >
               <RestartAltIcon />
             </IconButton>

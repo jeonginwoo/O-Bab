@@ -246,7 +246,7 @@ const Roulette = () => {
 
   const handleChargeStart = () => {
     if (participants.length <= 1) {
-      alert("메뉴는 최소 2개 이상이어야 합니다.");
+      alert("참가자는 최소 2명 이상이어야 합니다.");
       return;
     }
     if (isSpinning) return;
@@ -381,7 +381,7 @@ const Roulette = () => {
                 onClick={handleSort}
                 disabled={isSpinning}
                 color="primary"
-                sx={{ border: '1px solid', borderColor: 'divider', backdropFilter: 'blur(8px)', backgroundColor: 'rgba(128,128,128,0.15)' }}
+                sx={{ border: '1px solid', borderColor: 'divider', backdropFilter: 'blur(8px)' }}
               >
                 <SortByAlphaIcon />
               </IconButton>
@@ -393,7 +393,7 @@ const Roulette = () => {
                 onClick={handleShuffle}
                 disabled={isSpinning}
                 color="primary"
-                sx={{ border: '1px solid', borderColor: 'divider', backdropFilter: 'blur(8px)', backgroundColor: 'rgba(128,128,128,0.15)' }}
+                sx={{ border: '1px solid', borderColor: 'divider', backdropFilter: 'blur(8px)' }}
               >
                 <ShuffleIcon />
               </IconButton>

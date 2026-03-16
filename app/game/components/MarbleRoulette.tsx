@@ -233,7 +233,7 @@ export default function MarbleRoulette() {
                     disabled={!isReady}
                     color="primary"
                     size="small"
-                    sx={{ border: '1px solid', borderColor: 'divider', backdropFilter: 'blur(8px)', backgroundColor: 'rgba(128,128,128,0.15)' }}
+                    sx={{ border: '1px solid', borderColor: 'divider', backdropFilter: 'blur(8px)' }}
                   >
                     <RestartAltIcon />
                   </IconButton>
@@ -287,8 +287,6 @@ export default function MarbleRoulette() {
                 />
               </Box>
             </Box>
-
-            <Divider />
 
             {/* Participant list */}
             <ParticipantList
