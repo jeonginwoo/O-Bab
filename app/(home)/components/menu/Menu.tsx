@@ -13,8 +13,13 @@ import {
   ImageListItem,
   Modal,
   IconButton,
+  Tooltip,
+  Popover,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import DontoMenuView from "./DontoMenuView";
 import { classifyMenuImages, type MediaImage } from "../../utils/menuImageDetector";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -43,12 +48,15 @@ interface ApiResponse {
 }
 
 function Menu({ title, apiUrl }: { title:string; apiUrl: string }) {
-  const [menu, setMenu] = useState<MenuItem | null>(null);
+  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+  const [menuIndex, setMenuIndex] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [openModal, setOpenModal] = useState(false);
   const [initialSlide, setInitialSlide] = useState(0);
   const [modalImageStyle, setModalImageStyle] = useState({});
+  const [calendarAnchor, setCalendarAnchor] = useState<HTMLElement | null>(null);
+  const [calendarDate, setCalendarDate] = useState(() => new Date());
 
   useEffect(() => {
     if (!openModal) return;
@@ -77,9 +85,10 @@ function Menu({ title, apiUrl }: { title:string; apiUrl: string }) {
         const proxyUrl = `/api/proxy?url=${encodeURIComponent(apiUrl)}`;
         const response = await axios.get(proxyUrl);
         const data: ApiResponse = response.data;
-        const menuItem = data.items.find((item) => !item.pinned);
-        if (menuItem) {
-          setMenu(menuItem);
+        const items = data.items.filter((item) => !item.pinned);
+        if (items.length > 0) {
+          setMenuItems(items);
+          setMenuIndex(0);
         } else {
           setError("No available menu found.");
         }
@@ -94,6 +103,25 @@ function Menu({ title, apiUrl }: { title:string; apiUrl: string }) {
     }
     fetchData();
   }, [apiUrl]);
+
+  const menu = menuItems.length > 0 ? menuItems[menuIndex] : null;
+  const isLatest = menuIndex === 0;
+  const hasPrev = menuIndex < menuItems.length - 1;
+  const hasNext = menuIndex > 0;
+
+  // 메뉴 날짜 → 인덱스 매핑
+  const menuDateMap = React.useMemo(() => {
+    const map = new Map<string, number>();
+    menuItems.forEach((item, idx) => {
+      const ts = item.updated_at || item.created_at;
+      if (ts) {
+        const d = new Date(ts);
+        const key = `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
+        if (!map.has(key)) map.set(key, idx);
+      }
+    });
+    return map;
+  }, [menuItems]);
 
   const allImages: string[] = React.useMemo(() => {
     if (!menu) return [];
@@ -252,32 +280,210 @@ function Menu({ title, apiUrl }: { title:string; apiUrl: string }) {
       }}
     >
       <CardContent sx={{ flexGrow: 1 }}>
-        <Typography
-          variant="h5"
-          component="div"
-          align="center"
-          fontWeight="bold"
-          gutterBottom
-          sx={{
-            color: 'primary.main',
-            letterSpacing: '0.04em',
-            position: 'relative',
-            pb: 0.5,
-            '&::after': {
-              content: '""',
+        <Box sx={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          position: 'relative',
+          pb: 0.5,
+          '&::after': {
+            content: '""',
+            position: 'absolute',
+            bottom: 0,
+            left: '50%',
+            transform: 'translateX(-50%)',
+            width: '40%',
+            height: '2px',
+            borderRadius: '2px',
+            background: (t: any) => `linear-gradient(90deg, transparent, ${t.palette.primary.main}, transparent)`,
+          },
+        }}>
+          {/* 이전 메뉴 (과거) */}
+          <IconButton
+            size="small"
+            onClick={() => setMenuIndex((i) => i + 1)}
+            disabled={!hasPrev}
+            sx={{
               position: 'absolute',
-              bottom: 0,
-              left: '50%',
-              transform: 'translateX(-50%)',
-              width: '40%',
-              height: '2px',
-              borderRadius: '2px',
-              background: 'linear-gradient(90deg, transparent, currentColor, transparent)',
-            },
-          }}
-        >
-          {title}
-        </Typography>
+              left: 0,
+              top: '50%',
+              transform: 'translateY(-50%)',
+              opacity: hasPrev ? 1 : 0,
+              pointerEvents: hasPrev ? 'auto' : 'none',
+              transition: 'opacity 0.2s',
+            }}
+          >
+            <ChevronLeftIcon fontSize="small" />
+          </IconButton>
+
+          <Typography
+            variant="h5"
+            component="div"
+            align="center"
+            fontWeight="bold"
+            onClick={(e) => {
+              setCalendarAnchor(e.currentTarget);
+              if (menu) {
+                const ts = menu.updated_at || menu.created_at;
+                if (ts) setCalendarDate(new Date(ts));
+              }
+            }}
+            sx={{
+              color: 'primary.main',
+              letterSpacing: '0.04em',
+              cursor: 'pointer',
+              userSelect: 'none',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 0.5,
+              '&:hover': { opacity: 0.7 },
+              transition: 'opacity 0.2s',
+            }}
+          >
+            {title}
+            <CalendarMonthIcon sx={{ fontSize: '1rem', opacity: 0.5 }} />
+          </Typography>
+
+          {/* 달력 팝오버 */}
+          <Popover
+            open={Boolean(calendarAnchor)}
+            anchorEl={calendarAnchor}
+            onClose={() => setCalendarAnchor(null)}
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+            transformOrigin={{ vertical: 'top', horizontal: 'center' }}
+            slotProps={{ paper: {
+              sx: {
+                p: 1.5,
+                borderRadius: 2,
+                minWidth: 260,
+              },
+            }}}
+          >
+            {(() => {
+              const year = calendarDate.getFullYear();
+              const month = calendarDate.getMonth();
+              const firstDay = new Date(year, month, 1).getDay();
+              const daysInMonth = new Date(year, month + 1, 0).getDate();
+              const today = new Date();
+              const todayKey = `${today.getFullYear()}-${today.getMonth() + 1}-${today.getDate()}`;
+              const selectedTs = menu?.updated_at || menu?.created_at;
+              const selectedDate = selectedTs ? new Date(selectedTs) : null;
+              const selectedKey = selectedDate
+                ? `${selectedDate.getFullYear()}-${selectedDate.getMonth() + 1}-${selectedDate.getDate()}`
+                : '';
+
+              const days: (number | null)[] = [];
+              for (let i = 0; i < firstDay; i++) days.push(null);
+              for (let d = 1; d <= daysInMonth; d++) days.push(d);
+
+              return (
+                <Box>
+                  {/* 월 네비게이션 */}
+                  <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 1 }}>
+                    <IconButton size="small" onClick={() => setCalendarDate(new Date(year, month - 1, 1))}>
+                      <ChevronLeftIcon fontSize="small" />
+                    </IconButton>
+                    <Typography variant="subtitle2" fontWeight="bold">
+                      {year}년 {month + 1}월
+                    </Typography>
+                    <IconButton size="small" onClick={() => setCalendarDate(new Date(year, month + 1, 1))}>
+                      <ChevronRightIcon fontSize="small" />
+                    </IconButton>
+                  </Box>
+
+                  {/* 요일 헤더 */}
+                  <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 0.25, textAlign: 'center', mb: 0.5 }}>
+                    {['일','월','화','수','목','금','토'].map((d) => (
+                      <Typography key={d} variant="caption" color="text.secondary" sx={{ fontWeight: 600, fontSize: '0.65rem' }}>
+                        {d}
+                      </Typography>
+                    ))}
+                  </Box>
+
+                  {/* 날짜 그리드 */}
+                  <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 0.25 }}>
+                    {days.map((day, i) => {
+                      if (day === null) return <Box key={`e-${i}`} />;
+                      const dateKey = `${year}-${month + 1}-${day}`;
+                      const hasMenu = menuDateMap.has(dateKey);
+                      const isSelected = dateKey === selectedKey;
+                      const isToday = dateKey === todayKey;
+
+                      return (
+                        <Box
+                          key={day}
+                          onClick={() => {
+                            if (hasMenu) {
+                              setMenuIndex(menuDateMap.get(dateKey)!);
+                              setCalendarAnchor(null);
+                            }
+                          }}
+                          sx={{
+                            width: 32,
+                            height: 32,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            mx: 'auto',
+                            borderRadius: '50%',
+                            fontSize: '0.78rem',
+                            cursor: hasMenu ? 'pointer' : 'default',
+                            fontWeight: isSelected ? 700 : isToday ? 600 : 400,
+                            color: hasMenu
+                              ? isSelected ? 'primary.contrastText' : 'primary.main'
+                              : 'text.disabled',
+                            backgroundColor: isSelected
+                              ? 'primary.main'
+                              : isToday
+                                ? (t: any) => `${t.palette.primary.main}15`
+                                : 'transparent',
+                            border: isToday && !isSelected ? (t: any) => `1px solid ${t.palette.primary.main}44` : 'none',
+                            '&:hover': hasMenu && !isSelected ? {
+                              backgroundColor: (t: any) => `${t.palette.primary.main}22`,
+                            } : {},
+                            transition: 'background-color 0.15s',
+                          }}
+                        >
+                          {day}
+                        </Box>
+                      );
+                    })}
+                  </Box>
+                </Box>
+              );
+            })()}
+          </Popover>
+
+          {/* 다음 메뉴 (최신 방향) + 최근 버튼 */}
+          {!isLatest && (
+            <Box sx={{ position: 'absolute', right: 0, top: '50%', transform: 'translateY(-50%)', display: 'flex', alignItems: 'center', gap: 0.25 }}>
+              <IconButton
+                size="small"
+                onClick={() => setMenuIndex(0)}
+                sx={{
+                  fontSize: '0.65rem',
+                  borderRadius: '12px',
+                  px: 0.75,
+                  py: 0.15,
+                  color: 'primary.main',
+                  border: (t) => `1px solid ${t.palette.primary.main}44`,
+                  '&:hover': {
+                    backgroundColor: (t) => `${t.palette.primary.main}11`,
+                  },
+                }}
+              >
+                최근
+              </IconButton>
+              <IconButton
+                size="small"
+                onClick={() => setMenuIndex((i) => i - 1)}
+              >
+                <ChevronRightIcon fontSize="small" />
+              </IconButton>
+            </Box>
+          )}
+        </Box>
+
         {loading && (
           <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", my: 4, gap: 2 }}>
             <CircularProgress color="primary" size={36} thickness={3.5} />

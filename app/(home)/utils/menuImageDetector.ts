@@ -156,13 +156,16 @@ function classifyByConfig(
     const menuIndices = imageMedia
       .map((img, i) => ({ img, i }))
       .filter(({ img }) => getAvgBrightness(img.avg || '#ffffff') <= config.menuBrightnessMax!);
-    const finalMenuIndices = (menuIndices.length >= 3 && config.dinnerIndex != null)
-      ? menuIndices.filter(({ i }) => i !== config.dinnerIndex)
+    const excludedIndex = (menuIndices.length >= 3 && config.dinnerIndex != null)
+      ? config.dinnerIndex
+      : -1;
+    const finalMenuIndices = excludedIndex >= 0
+      ? menuIndices.filter(({ i }) => i !== excludedIndex)
       : menuIndices;
     const menuIndexSet = new Set(finalMenuIndices.map(({ i }) => i));
     return {
       menuImages: finalMenuIndices.slice(0, config.count).map(({ img }) => img),
-      foodImages: imageMedia.filter((_, i) => !menuIndexSet.has(i)),
+      foodImages: imageMedia.filter((_, i) => !menuIndexSet.has(i) && i !== excludedIndex),
     };
   }
 

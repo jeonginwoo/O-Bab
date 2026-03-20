@@ -27,9 +27,18 @@ type ChangelogEntry = {
 
 const changelog: ChangelogEntry[] = [
   {
-    version: "3.8.9",
+    version: "3.9.0",
     date: "2026-03-20",
     label: "최신",
+    changes: [
+      { type: "feat", text: "메뉴 날짜 네비게이션 — 좌우 화살표로 이전/다음 메뉴 이동, [최근] 버튼으로 최신 메뉴 복귀" },
+      { type: "feat", text: "달력 팝오버 — 식당명 클릭 시 달력에서 메뉴 올라온 날짜 선택 가능 (메뉴 없는 날은 비활성)" },
+      { type: "fix", text: "돈토 메뉴 이미지 3개일 때 저녁 메뉴가 음식 이미지에 포함되던 문제 수정" },
+    ],
+  },
+  {
+    version: "3.8.9",
+    date: "2026-03-20",
     changes: [
       { type: "update", text: "메뉴 이미지 분류 로직을 menuImageDetector로 통합 — 자동 감지와 폴백 설정을 한 곳에서 관리" },
     ],
