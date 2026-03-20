@@ -127,6 +127,89 @@ export function detectMenuImages(
   return { menuImages, foodImages };
 }
 
+// 식당별 메뉴 이미지 설정 (폴백용 - 자동 감지 실패 시 사용)
+const MENU_IMAGE_CONFIG: Record<string, {
+  position?: 'first' | 'last';
+  count?: number;
+  indices?: number[];
+  exclude?: number[];
+  menuBrightnessMax?: number;
+  dinnerIndex?: number;
+}> = {
+  돈토: { menuBrightnessMax: 100, dinnerIndex: 1, position: 'first', count: 2 },
+  윤스: { position: 'first', count: 1 },
+};
+
+/**
+ * 설정 기반 폴백으로 메뉴/음식 이미지를 분류
+ */
+function classifyByConfig(
+  imageMedia: MediaImage[],
+  title: string,
+): { menuImages: MediaImage[]; foodImages: MediaImage[] } {
+  const config = MENU_IMAGE_CONFIG[title];
+  if (!config) {
+    return { menuImages: [], foodImages: imageMedia };
+  }
+
+  if (config.menuBrightnessMax != null) {
+    const menuIndices = imageMedia
+      .map((img, i) => ({ img, i }))
+      .filter(({ img }) => getAvgBrightness(img.avg || '#ffffff') <= config.menuBrightnessMax!);
+    const finalMenuIndices = (menuIndices.length >= 3 && config.dinnerIndex != null)
+      ? menuIndices.filter(({ i }) => i !== config.dinnerIndex)
+      : menuIndices;
+    const menuIndexSet = new Set(finalMenuIndices.map(({ i }) => i));
+    return {
+      menuImages: finalMenuIndices.slice(0, config.count).map(({ img }) => img),
+      foodImages: imageMedia.filter((_, i) => !menuIndexSet.has(i)),
+    };
+  }
+
+  const filtered = config.exclude
+    ? imageMedia.filter((_, i) => !config.exclude!.includes(i))
+    : imageMedia;
+
+  if (config.indices) {
+    return {
+      menuImages: config.indices.map((i) => filtered[i]).filter(Boolean),
+      foodImages: filtered.filter((_, i) => !config.indices!.includes(i)),
+    };
+  }
+  if (config.position === 'first') {
+    return {
+      menuImages: filtered.slice(0, config.count),
+      foodImages: filtered.slice(config.count),
+    };
+  }
+  if (config.position === 'last') {
+    const count = config.count ?? 1;
+    return {
+      menuImages: filtered.slice(-count),
+      foodImages: filtered.slice(0, -count),
+    };
+  }
+  return { menuImages: filtered, foodImages: [] };
+}
+
+/**
+ * 메뉴/음식 이미지를 자동 감지 → 폴백 순서로 분류
+ * 
+ * 1단계: detectMenuImages로 자동 감지
+ * 2단계: 실패 시 MENU_IMAGE_CONFIG 설정 기반 폴백
+ */
+export function classifyMenuImages(
+  images: MediaImage[],
+  title: string,
+): { menuImages: MediaImage[]; foodImages: MediaImage[] } {
+  if (images.length === 0) return { menuImages: [], foodImages: [] };
+
+  const detected = detectMenuImages(images);
+  if (detected) return detected;
+
+  return classifyByConfig(images, title);
+}
+
 /**
  * 디버깅용: 각 이미지의 점수를 계산하여 반환
  */
