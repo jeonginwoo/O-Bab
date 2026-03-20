@@ -27,9 +27,17 @@ type ChangelogEntry = {
 
 const changelog: ChangelogEntry[] = [
   {
+    version: "3.8.8",
+    date: "2026-03-20",
+    label: "최신",
+    changes: [
+      { type: "update", text: "돈토 메뉴 이미지 분류 개선 — 평균 색상 밝기 기반으로 메뉴판/음식 사진 자동 구분" },
+      { type: "feat", text: "메뉴 이미지가 3개(점심·저녁·내일)일 때만 저녁 메뉴 제외, 2개일 때는 모두 표시" },
+    ],
+  },
+  {
     version: "3.8.7",
     date: "2026-03-16",
-    label: "최신",
     changes: [
       { type: "style", text: "룰렛 정렬·섞기 버튼 및 사다리타기·마블 룰렛 초기화 버튼 — 회색 배경색 제거, 블러 효과만 유지" },
       { type: "update", text: "참가자 이름 입력란 위치 변경 — 참가자 목록 상단으로 이동" },

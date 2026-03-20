@@ -27,6 +27,17 @@ interface ScoredImage {
 }
 
 /**
+ * 이미지의 평균 색상에서 밝기를 계산 (0~255)
+ */
+export function getAvgBrightness(avgColor: string): number {
+  const hex = avgColor.replace('#', '');
+  const r = parseInt(hex.substring(0, 2), 16);
+  const g = parseInt(hex.substring(2, 4), 16);
+  const b = parseInt(hex.substring(4, 6), 16);
+  return (r + g + b) / 3;
+}
+
+/**
  * 이미지가 메뉴판일 가능성을 점수로 계산 (0~100)
  * 높을수록 메뉴판일 가능성 높음
  */

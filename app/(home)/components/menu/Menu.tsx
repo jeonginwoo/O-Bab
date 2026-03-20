@@ -16,7 +16,7 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import DontoMenuView from "./DontoMenuView";
-import { detectMenuImages, type MediaImage } from "../../utils/menuImageDetector";
+import { detectMenuImages, getAvgBrightness, type MediaImage } from "../../utils/menuImageDetector";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, Keyboard } from "swiper/modules";
 
@@ -30,8 +30,10 @@ const MENU_IMAGE_CONFIG: Record<string, {
   count?: number;              // 메뉴판 이미지 개수
   indices?: number[];          // 사용할 메뉴판 이미지 인덱스 (명시적 지정)
   exclude?: number[];          // 제외할 이미지 인덱스
+  menuBrightnessMax?: number;  // 이 밝기 이하면 메뉴 이미지로 판단
+  dinnerIndex?: number;        // 메뉴 이미지가 3개일 때 제외할 인덱스 (저녁 메뉴)
 }> = {
-  돈토: { exclude: [1], position: 'first', count: 2 },  // 1=저녁메뉴 제외, 나머지 처음 2개가 메뉴판
+  돈토: { menuBrightnessMax: 100, dinnerIndex: 1, position: 'first', count: 2 },  // 어두운 이미지=메뉴판, 메뉴 3개면 1=저녁메뉴 제외
   윤스: { position: 'first', count: 1 },
 };
 
@@ -124,21 +126,49 @@ function Menu({ title, apiUrl }: { title:string; apiUrl: string }) {
       // 폴백: 설정 사용
       const config = MENU_IMAGE_CONFIG[title];
       if (config) {
-        const filtered = config.exclude
-          ? imageMedia.filter((_, i) => !config.exclude!.includes(i))
-          : imageMedia;
-        if (config.indices) {
-          menuImages = config.indices.map((i) => filtered[i]).filter(Boolean);
-          foodImages = filtered.filter((_, i) => !config.indices!.includes(i));
-        } else if (config.position === 'first') {
-          menuImages = filtered.slice(0, config.count);
-          foodImages = filtered.slice(config.count);
-        } else if (config.position === 'last') {
-          menuImages = filtered.slice(-(config.count ?? 1));
-          foodImages = filtered.slice(0, -(config.count ?? 1));
+        let filtered: Media[];
+        if (config.menuBrightnessMax != null) {
+          // 밝기 기반으로 메뉴/음식 이미지 분류
+          const menuIndices = imageMedia
+            .map((img, i) => ({ img, i }))
+            .filter(({ img }) => getAvgBrightness(img.avg || '#ffffff') <= config.menuBrightnessMax!);
+          // 메뉴 이미지가 3개면 저녁 메뉴(dinnerIndex) 제외
+          const finalMenuIndices = (menuIndices.length >= 3 && config.dinnerIndex != null)
+            ? menuIndices.filter(({ i }) => i !== config.dinnerIndex)
+            : menuIndices;
+          const menuIndexSet = new Set(finalMenuIndices.map(({ i }) => i));
+          menuImages = finalMenuIndices.slice(0, config.count).map(({ img }) => img);
+          foodImages = imageMedia.filter((_, i) => !menuIndexSet.has(i));
+        } else if (config.exclude) {
+          filtered = imageMedia.filter((_, i) => !config.exclude!.includes(i));
+          if (config.indices) {
+            menuImages = config.indices.map((i) => filtered[i]).filter(Boolean);
+            foodImages = filtered.filter((_, i) => !config.indices!.includes(i));
+          } else if (config.position === 'first') {
+            menuImages = filtered.slice(0, config.count);
+            foodImages = filtered.slice(config.count);
+          } else if (config.position === 'last') {
+            menuImages = filtered.slice(-(config.count ?? 1));
+            foodImages = filtered.slice(0, -(config.count ?? 1));
+          } else {
+            menuImages = filtered;
+            foodImages = [];
+          }
         } else {
-          menuImages = filtered;
-          foodImages = [];
+          filtered = imageMedia;
+          if (config.indices) {
+            menuImages = config.indices.map((i) => filtered[i]).filter(Boolean);
+            foodImages = filtered.filter((_, i) => !config.indices!.includes(i));
+          } else if (config.position === 'first') {
+            menuImages = filtered.slice(0, config.count);
+            foodImages = filtered.slice(config.count);
+          } else if (config.position === 'last') {
+            menuImages = filtered.slice(-(config.count ?? 1));
+            foodImages = filtered.slice(0, -(config.count ?? 1));
+          } else {
+            menuImages = filtered;
+            foodImages = [];
+          }
         }
       } else {
         menuImages = [];
@@ -165,6 +195,15 @@ function Menu({ title, apiUrl }: { title:string; apiUrl: string }) {
     if (detected) return detected.menuImages;
     const config = MENU_IMAGE_CONFIG[title];
     if (config) {
+      if (config.menuBrightnessMax != null) {
+        const menuCandidates = imageMedia
+          .map((img, i) => ({ img, i }))
+          .filter(({ img }) => getAvgBrightness(img.avg || '#ffffff') <= config.menuBrightnessMax!);
+        const finalCandidates = (menuCandidates.length >= 3 && config.dinnerIndex != null)
+          ? menuCandidates.filter(({ i }) => i !== config.dinnerIndex)
+          : menuCandidates;
+        return finalCandidates.slice(0, config.count).map(({ img }) => img);
+      }
       const filtered = config.exclude
         ? imageMedia.filter((_, i) => !config.exclude!.includes(i))
         : imageMedia;
