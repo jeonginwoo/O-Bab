@@ -6,6 +6,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import ViewListIcon from '@mui/icons-material/ViewList';
 import ViewModuleIcon from '@mui/icons-material/ViewModule';
 import CloseIcon from '@mui/icons-material/Close';
+import { useTheme } from '@mui/material/styles';
 import { useNaverMap } from '../../hooks/useNaverMap';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, Keyboard } from 'swiper/modules';
@@ -15,32 +16,41 @@ import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 
 interface Restaurant {
-  id: number;
+  place_id: string;
   name: string;
-  address: string;
-  menu: string;
+  address?: string;
+  category?: string;
   mapUrl?: string;
+  phone?: string;
+  score?: string;
+  reviewsCount?: string;
+  conveniences?: string[];
+  microReviews?: string[];
 }
 
 interface RestaurantMarker {
-  restaurantId: number;
+  restaurantId: string;
   marker: naver.maps.Marker;
   infoWindow: naver.maps.InfoWindow;
   originalPosition: naver.maps.LatLng;
+  contentEl: HTMLDivElement;
 }
 
 const sampleRestaurants: Restaurant[] = [
-  { id: 1, name: '고기부자집', address: '서울 금천구 가산디지털1로 168 A동 B119호', menu: '육류,고기요리', mapUrl: 'https://map.naver.com/p/entry/place/1670660666?c=15.00,0,0,0,dh&isCorrectAnswer=true&placePath=/home?from=map&fromPanelNum=1&additionalHeight=76&timestamp=202603091320&locale=ko&svcName=map_pcv5' },
-  { id: 2, name: '양원집 가산디지털단지점', address: '서울 금천구 가산디지털1로 168 우림라이온스밸리 A동 207호', menu: '양갈비', mapUrl: "https://map.naver.com/p/entry/place/1005368159?c=15.00,0,0,0,dh&isCorrectAnswer=true&placePath=/home?from=map&fromPanelNum=1&additionalHeight=76&timestamp=202603091326&locale=ko&svcName=map_pcv5" },
-  { id: 3, name: '서울식당', address: '서울 금천구 가산디지털1로 168 우림라이온스밸리1차 A동 2층', menu: '한식', mapUrl: "https://map.naver.com/p/entry/place/1286557957?c=15.00,0,0,0,dh&isCorrectAnswer=true&placePath=/home?from=map&fromPanelNum=1&additionalHeight=76&timestamp=202603091347&locale=ko&svcName=map_pcv5" },
-  { id: 4, name: '양은이네 가산직영점', address: '서울 금천구 가산디지털1로 168 우림라이온스밸리 A동 2층 205호', menu: '한식', mapUrl: "https://map.naver.com/p/entry/place/1391481694?c=15.00,0,0,0,dh&isCorrectAnswer=true&placePath=/home?from=map&fromPanelNum=1&additionalHeight=76&timestamp=202603091348&locale=ko&svcName=map_pcv5" },
-  { id: 5, name: '가산 마포갈매기', address: '서울 금천구 벚꽃로 298 대륭포스트타워 6차 B1층(지하) 104호', menu: '육류,고기요리', mapUrl: "https://map.naver.com/p/entry/place/1403999050?c=15.00,0,0,0,dh&isCorrectAnswer=true&placePath=/home?from=map&fromPanelNum=1&additionalHeight=76&timestamp=202603091349&locale=ko&svcName=map_pcv5" },
-  { id: 6, name: '여장군 가산점', address: '서울 금천구 가산디지털1로 142 더스카이밸리 2층 220호', menu: '육류,고기요리', mapUrl: "https://map.naver.com/p/entry/place/1733685335?c=15.00,0,0,0,dh&isCorrectAnswer=true&placePath=/home?from=map&fromPanelNum=1&additionalHeight=76&timestamp=202603091349&locale=ko&svcName=map_pcv5" },
-  { id: 7, name: '오리오리 가산디지털단지점', address: '서울 금천구 가산디지털1로 186 제이플라츠 지하1층 B130호', menu: '오리요리', mapUrl: "https://map.naver.com/p/entry/place/1508800766?c=16.00,0,0,0,dh&placePath=/home?from=map&fromPanelNum=1&additionalHeight=76&timestamp=202603091350&locale=ko&svcName=map_pcv5" },
-  { id: 8, name: '민락양꼬치👍', address: '경기 의정부시 오목로225번길 16-4 1층', menu: '양꼬치', mapUrl: "https://map.naver.com/p/entry/place/1887883027?c=15.00,0,0,0,dh&placePath=/home?from=map&fromPanelNum=1&additionalHeight=76&timestamp=202603091351&locale=ko&svcName=map_pcv5" },
-  { id: 9, name: '더낙원램양꼬치', address: '서울 관악구 남부순환로151길 78 1층', menu: '양꼬치', mapUrl: "https://map.naver.com/p/entry/place/1683527716?c=15.00,0,0,0,dh&placePath=/home?from=map&fromPanelNum=1&additionalHeight=76&timestamp=202603091352&locale=ko&svcName=map_pcv5" },
-  { id: 10, name: '먹거리곱창', address: '서울 성북구 정릉로21길 71 1층', menu: '곱창,막창,양', mapUrl: "https://map.naver.com/p/entry/place/1278152415?c=15.00,0,0,0,dh&placePath=/home?from=map&fromPanelNum=1&additionalHeight=76&timestamp=202603091352&locale=ko&svcName=map_pcv5" },
-  { id: 11, name: '천막집', address: '서울 성북구 보문로30길 31 1층 천막집', menu: '요리주점', mapUrl: "https://map.naver.com/p/entry/place/1502574317?c=15.00,0,0,0,dh&placePath=/home?from=map&fromPanelNum=1&additionalHeight=76&timestamp=202603091353&locale=ko&svcName=map_pcv5" },
+  { place_id: '1670660666', name: '고기부자집' },
+  { place_id: '1005368159', name: '양원집 가산디지털단지점' },
+  { place_id: '1286557957', name: '서울식당' },
+  { place_id: '1391481694', name: '양은이네 가산직영점' },
+  { place_id: '1403999050', name: '가산 마포갈매기' },
+  { place_id: '1733685335', name: '여장군 가산점' },
+  { place_id: '1508800766', name: '오리오리 가산디지털단지점' },
+  { place_id: '1560761793', name: '보배반점' },
+  { place_id: '1659037504', name: '오키소바' },
+  { place_id: '1335927402', name: '고칸 가산점' },
+  { place_id: '1887883027', name: '민락양꼬치👍' },
+  { place_id: '1683527716', name: '더낙원램양꼬치' },
+  { place_id: '1278152415', name: '먹거리곱창' },
+  { place_id: '1502574317', name: '천막집' },
 ];
 
 const RestaurantChip = ({ 
@@ -57,7 +67,7 @@ const RestaurantChip = ({
       <span>
         {restaurant.name}{" "}
         <span style={{ fontSize: "0.85em", opacity: 0.6 }}>
-          ({restaurant.menu})
+          ({restaurant.category})
         </span>
       </span>
     }
@@ -69,9 +79,11 @@ const RestaurantChip = ({
 );
 
 const RestaurantMap = () => {
+  const theme = useTheme();
   const { isLoaded, error } = useNaverMap();
   const mapRef = useRef<HTMLDivElement | null>(null);
   const chipsContainerRef = useRef<HTMLDivElement>(null);
+  const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [selectedRestaurant, setSelectedRestaurant] = useState<Restaurant | null>(null);
   const [isUserMenuMode, setIsUserMenuMode] = useState(false); // User preference
   const [mobileAnchorEl, setMobileAnchorEl] = useState<null | HTMLElement>(null);
@@ -87,12 +99,43 @@ const RestaurantMap = () => {
   const [imageModalSlide, setImageModalSlide] = useState(0);
 
   // Dynamically fetched images
-  const [imageCache, setImageCache] = useState<Record<number, string[]>>({});
-  const [imageLoading, setImageLoading] = useState<Record<number, boolean>>({});
-  const fetchedIdsRef = useRef<Set<number>>(new Set());
+  const [imageCache, setImageCache] = useState<Record<string, string[]>>({});
+  const [imageLoading, setImageLoading] = useState<Record<string, boolean>>({});
+  const fetchedIdsRef = useRef<Set<string>>(new Set());
 
   // Paginated image rendering
   const [visibleImageCount, setVisibleImageCount] = useState(9);
+
+  useEffect(() => {
+    const fetchInfo = async () => {
+      const updated = await Promise.all(
+        sampleRestaurants.map(async (r) => {
+          try {
+            const res = await fetch(`/api/place-info?placeId=${r.place_id}`);
+            if (res.ok) {
+              const data = await res.json();
+              return {
+                ...r,
+                address: data.address || '',
+                category: data.category || '',
+                phone: data.phone || '',
+                score: data.score || '',
+                reviewsCount: data.reviewsCount || '',
+                conveniences: data.conveniences || [],
+                microReviews: data.microReviews || [],
+                mapUrl: `https://map.naver.com/v5/entry/place/${r.place_id}?c=15.00,0,0,0,dh`,
+              };
+            }
+          } catch (e) {
+            console.error('Failed to fetch info for', r.name);
+          }
+          return r;
+        })
+      );
+      setRestaurants(updated);
+    };
+    fetchInfo();
+  }, []);
 
   const handleImageClick = (idx: number) => {
     setImageModalSlide(idx);
@@ -139,7 +182,7 @@ const RestaurantMap = () => {
 
   // Initialize map and markers
   useEffect(() => {
-    if (!isLoaded || !mapRef.current || map) {
+    if (!isLoaded || !mapRef.current || map || restaurants.length === 0 || !restaurants[0].address) {
       return;
     }
 
@@ -168,9 +211,8 @@ const RestaurantMap = () => {
     });
 
     // 2. Geocode and create markers
-    sampleRestaurants.forEach((restaurant) => {
-      if (!window.naver.maps.Service) {
-        console.error("Naver Maps Service is not available.");
+    restaurants.forEach((restaurant) => {
+      if (!window.naver.maps.Service || !restaurant.address) {
         return;
       }
       naver.maps.Service.geocode({ query: restaurant.address }, (status, response) => {
@@ -199,22 +241,23 @@ const RestaurantMap = () => {
         }
 
         const marker = new naver.maps.Marker({ position: finalPosition, map: mapInstance, title: restaurant.name });
-        const naverMapSearchUrl = restaurant.mapUrl ?? `https://map.naver.com/v5/search/${encodeURIComponent(restaurant.address)}`;
+        const naverMapSearchUrl = restaurant.mapUrl ?? `https://map.naver.com/v5/search/${encodeURIComponent(restaurant.address ?? '')}`;
 
+        const { palette } = theme;
         const contentEl = document.createElement("div");
-        contentEl.style.cssText = "padding: 10px; min-width: 200px; max-width: calc(100vw - 40px); width: 260px; line-height: 1.5; color: #000; position: relative; word-break: break-word; box-sizing: border-box;";
+        contentEl.style.cssText = `padding: 10px; min-width: 200px; max-width: calc(100vw - 40px); width: 260px; line-height: 1.5; color: ${palette.text.primary}; background-color: ${palette.background.paper}; position: relative; word-break: break-word; box-sizing: border-box;`;
 
         contentEl.innerHTML = `
           <h4 style="margin: 0 0 5px 0; padding-right: 20px;">
-            <a href="${naverMapSearchUrl}" target="_blank" rel="noopener noreferrer" style="color: #03a9f4; text-decoration: underline;">${restaurant.name}</a>
+            <a href="${naverMapSearchUrl}" target="_blank" rel="noopener noreferrer" class="info-link" style="color: ${palette.primary.main}; text-decoration: underline;">${restaurant.name}</a>
+            ${restaurant.category ? `<span class="info-category" style="font-size: 0.8em; opacity: 0.7; color: ${palette.text.secondary}; font-weight: normal; margin-left: 4px;">${restaurant.category}</span>` : ''}
           </h4>
-          <p style="margin: 0; color: #333;">${restaurant.address}</p>
-          <p style="margin: 0; color: #977162;">${restaurant.menu}</p>
+          <p class="info-address" style="font-size: 0.8em; margin: 0 0 2px 0; color: ${palette.text.secondary};">${restaurant.address || ''}</p>
         `;
 
         const closeBtn = document.createElement("button");
         closeBtn.innerHTML = "&#x2715;";
-        closeBtn.style.cssText = "position: absolute; top: 0px; right: 0px; border: none; background: transparent; cursor: pointer; font-size: 18px; color: #888; padding: 5px; line-height: 1;";
+        closeBtn.style.cssText = `position: absolute; top: 0px; right: 0px; border: none; background: transparent; cursor: pointer; font-size: 18px; color: ${palette.text.secondary}; padding: 5px; line-height: 1;`;
         closeBtn.type = "button";
         contentEl.appendChild(closeBtn);
 
@@ -222,6 +265,9 @@ const RestaurantMap = () => {
           content: contentEl,
           maxWidth: 300,
           borderWidth: 0,
+          backgroundColor: palette.background.paper,
+          borderColor: palette.background.paper,
+          anchorColor: palette.background.paper,
         });
 
         closeBtn.addEventListener('click', (e) => {
@@ -229,7 +275,7 @@ const RestaurantMap = () => {
           infoWindow.close();
         });
 
-        markersRef.current.push({ restaurantId: restaurant.id, marker, infoWindow, originalPosition: point });
+        markersRef.current.push({ restaurantId: restaurant.place_id, marker, infoWindow, originalPosition: point, contentEl });
 
         naver.maps.Event.addListener(marker, 'click', () => {
           markersRef.current.forEach(m => m.infoWindow.close());
@@ -239,30 +285,48 @@ const RestaurantMap = () => {
         });
       });
     });
-  }, [isLoaded, map]);
+  }, [isLoaded, map, restaurants]);
 
   useEffect(() => {
     if (!selectedRestaurant) return;
-    const businessId = selectedRestaurant.mapUrl?.match(/\/place\/(\d+)/)?.[1];
-    if (!businessId || fetchedIdsRef.current.has(selectedRestaurant.id)) return;
-    fetchedIdsRef.current.add(selectedRestaurant.id);
-    const id = selectedRestaurant.id;
-    setImageLoading(prev => ({ ...prev, [id]: true }));
+    const businessId = selectedRestaurant.place_id;
+    if (!businessId || fetchedIdsRef.current.has(businessId)) return;
+    fetchedIdsRef.current.add(businessId);
+    setImageLoading(prev => ({ ...prev, [businessId]: true }));
     fetch(`/api/naver-photos?businessId=${businessId}`)
       .then(res => res.json())
-      .then(data => setImageCache(prev => ({ ...prev, [id]: data.photos ?? [] })))
-      .catch(() => setImageCache(prev => ({ ...prev, [id]: [] })))
-      .finally(() => setImageLoading(prev => ({ ...prev, [id]: false })));
-  }, [selectedRestaurant?.id]);
+      .then(data => setImageCache(prev => ({ ...prev, [businessId]: data.photos ?? [] })))
+      .catch(() => setImageCache(prev => ({ ...prev, [businessId]: [] })))
+      .finally(() => setImageLoading(prev => ({ ...prev, [businessId]: false })));
+  }, [selectedRestaurant?.place_id]);
 
   useEffect(() => {
     setVisibleImageCount(9);
-  }, [selectedRestaurant?.id]);
+  }, [selectedRestaurant?.place_id]);
+
+  // Update InfoWindow colors when theme changes
+  useEffect(() => {
+    if (markersRef.current.length === 0) return;
+    const { palette } = theme;
+    markersRef.current.forEach(({ contentEl, infoWindow }) => {
+      contentEl.style.color = palette.text.primary;
+      contentEl.style.backgroundColor = palette.background.paper;
+      const link = contentEl.querySelector('.info-link') as HTMLAnchorElement | null;
+      if (link) link.style.color = palette.primary.main;
+      const category = contentEl.querySelector('.info-category') as HTMLElement | null;
+      if (category) category.style.color = palette.text.secondary;
+      const address = contentEl.querySelector('.info-address') as HTMLElement | null;
+      if (address) address.style.color = palette.text.secondary;
+      const closeBtn = contentEl.querySelector('button') as HTMLButtonElement | null;
+      if (closeBtn) closeBtn.style.color = palette.text.secondary;
+      infoWindow.setOptions({ content: contentEl, backgroundColor: palette.background.paper, borderColor: palette.background.paper, anchorColor: palette.background.paper });
+    });
+  }, [theme]);
 
   const handleListItemClick = (restaurant: Restaurant) => {
     setSelectedRestaurant(restaurant);
     if (!map) return;
-    const restaurantMarker = markersRef.current.find(m => m.restaurantId === restaurant.id);
+    const restaurantMarker = markersRef.current.find(m => m.restaurantId === restaurant.place_id);
     if (restaurantMarker) {
       map.panTo(restaurantMarker.marker.getPosition());
       markersRef.current.forEach(m => m.infoWindow.close());
@@ -295,10 +359,10 @@ const RestaurantMap = () => {
   if (!isLoaded) return <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}><CircularProgress /><Typography sx={{ ml: 2 }}>지도 로딩 중...</Typography></Box>;
 
   const naverMapSearchUrl = selectedRestaurant
-    ? (selectedRestaurant.mapUrl ?? `https://map.naver.com/v5/search/${encodeURIComponent(selectedRestaurant.address)}`)
+    ? (selectedRestaurant.mapUrl ?? `https://map.naver.com/v5/search/${encodeURIComponent(selectedRestaurant.address ?? '')}`)
     : '';
-  const currentImages = selectedRestaurant ? (imageCache[selectedRestaurant.id] ?? []) : [];
-  const isImagesLoading = selectedRestaurant ? (imageLoading[selectedRestaurant.id] ?? false) : false;
+  const currentImages = selectedRestaurant ? (imageCache[selectedRestaurant.place_id] ?? []) : [];
+  const isImagesLoading = selectedRestaurant ? (imageLoading[selectedRestaurant.place_id] ?? false) : false;
   
   return (
     <Box sx={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', position: 'relative' }}>
@@ -334,11 +398,11 @@ const RestaurantMap = () => {
                sx={{ '& .MuiChip-label': { px: 1 } }}
             />
           </Tooltip>
-          {sampleRestaurants.map((r) => (
+          {restaurants.map((r) => (
             <RestaurantChip
-              key={r.id}
+              key={r.place_id}
               restaurant={r}
-              isSelected={selectedRestaurant?.id === r.id}
+              isSelected={selectedRestaurant?.place_id === r.place_id}
               onClick={() => handleListItemClick(r)}
             />
           ))}
@@ -378,7 +442,7 @@ const RestaurantMap = () => {
                   <span>
                     {selectedRestaurant.name}{" "}
                     <span style={{ fontSize: "0.85em", opacity: 0.6 }}>
-                      ({selectedRestaurant.menu})
+                      ({selectedRestaurant.category})
                     </span>
                   </span>
                 }
@@ -397,11 +461,11 @@ const RestaurantMap = () => {
               }}
             >
               <Box sx={{ p: 2, display: 'flex', flexWrap: 'wrap', gap: 1, maxWidth: 600, maxHeight: 600 }}>
-                {sampleRestaurants.map((r) => (
+                {restaurants.map((r) => (
                   <RestaurantChip
-                    key={r.id}
+                    key={r.place_id}
                     restaurant={r}
-                    isSelected={selectedRestaurant?.id === r.id}
+                    isSelected={selectedRestaurant?.place_id === r.place_id}
                     onClick={() => handleMobileSelect(r)}
                   />
                 ))}
@@ -431,15 +495,21 @@ const RestaurantMap = () => {
         >
           {/* Header */}
           <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', mb: 0.5 }}>
-            <Typography
-              component="a"
-              href={naverMapSearchUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              variant="subtitle1"
-              sx={{ fontWeight: 700, color: '#03a9f4', textDecoration: 'underline', lineHeight: 1.3, pr: 1 }}
-            >
-              {selectedRestaurant.name}
+            <Typography variant="subtitle1" sx={{ fontWeight: 700, lineHeight: 1.3, pr: 1 }}>
+              <Box
+                component="a"
+                href={naverMapSearchUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                sx={{ color: 'primary.main', textDecoration: 'underline' }}
+              >
+                {selectedRestaurant.name}
+              </Box>
+              {selectedRestaurant.category && (
+                <Box component="span" sx={{ fontSize: '0.85em', opacity: 0.8, color: 'text.secondary', fontWeight: 'normal', ml: 1, textDecoration: 'none' }}>
+                  {selectedRestaurant.category}
+                </Box>
+              )}
             </Typography>
             <IconButton size="small" onClick={() => setSelectedRestaurant(null)} sx={{ mt: -0.5, mr: -0.5 }}>
               <CloseIcon fontSize="small" />
@@ -449,9 +519,43 @@ const RestaurantMap = () => {
           <Typography variant="body2" color="text.secondary" sx={{ mb: 0.5 }}>
             {selectedRestaurant.address}
           </Typography>
-          <Typography variant="body2" sx={{ color: '#977162', mb: (isImagesLoading || currentImages.length > 0) ? 1.5 : 0 }}>
-            {selectedRestaurant.menu}
-          </Typography>
+
+          {(selectedRestaurant.phone || selectedRestaurant.score || (selectedRestaurant.microReviews && selectedRestaurant.microReviews.length > 0) || (selectedRestaurant.conveniences && selectedRestaurant.conveniences.length > 0)) && (
+            <Box sx={{ mb: (isImagesLoading || currentImages.length > 0) ? 1.5 : 0, display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+              {(selectedRestaurant.score || selectedRestaurant.phone) && (
+                <Typography variant="body2" sx={{ color: 'text.secondary', fontSize: '0.9rem', display: 'inline-block' }}>
+                  {selectedRestaurant.score && (
+                    <Box component="span" sx={{ mr: 1.5 }}>
+                      ⭐ {selectedRestaurant.score} <Box component="span" sx={{ fontSize: '0.85em', opacity: 0.8 }}>(리뷰 {selectedRestaurant.reviewsCount})</Box>
+                    </Box>
+                  )}
+                  {selectedRestaurant.phone && (
+                    <Box component="span">
+                      📞 {selectedRestaurant.phone}
+                    </Box>
+                  )}
+                </Typography>
+              )}
+              {selectedRestaurant.microReviews && selectedRestaurant.microReviews.length > 0 && (
+                 <Typography variant="body2" sx={{ color: 'success.main', fontSize: '0.85rem', mt: 0.5, fontStyle: 'italic' }}>
+                   &quot;{selectedRestaurant.microReviews[0]}&quot;
+                 </Typography>
+              )}
+              {selectedRestaurant.conveniences && selectedRestaurant.conveniences.length > 0 && (
+                <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5, mt: 0.5 }}>
+                  {selectedRestaurant.conveniences.map((conv, idx) => (
+                    <Chip
+                      key={idx}
+                      label={conv}
+                      size="small"
+                      variant="outlined"
+                      sx={{ fontSize: '0.75rem', height: '20px' }}
+                    />
+                  ))}
+                </Box>
+              )}
+            </Box>
+          )}
 
           {/* Image grid */}
           {(isImagesLoading || currentImages.length > 0) && (

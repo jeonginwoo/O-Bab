@@ -27,9 +27,20 @@ type ChangelogEntry = {
 
 const changelog: ChangelogEntry[] = [
   {
+    version: "3.9.1",
+    date: "2026-03-24",
+    label: "최신",
+    changes: [
+      { type: "feat", text: "/api/place-info 라우트 신설 — 서버 사이드에서 네이버 지도 pcmap API 호출 및 APOLLO_STATE 파싱으로 CORS 없이 상세 정보 제공" },
+      { type: "feat", text: "맛집 목록 place_id 기반으로 전환 — 주소·카테고리·평점·리뷰 수·전화번호·한 줄 리뷰·편의시설을 API로 실시간 수집" },
+      { type: "feat", text: "식당 3개 추가 — 보배반점, 오키소바, 고칸 가산점" },
+      { type: "style", text: "지도 핀 InfoWindow에 MUI 테마 색상 적용 — 배경·텍스트·링크·앵커(꼬리)까지 팔레트 반영" },
+      { type: "update", text: "테마 변경 시 기존 InfoWindow 색상 즉시 갱신 effect 추가" },
+    ],
+  },
+  {
     version: "3.9.0",
     date: "2026-03-20",
-    label: "최신",
     changes: [
       { type: "feat", text: "메뉴 날짜 네비게이션 — 좌우 화살표로 이전/다음 메뉴 이동, [최근] 버튼으로 최신 메뉴 복귀" },
       { type: "feat", text: "달력 팝오버 — 식당명 클릭 시 달력에서 메뉴 올라온 날짜 선택 가능 (메뉴 없는 날은 비활성)" },
