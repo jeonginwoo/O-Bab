@@ -1,7 +1,7 @@
 "use client";
 
 import { Box } from "@mui/material";
-import React, { useState, useEffect } from "react";
+import React from "react";
 
 interface Media {
   type: string;
@@ -21,44 +21,6 @@ const DontoMenuView: React.FC<DontoMenuViewProps> = ({
   view,
   onClick,
 }) => {
-  const [fitStyle, setFitStyle] = useState<{ width?: string; height?: string }>(
-    {}
-  );
-
-  useEffect(() => {
-    if (view !== "modal") return;
-
-    const calculateSize = () => {
-      const containerWidth = window.innerWidth * 0.9;
-      const containerHeight = window.innerHeight * 0.9;
-
-      if (containerWidth === 0 || containerHeight === 0) return;
-
-      const targetRatio = 5 / 4;
-
-      let newWidth;
-      let newHeight;
-
-      if (containerWidth / containerHeight > targetRatio) {
-        newHeight = containerHeight;
-        newWidth = containerHeight * targetRatio;
-      } else {
-        newWidth = containerWidth;
-        newHeight = containerWidth / targetRatio;
-      }
-
-      setFitStyle({
-        width: `${newWidth}px`,
-        height: `${newHeight}px`,
-      });
-    };
-
-    calculateSize();
-
-    window.addEventListener("resize", calculateSize);
-    return () => window.removeEventListener("resize", calculateSize);
-  }, [view]);
-
   if (menuImages.length < 2) {
     return null;
   }
@@ -133,10 +95,12 @@ const DontoMenuView: React.FC<DontoMenuViewProps> = ({
       <Box
         sx={{
           display: "flex",
-
-          ...fitStyle,
-
-          aspectRatio: fitStyle.width ? undefined : "5 / 4",
+          width: "90vw",
+          height: "90vh",
+          maxWidth: "calc(90vh * 5 / 4)",
+          maxHeight: "calc(90vw * 4 / 5)",
+          aspectRatio: "5 / 4",
+          margin: "auto",
         }}
       >
         <Box

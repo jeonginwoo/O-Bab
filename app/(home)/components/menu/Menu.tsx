@@ -1,7 +1,7 @@
 "use client";
 
 import axios from "axios";
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Card,
   CardContent,
@@ -13,7 +13,6 @@ import {
   ImageListItem,
   Modal,
   IconButton,
-  Tooltip,
   Popover,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
@@ -22,6 +21,7 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import DontoMenuView from "./DontoMenuView";
 import { classifyMenuImages, type MediaImage } from "../../utils/menuImageDetector";
+import { mergeDontoImages } from "../../utils/imageMerger";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, Keyboard } from "swiper/modules";
 
@@ -57,6 +57,32 @@ function Menu({ title, apiUrl }: { title:string; apiUrl: string }) {
   const [modalImageStyle, setModalImageStyle] = useState({});
   const [calendarAnchor, setCalendarAnchor] = useState<HTMLElement | null>(null);
   const [calendarDate, setCalendarDate] = useState(() => new Date());
+  const [dontoCombinedUrl, setDontoCombinedUrl] = useState<string | null>(null);
+
+  const menu = menuItems.length > 0 ? menuItems[menuIndex] : null;
+  const isLatest = menuIndex === 0;
+  const hasPrev = menuIndex < menuItems.length - 1;
+  const hasNext = menuIndex > 0;
+
+  useEffect(() => {
+    if (title === "돈토" && menu) {
+      const { menuImages } = classifyMenuImages(menu.media, title);
+      if (menuImages.length >= 2) {
+        const url1 = `/api/image-proxy?url=${encodeURIComponent(menuImages[0].url)}`;
+        const url2 = `/api/image-proxy?url=${encodeURIComponent(menuImages[1].url)}`;
+        mergeDontoImages(url1, url2)
+          .then(setDontoCombinedUrl)
+          .catch((err) => {
+            console.error("Donto image merge failed:", err);
+            setDontoCombinedUrl(null);
+          });
+      } else {
+        setDontoCombinedUrl(null);
+      }
+    } else {
+      setDontoCombinedUrl(null);
+    }
+  }, [menu, title]);
 
   useEffect(() => {
     if (!openModal) return;
@@ -104,12 +130,6 @@ function Menu({ title, apiUrl }: { title:string; apiUrl: string }) {
     fetchData();
   }, [apiUrl]);
 
-  const menu = menuItems.length > 0 ? menuItems[menuIndex] : null;
-  const isLatest = menuIndex === 0;
-  const hasPrev = menuIndex < menuItems.length - 1;
-  const hasNext = menuIndex > 0;
-
-  // 메뉴 날짜 → 인덱스 매핑
   const menuDateMap = React.useMemo(() => {
     const map = new Map<string, number>();
     menuItems.forEach((item, idx) => {
@@ -133,14 +153,14 @@ function Menu({ title, apiUrl }: { title:string; apiUrl: string }) {
     if (title === "돈토" && menuImages.length >= 2) {
       // 돈토는 특수 뷰를 먼저 보여주고 음식 이미지를 나중에
       const foodImagesSrc = foodImages.map((m) => m.url);
-      return ["combined_donto_view", ...foodImagesSrc];
+      return [dontoCombinedUrl || "combined_donto_view", ...foodImagesSrc];
     } else {
       // 다른 식당은 메뉴판 먼저, 음식 이미지 나중에
       const menuImagesSrc = menuImages.map((m) => m.url);
       const foodImagesSrc = foodImages.map((m) => m.url);
       return [...menuImagesSrc, ...foodImagesSrc];
     }
-  }, [menu, title]);
+  }, [menu, title, dontoCombinedUrl]);
 
   const dontoMenuImages: Media[] = React.useMemo(() => {
     if (!menu || title !== "돈토") return [];
@@ -181,12 +201,37 @@ function Menu({ title, apiUrl }: { title:string; apiUrl: string }) {
     return (
       <Box sx={{ mt: 2 }}>
         {title === "돈토" && menu && menuImages.length >= 2 ? (
-          <DontoMenuView
-            menuImages={menuImages}
-            menuTitle={menu.title}
-            view="preview"
-            onClick={() => handleImageClick("combined_donto_view")}
-          />
+          dontoCombinedUrl ? (
+            <Box
+              sx={{
+                mb: 2,
+                borderRadius: 1,
+                overflow: 'hidden',
+                '&:hover img': { opacity: 0.8 },
+              }}
+            >
+              <img
+                src={dontoCombinedUrl}
+                alt={`${menu.title} combined menu image`}
+                style={{
+                  width: "100%",
+                  height: "auto",
+                  display: 'block',
+                  borderRadius: 4,
+                  cursor: "pointer",
+                  transition: 'opacity 0.2s',
+                }}
+                onClick={() => handleImageClick(dontoCombinedUrl)}
+              />
+            </Box>
+          ) : (
+            <DontoMenuView
+              menuImages={menuImages}
+              menuTitle={menu.title}
+              view="preview"
+              onClick={() => handleImageClick("combined_donto_view")}
+            />
+          )
         ) : (
           menuImages.map((media, index) => (
             <Box
@@ -575,44 +620,48 @@ function Menu({ title, apiUrl }: { title:string; apiUrl: string }) {
           >
             <CloseIcon />
           </IconButton>
-          <Swiper
-            modules={[Navigation, Pagination, Keyboard]}
-            spaceBetween={50}
-            slidesPerView={1}
-            navigation
-            pagination={{ clickable: true }}
-            keyboard={{ enabled: true }}
-            loop
-            initialSlide={initialSlide}
-            style={{
-              '--swiper-navigation-color': '#e4e4e4',
-              '--swiper-pagination-color': '#e4e4e4',
-            } as React.CSSProperties}
-          >
-            {allImages.map((imageUrl, index) => (
-              <SwiperSlide key={index}>
-                <Box sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}>
-                  {imageUrl === "combined_donto_view" && menu ? (
-                    <DontoMenuView
-                      menuImages={dontoMenuImages}
-                      menuTitle={menu.title}
-                      view="modal"
-                    />
-                  ) : (
-                    <img
-                      src={imageUrl}
-                      alt={`Expanded view ${index + 1}`}
-                      style={modalImageStyle}
-                    />
-                  )}
-                </Box>
-              </SwiperSlide>
-            ))}
-          </Swiper>
+          {openModal && allImages.length > 0 && (
+            <Swiper
+              key={initialSlide}
+              modules={[Navigation, Pagination, Keyboard]}
+              spaceBetween={50}
+              slidesPerView={1}
+              navigation
+              pagination={{ clickable: true }}
+              keyboard={{ enabled: true }}
+              initialSlide={initialSlide}
+              observer={true}
+              observeParents={true}
+              style={{
+                '--swiper-navigation-color': '#e4e4e4',
+                '--swiper-pagination-color': '#e4e4e4',
+              } as React.CSSProperties}
+            >
+              {allImages.map((imageUrl, index) => (
+                <SwiperSlide key={index}>
+                  <Box sx={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                  }}>
+                    {imageUrl === "combined_donto_view" && menu ? (
+                      <DontoMenuView
+                        menuImages={dontoMenuImages}
+                        menuTitle={menu.title}
+                        view="modal"
+                      />
+                    ) : (
+                      <img
+                        src={imageUrl}
+                        alt={`Expanded view ${index + 1}`}
+                        style={modalImageStyle}
+                      />
+                    )}
+                  </Box>
+                </SwiperSlide>
+              ))}
+            </Swiper>
+          )}
         </Box>
       </Modal>
     </Card>
