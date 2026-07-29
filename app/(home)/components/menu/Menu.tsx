@@ -58,6 +58,18 @@ function Menu({ title, apiUrl }: { title:string; apiUrl: string }) {
   const [calendarAnchor, setCalendarAnchor] = useState<HTMLElement | null>(null);
   const [calendarDate, setCalendarDate] = useState(() => new Date());
   const [dontoCombinedUrl, setDontoCombinedUrl] = useState<string | null>(null);
+  const [dontoMergePending, setDontoMergePending] = useState(false);
+  // 한 번 로드된 이미지 URL 집합 — 날짜 이동 시 아직 안 받아진 이미지에만 로딩 표시
+  const [loadedUrls, setLoadedUrls] = useState<Set<string>>(() => new Set());
+  // 마지막으로 로드된 메뉴판 이미지의 비율 — 로딩 표시 높이를 실제 이미지와 비슷하게 유지해 레이아웃 시프트 방지
+  const [menuImageRatio, setMenuImageRatio] = useState<string | null>(null);
+
+  const markLoaded = React.useCallback((url: string, img?: HTMLImageElement) => {
+    if (img && img.naturalWidth > 0 && img.naturalHeight > 0) {
+      setMenuImageRatio(`${img.naturalWidth} / ${img.naturalHeight}`);
+    }
+    setLoadedUrls((prev) => (prev.has(url) ? prev : new Set(prev).add(url)));
+  }, []);
 
   const menu = menuItems.length > 0 ? menuItems[menuIndex] : null;
   const isLatest = menuIndex === 0;
@@ -68,14 +80,26 @@ function Menu({ title, apiUrl }: { title:string; apiUrl: string }) {
     if (title === "돈토" && menu) {
       const { menuImages } = classifyMenuImages(menu.media, title);
       if (menuImages.length >= 2) {
+        let cancelled = false;
         const url1 = `/api/image-proxy?url=${encodeURIComponent(menuImages[0].url)}`;
         const url2 = `/api/image-proxy?url=${encodeURIComponent(menuImages[1].url)}`;
+        // 이전 날짜의 합성 이미지가 남지 않도록 초기화하고 합성 완료까지 로딩 표시
+        setDontoCombinedUrl(null);
+        setDontoMergePending(true);
         mergeDontoImages(url1, url2)
-          .then(setDontoCombinedUrl)
+          .then((url) => {
+            if (!cancelled) setDontoCombinedUrl(url);
+          })
           .catch((err) => {
             console.error("Donto image merge failed:", err);
-            setDontoCombinedUrl(null);
+            if (!cancelled) setDontoCombinedUrl(null);
+          })
+          .finally(() => {
+            if (!cancelled) setDontoMergePending(false);
           });
+        return () => {
+          cancelled = true;
+        };
       } else {
         setDontoCombinedUrl(null);
       }
@@ -190,6 +214,27 @@ function Menu({ title, apiUrl }: { title:string; apiUrl: string }) {
     return `${year}.${month}.${day} ${hours}:${minutes}`;
   };
 
+  const renderImageLoading = (aspectRatio?: string) => (
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: 1.5,
+        width: "100%",
+        ...(aspectRatio ? { aspectRatio } : { height: 280 }),
+        borderRadius: 1,
+        backgroundColor: "action.hover",
+      }}
+    >
+      <CircularProgress color="primary" size={28} thickness={3.5} />
+      <Typography variant="caption" color="text.secondary" sx={{ letterSpacing: "0.06em" }}>
+        메뉴 불러오는 중...
+      </Typography>
+    </Box>
+  );
+
   const renderImages = () => {
     if (!menu || !menu.media || menu.media.length === 0) return null;
 
@@ -224,6 +269,8 @@ function Menu({ title, apiUrl }: { title:string; apiUrl: string }) {
                 onClick={() => handleImageClick(dontoCombinedUrl)}
               />
             </Box>
+          ) : dontoMergePending ? (
+            <Box sx={{ mb: 2 }}>{renderImageLoading("5 / 4")}</Box>
           ) : (
             <DontoMenuView
               menuImages={menuImages}
@@ -233,37 +280,47 @@ function Menu({ title, apiUrl }: { title:string; apiUrl: string }) {
             />
           )
         ) : (
-          menuImages.map((media, index) => (
-            <Box
-              key={index}
-              sx={{
-                mb: 2,
-                borderRadius: 1,
-                overflow: 'hidden',
-                '&:hover img': { opacity: 0.8 },
-              }}
-            >
-              <img
-                src={media.url}
-                alt={`${menu.title} menu image ${index + 1}`}
-                style={{
-                  width: "100%",
-                  height: "auto",
-                  display: 'block',
-                  borderRadius: 4,
-                  cursor: "pointer",
-                  transition: 'opacity 0.2s',
+          menuImages.map((media, index) => {
+            const isLoaded = loadedUrls.has(media.url);
+            return (
+              <Box
+                key={media.url}
+                sx={{
+                  mb: 2,
+                  borderRadius: 1,
+                  overflow: 'hidden',
+                  '&:hover img': { opacity: 0.8 },
                 }}
-                onClick={() => handleImageClick(media.url)}
-              />
-            </Box>
-          ))
+              >
+                {!isLoaded && renderImageLoading(menuImageRatio ?? undefined)}
+                <img
+                  src={media.url}
+                  alt={`${menu.title} menu image ${index + 1}`}
+                  ref={(el) => {
+                    // 브라우저 캐시로 이미 로드 완료된 경우 onLoad가 누락될 수 있어 보완
+                    if (el && el.complete && el.naturalWidth > 0) markLoaded(media.url, el);
+                  }}
+                  onLoad={(e) => markLoaded(media.url, e.currentTarget)}
+                  onError={() => markLoaded(media.url)}
+                  style={{
+                    width: "100%",
+                    height: "auto",
+                    display: isLoaded ? 'block' : 'none',
+                    borderRadius: 4,
+                    cursor: "pointer",
+                    transition: 'opacity 0.2s',
+                  }}
+                  onClick={() => handleImageClick(media.url)}
+                />
+              </Box>
+            );
+          })
         )}
         {foodImages.length > 0 && (
           <ImageList sx={{ mt: 2 }} cols={3} gap={8}>
             {foodImages.map((media, index) => (
               <ImageListItem
-                key={index}
+                key={media.url}
                 onClick={() => handleImageClick(media.url)}
                 sx={{
                   borderRadius: 1,
@@ -272,6 +329,7 @@ function Menu({ title, apiUrl }: { title:string; apiUrl: string }) {
                   '&:hover img': { opacity: 0.8 },
                   position: 'relative',
                   cursor: 'pointer',
+                  backgroundColor: 'action.hover',
                 }}
               >
                 <img

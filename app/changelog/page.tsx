@@ -27,9 +27,18 @@ type ChangelogEntry = {
 
 const changelog: ChangelogEntry[] = [
   {
+    version: "3.9.3",
+    date: "2026-07-29",
+    label: "최신",
+    changes: [
+      { type: "fix", text: "다른 날짜 메뉴 조회 시 이전 메뉴 이미지가 남아 보이던 문제 수정 — 이미지 로드 완료 전까지 로딩 표시" },
+      { type: "update", text: "돈토 합성 이미지 생성 중 로딩 표시 추가 및 빠른 날짜 전환 시 이전 합성 결과가 덮어쓰는 문제 방지" },
+      { type: "update", text: "로딩 표시가 직전 메뉴판 이미지 비율을 따라가도록 하여 로드 완료 시 레이아웃 시프트 최소화" },
+    ],
+  },
+  {
     version: "3.9.2",
     date: "2026-05-22",
-    label: "최신",
     changes: [
       { type: "fix", text: "이미지 슬라이드 깜빡임 현상 수정 — Swiper 루프 제거 및 옵저버 적용으로 초기화 안정성 확보" },
       { type: "update", text: "돈토 메뉴 이미지 사전 생성 기능 추가 — 캔버스를 이용해 메뉴판 이미지를 미리 병합하여 슬라이드 로딩 성능 최적화" },
