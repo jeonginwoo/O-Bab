@@ -27,9 +27,17 @@ type ChangelogEntry = {
 
 const changelog: ChangelogEntry[] = [
   {
+    version: "3.9.4",
+    date: "2026-10-06",
+    label: "최신",
+    changes: [
+      { type: "fix", text: "맛집 지도 핀이 실제 매장보다 아래쪽(건물 대표 좌표)에 표시되던 문제 수정 — 네이버 플레이스 매장 좌표를 우선 사용" },
+      { type: "update", text: "맛집 목록 갱신 — 깜닭치킨 가산점, 대두네순두부 추가 및 일부 매장 제외" },
+    ],
+  },
+  {
     version: "3.9.3",
     date: "2026-07-29",
-    label: "최신",
     changes: [
       { type: "fix", text: "다른 날짜 메뉴 조회 시 이전 메뉴 이미지가 남아 보이던 문제 수정 — 이미지 로드 완료 전까지 로딩 표시" },
       { type: "update", text: "돈토 합성 이미지 생성 중 로딩 표시 추가 및 빠른 날짜 전환 시 이전 합성 결과가 덮어쓰는 문제 방지" },

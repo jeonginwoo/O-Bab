@@ -40,6 +40,9 @@ export async function GET(request: NextRequest) {
           reviewsCount: baseInfo.visitorReviewsTotal,
           conveniences: baseInfo.conveniences || [],
           microReviews: baseInfo.microReviews || [],
+          // 주소 지오코딩은 건물 대표 좌표를 반환하므로, 실제 매장 좌표를 함께 제공
+          lat: baseInfo.coordinate?.y ? parseFloat(baseInfo.coordinate.y) : null,
+          lng: baseInfo.coordinate?.x ? parseFloat(baseInfo.coordinate.x) : null,
         });
       }
     }

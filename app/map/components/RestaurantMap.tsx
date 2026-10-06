@@ -26,6 +26,8 @@ interface Restaurant {
   reviewsCount?: string;
   conveniences?: string[];
   microReviews?: string[];
+  lat?: number;
+  lng?: number;
 }
 
 interface RestaurantMarker {
@@ -39,7 +41,6 @@ interface RestaurantMarker {
 const sampleRestaurants: Restaurant[] = [
   { place_id: '1670660666', name: '고기부자집' },
   { place_id: '1005368159', name: '양원집 가산디지털단지점' },
-  { place_id: '1286557957', name: '서울식당' },
   { place_id: '1391481694', name: '양은이네 가산직영점' },
   { place_id: '1403999050', name: '가산 마포갈매기' },
   { place_id: '1733685335', name: '여장군 가산점' },
@@ -47,10 +48,12 @@ const sampleRestaurants: Restaurant[] = [
   { place_id: '1560761793', name: '보배반점' },
   { place_id: '1659037504', name: '오키소바' },
   { place_id: '1335927402', name: '고칸 가산점' },
-  { place_id: '1887883027', name: '민락양꼬치👍' },
-  { place_id: '1683527716', name: '더낙원램양꼬치' },
-  { place_id: '1278152415', name: '먹거리곱창' },
-  { place_id: '1502574317', name: '천막집' },
+  { place_id: '37943749', name: '깜닭치킨 가산점' },
+  { place_id: '1171278226', name: '대두네순두부' },
+  // { place_id: '1887883027', name: '민락양꼬치👍' },
+  // { place_id: '1683527716', name: '더낙원램양꼬치' },
+  // { place_id: '1278152415', name: '먹거리곱창' },
+  // { place_id: '1502574317', name: '천막집' },
 ];
 
 const RestaurantChip = ({ 
@@ -123,6 +126,8 @@ const RestaurantMap = () => {
                 reviewsCount: data.reviewsCount || '',
                 conveniences: data.conveniences || [],
                 microReviews: data.microReviews || [],
+                lat: data.lat ?? undefined,
+                lng: data.lng ?? undefined,
                 mapUrl: `https://map.naver.com/v5/entry/place/${r.place_id}?c=15.00,0,0,0,dh`,
               };
             }
@@ -212,18 +217,7 @@ const RestaurantMap = () => {
 
     // 2. Geocode and create markers
     restaurants.forEach((restaurant) => {
-      if (!window.naver.maps.Service || !restaurant.address) {
-        return;
-      }
-      naver.maps.Service.geocode({ query: restaurant.address }, (status, response) => {
-        if (status !== naver.maps.Service.Status.OK || !response.v2.addresses.length) {
-          console.error('Geocoding error for:', restaurant.address);
-          return;
-        }
-
-        const coords = response.v2.addresses[0];
-        const point = new naver.maps.LatLng(parseFloat(coords.y), parseFloat(coords.x));
-
+      const createMarker = (point: naver.maps.LatLng) => {
         let finalPosition = point;
         const sameLocMarkers = markersRef.current.filter(m => 
             m.originalPosition.equals(point)
@@ -235,8 +229,8 @@ const RestaurantMap = () => {
             const theta = offsetIdx * 2.4; // Approx 137.5 degrees
             const r = spacing * (1 + 0.1 * offsetIdx); 
             
-            const lat = parseFloat(coords.y) + r * Math.sin(theta);
-            const lng = parseFloat(coords.x) + r * Math.cos(theta);
+            const lat = point.lat() + r * Math.sin(theta);
+            const lng = point.lng() + r * Math.cos(theta);
             finalPosition = new naver.maps.LatLng(lat, lng);
         }
 
@@ -283,6 +277,25 @@ const RestaurantMap = () => {
           setSelectedRestaurant(restaurant);
           mapInstance.panTo(finalPosition);
         });
+      };
+
+      // 매장 실좌표 우선 사용 (주소 지오코딩은 건물 대표 좌표라 핀이 어긋남)
+      if (restaurant.lat != null && restaurant.lng != null) {
+        createMarker(new naver.maps.LatLng(restaurant.lat, restaurant.lng));
+        return;
+      }
+
+      if (!window.naver.maps.Service || !restaurant.address) {
+        return;
+      }
+      naver.maps.Service.geocode({ query: restaurant.address }, (status, response) => {
+        if (status !== naver.maps.Service.Status.OK || !response.v2.addresses.length) {
+          console.error('Geocoding error for:', restaurant.address);
+          return;
+        }
+
+        const coords = response.v2.addresses[0];
+        createMarker(new naver.maps.LatLng(parseFloat(coords.y), parseFloat(coords.x)));
       });
     });
   }, [isLoaded, map, restaurants]);
